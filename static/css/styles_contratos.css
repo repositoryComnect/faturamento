@@ -1,0 +1,39 @@
+.section-header {
+    background-color: #f8f9fa;
+    padding: 10px 15px;
+    margin-bottom: 0;
+    border-left: 4px solid #0d6efd;
+    cursor: pointer;
+}
+.form-label {
+    font-weight: 500;
+}
+.collapsed .bi-chevron-down {
+    display: none;
+}
+.collapsed .bi-chevron-up {
+    display: none;
+}
+.not-collapsed .bi-chevron-up {
+    display: inline-block;
+}
+.not-collapsed .bi-chevron-down {
+    display: none;
+}
+.status-canceled {
+    background-color: #dc3545;
+    color: white;
+}
+.btn-create-contract {
+    background-color: #0d6efd;
+    color: white;
+    font-weight: 500;
+    padding: 8px 20px;
+    margin-bottom: 20px;
+}
+.btn-create-contract:hover {
+    background-color: #0b5ed7;
+    color: white;
+}
+
+

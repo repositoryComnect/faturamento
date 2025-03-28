@@ -1,0 +1,72 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faturamento Comnect</title>
+    <!-- DevExtreme CSS -->
+    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/21.2.6/css/dx.common.css">
+    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/21.2.6/css/dx.light.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- DevExtreme JavaScript -->
+    <script src="https://cdn3.devexpress.com/jslib/21.2.6/js/dx.all.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_home.css')}}">
+    <link rel="icon" href="{{ url_for('static', filename='img/wireless.ico') }}">
+    
+    <script>
+        function voltar() {
+          window.history.back();
+        } 
+    
+        function home() {
+          location.reload();
+        }
+    </script>
+    </head>
+
+    <body class="index-page">
+    
+        <!-- Navbar (não alterado) -->
+        <div class="container-fluid container-xl position-relative d-flex align-items-center">
+            <a href="" class="logo d-flex align-items-center me-auto">
+                <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" onclick="home()">
+            </a>
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    <li><a href="" class="active">Início</a></li>
+                    <li><a href="http://www.comnect.com.br/empresa.html">Sobre</a></li>
+    
+                    {% if session.get('username') %}
+                    <li><strong style="color: rgb(82, 157, 255)">{{ session['username'] }}</strong></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    
+        <br>
+    
+        <!-- Menu Lateral -->
+        <div id="sidebar">
+            <nav><br><br><br><br>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/contratos">Contratos</a></li>
+                    <li><a href="/clientes">Clientes</a></li>
+                    <li><a href="/">Produtos</a></li>
+                    <li><a href="/">Relatórios</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    
+        <!-- Conteúdo Principal -->
+        <div id="content">
+            <div class="buttonsHeader">
+                <form action="/logout" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-primary">Sair</button>
+                </form>
+            </div>
+        </body>

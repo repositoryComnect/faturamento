@@ -1,0 +1,72 @@
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+    padding-bottom: 300px; /* Ajuste conforme necessário para dar espaço ao footer */
+}
+
+/* Corpo da página */
+body.index-page {
+    font-family: Arial, sans-serif;
+    background-color: #4e4f5000;
+    color: #212020;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.h1 {
+    align-items: center;
+}
+
+/* Container do Header */
+.container-fluid.container-xl {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px;
+    margin: 0;  /* Remove qualquer margem padrão */
+    width: 100%;
+    max-width: 100%;
+    padding-left: 2;
+    padding-right: 2;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1), 
+            0px 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+
+/* Adiciona um espaçamento superior ao conteúdo para evitar sobreposição */
+body > .form {
+    margin-top: 100px;
+}
+
+
+h1 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    color: #343a40;
+}
+
+
+h2 {
+    margin-top: 30px;
+    font-size: 1.5rem;
+    color: #343a40;
+}
+
+
+
+.buttonsHeader {
+    display: flex; /* Ativa o flexbox */
+    justify-content: space-between; /* Coloca os botões nas extremidades */
+    align-items: center; /* Alinha verticalmente */
+    width: 100%; /* Garante que o contêiner ocupe toda a largura disponível */
+    padding: 10px; /* Adiciona um espaçamento interno */
+    box-sizing: border-box; /* Inclui padding no cálculo da largura */
+}
+
+
+

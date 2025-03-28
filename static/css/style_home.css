@@ -1,0 +1,170 @@
+/* Container do Header */
+.container-fluid.container-xl {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;  /* Alinha o logo e menu na horizontal */
+    padding: 30px;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1), 
+                0px 1px 3px rgba(0, 0, 0, 0.05);
+    position: relative;  /* Necessário para garantir o posicionamento correto dos filhos */
+}
+
+/* Logo */
+.logo {
+    position: relative;  /* Adicionando um position para garantir que o logo não seja afetado */
+    z-index: 10;  /* Garante que o logo fique acima de outros elementos */
+}
+
+.logo img {
+    max-height: 50px;
+    cursor: pointer;
+    margin-left: auto;  /* Alinha o logo à direita */
+    margin-right: 20px;  /* Deixa um espaço entre o logo e a borda */
+}
+
+/* Navegação (Navmenu) */
+.navmenu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.navmenu ul {
+    display: flex;
+    list-style: none;
+    padding-left: 0;
+}
+
+.navmenu li {
+    position: relative;
+    margin-right: 30px;
+}
+
+.navmenu a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    transition: color 0.3s, transform 0.3s;
+}
+
+.navmenu a.active {
+    color: #529dff;
+}
+
+.navmenu a:hover {
+    color: #529dff;
+    transform: translateY(-3px);
+}
+
+/* Aumentando o peso da fonte do nome de usuário */
+.navmenu li strong {
+    font-weight: 800; /* Mais forte do que 600 */
+    font-size: 16px;
+    color: rgb(82, 157, 255);
+}
+
+/* Menu lateral */
+#sidebar {
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    background-color: #343a40;
+    padding-top: 20px;
+    color: white;
+    z-index: 5; /* Menor que o logo, para que o logo fique visível */
+    padding-left: 15px;
+}
+
+#sidebar a {
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    margin: 5px 0;
+}
+
+#sidebar a:hover {
+    background-color: #575757;
+}
+
+/* Estilo para o conteúdo da página */
+#content {
+    margin-left: 250px;  /* Ajusta a margem para a largura do menu lateral */
+    padding: 20px;
+}
+
+/* Estilo de responsividade */
+@media (max-width: 768px) {
+    .navmenu ul {
+        flex-direction: column;
+        background-color: rgba(33, 37, 41, 0.9);
+        position: absolute;
+        top: 0;
+        right: 0;
+        left: 0;
+        padding: 20px;
+        margin-top: 60px;
+        display: none;
+    }
+
+    .navmenu.active ul {
+        display: block;
+    }
+
+    .navmenu li {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .navmenu a {
+        font-size: 18px;
+        padding: 10px;
+        color: white;
+    }
+}
+
+/* Responsividade para o footer */
+@media (max-width: 576px) {
+    .footer {
+        padding: 5px;
+    }
+
+    .footer .social-links {
+        margin-top: 50px;
+    }
+
+    .footer .social-links a {
+        margin: 0 5px;
+    }
+}
+
+.buttonsHeader {
+    display: flex; /* Ativa o flexbox */
+    justify-content: flex-end; /* Move o botão para a extrema direita */
+    align-items: center; /* Garante alinhamento vertical */
+    width: 100%; /* Ocupar toda a largura disponível */
+    padding: 10px; /* Adiciona espaçamento interno */
+    box-sizing: border-box; /* Mantém o padding dentro da largura */
+}
+
+
+/* Responsividade para o footer */
+@media (max-width: 576px) {
+    .footer {
+        padding: 5px;
+    }
+
+    .footer .social-links {
+        margin-top: 50px;
+    }
+
+    .footer .social-links a {
+        margin: 0 5px;
+    }
+}

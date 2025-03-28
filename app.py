@@ -1,0 +1,56 @@
+# app.py
+
+from flask import Flask
+from flask_login import LoginManager
+from werkzeug.security import generate_password_hash
+from modules.login.routes import login_bp
+from modules.home.routes import home_bp
+import os
+
+# Inicializa o Flask app
+app = Flask(__name__)
+
+# Registre suas blueprints aqui
+
+app.register_blueprint(login_bp)
+app.register_blueprint(home_bp)
+
+
+# Configuração do MySQL (CODIFIQUE o @ na senha como %40)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%40Slink1205@localhost/faturamento'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SECRET_KEY'] = os.urandom(24)
+
+# Importa o db e a classe User de models.py
+from application.models.models import db, User
+
+# Inicializa o db com o app
+db.init_app(app)
+
+# Inicialização do LoginManager
+login_manager = LoginManager(app)
+
+# Configuração do LoginManager
+login_manager.login_view = 'login.login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+# Criação do banco e usuário admin
+with app.app_context():
+    db.create_all()
+    
+    # Verifica se o usuário admin já existe
+    if not User.query.filter_by(username='admin').first():
+        admin = User(
+            username='admin',
+            password=generate_password_hash('admin123'),
+            is_admin=True
+        )
+        db.session.add(admin)
+        db.session.commit()
+
+
+if __name__ == '__main__':
+        app.run(host='0.0.0.0', port=5000, debug=True)

@@ -1,0 +1,36 @@
+{% include 'model-header.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css')}}">
+
+    <h1>Faturamento</h1>
+
+    <div id="chartContainer" style="height: 400px; width: 600px;"></div>
+
+    <script>
+        fetch('/api/chart_data')
+            .then(response => response.json())
+            .then(data => {
+                $('#chartContainer').dxChart({
+                    dataSource: data,
+                    series: [{
+                        argumentField: 'month',
+                        valueField: 'sales',
+                        type: 'line',
+                        name: 'Sales'
+                    }],
+                    title: 'Monthly Sales',
+                    argumentAxis: {
+                        title: 'Month'
+                    },
+                    valueAxis: {
+                        title: 'Sales'
+                    }
+                });
+            });
+    </script>
+
+</div>
+
+{% include 'model-footer.html' %}
+
+</body>
+</html>
