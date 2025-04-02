@@ -5,6 +5,8 @@ from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
 from modules.login.routes import login_bp
 from modules.home.routes import home_bp
+from modules.clientes.routes import cliente_bp
+from modules.contratos.routes import contratos_bp
 import os
 
 # Inicializa o Flask app
@@ -14,6 +16,8 @@ app = Flask(__name__)
 
 app.register_blueprint(login_bp)
 app.register_blueprint(home_bp)
+app.register_blueprint(cliente_bp)
+app.register_blueprint(contratos_bp)
 
 
 # Configuração do MySQL (CODIFIQUE o @ na senha como %40)
@@ -53,4 +57,4 @@ with app.app_context():
 
 
 if __name__ == '__main__':
-        app.run(host='0.0.0.0', port=5000, debug=True)
+        app.run(host='0.0.0.0', port=9000, debug=True)
