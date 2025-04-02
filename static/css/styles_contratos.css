@@ -1,9 +1,10 @@
 .section-header {
     background-color: #f8f9fa;
-    padding: 10px 15px;
+    padding: 5px 10px;
     margin-bottom: 0;
     border-left: 4px solid #0d6efd;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 .form-label {
     font-weight: 500;
@@ -36,4 +37,49 @@
     color: white;
 }
 
+.section-header:hover {
+    background-color: #e9ecef;
+}
 
+.form-control[readonly] {
+    background-color: #f8f9fa;
+    opacity: 1;
+    border: 1px solid #ced4da;
+}
+
+/* Badges */
+.badge {
+    font-size: 0.9em;
+    padding: 0.35em 0.65em;
+    font-weight: 500;
+}
+
+/* Espaçamentos */
+.mt-6 {
+    margin-top: 4rem;
+}
+
+.mb-6 {
+    margin-bottom: 4rem;
+}
+
+/* Botões */
+.btn-outline-primary {
+    transition: all 0.3s ease;
+}
+
+/* Garanta que os campos readonly tenham estilo consistente */
+.form-control[readonly] {
+    background-color: #f8f9fa;
+    opacity: 1;
+}
+
+/* Estilos para status */
+.status-ativo {
+    background-color: #d4edda;
+    color: #155724;
+}
+.status-inativo {
+    background-color: #f8d7da;
+    color: #721c24;
+}

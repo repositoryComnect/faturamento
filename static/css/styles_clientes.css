@@ -20,7 +20,10 @@
 .not-collapsed .bi-chevron-down {
     display: none;
 }
-
+.status-canceled {
+    background-color: #dc3545;
+    color: white;
+}
 .btn-create-contract {
     background-color: #0d6efd;
     color: white;
@@ -32,3 +35,5 @@
     background-color: #0b5ed7;
     color: white;
 }
+
+
