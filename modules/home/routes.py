@@ -1,4 +1,7 @@
 from flask import Blueprint, jsonify, render_template
+from application.models.models import db, Contrato
+from flask_login import login_required
+
 
 home_bp = Blueprint('home_bp', __name__)
 
@@ -15,10 +18,24 @@ def chart_data():
     return jsonify(data)
 
 @home_bp.route('/contratos', methods=['GET'])
+@login_required
 def render_contratos():
-    return render_template('contratos.html')
+    try:
+        # Usando a nova sintaxe do SQLAlchemy 2.0
+        contrato = db.session.execute(db.select(Contrato).limit(1)).scalar_one_or_none()
+        
+        if contrato:
+            return render_template('contratos.html', contrato=contrato)
+        else:
+            return render_template('contratos.html', contrato=None)
+    except Exception as e:
+        print(f"Erro ao acessar contratos: {str(e)}")
+        return render_template('contratos.html', contrato=None)
+    
+
 
 @home_bp.route('/clientes', methods=['GET'])
+@login_required
 def render_clientes():
     return render_template('clientes.html')
 
@@ -51,5 +68,6 @@ def render_comis_resp():
     return render_template('comis_resp.html')
 
 @home_bp.route('/dashboard', methods=['GET'])
+@login_required
 def render_dashboard():
     return render_template('dashboard.html')
