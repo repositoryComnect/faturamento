@@ -2,9 +2,19 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from datetime import datetime
 
 # Inicializa o db, que será importado no app.py
 db = SQLAlchemy()
+
+# Tabela associativa N:N entre Cliente e Contrato
+cliente_contrato = db.Table(
+    'cliente_contrato',
+    db.Column('cliente_id', db.Integer, db.ForeignKey('clientes.id'), primary_key=True),
+    db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id'), primary_key=True)
+)
+
+
 
 class User(db.Model, UserMixin):
     __tablename__ = 'usuarios'
@@ -58,7 +68,6 @@ class Cliente(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     
     # Dados básicos
-    numero_contato = db.Column(db.String(20))
     sequencia = db.Column(db.String(20))
     cadastramento = db.Column(db.Date)
     atualizacao = db.Column(db.Date)
@@ -76,7 +85,7 @@ class Cliente(db.Model):
     
     # Dados comerciais
     revenda_nome = db.Column(db.String(100))  
-    vendedor_nome = db.Column(db.String(100))  # Renomeado para evitar conflito
+    vendedor_nome = db.Column(db.String(100))
     tipo_servico = db.Column(db.String(50))
     localidade = db.Column(db.String(50))
     regiao = db.Column(db.String(50))
@@ -114,8 +123,19 @@ class Cliente(db.Model):
     observacao = db.Column(db.Text)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
     
-    contratos = db.relationship('Contrato', backref='cliente', lazy=True)
+    # Novo campo para número de contrato
+    numero_contrato = db.Column(db.String(255))  # Novo campo
+
+    # Relacionamentos
+    contratos = db.relationship(
+        'Contrato',
+        secondary=cliente_contrato,
+        back_populates='clientes',
+        lazy=True
+    )
     instalacoes = db.relationship('Instalacao', backref='cliente', lazy=True)
+
+
 
 class Produto(db.Model):
     __tablename__ = 'produtos'
@@ -127,27 +147,30 @@ class Produto(db.Model):
     preco_base = db.Column(db.Numeric(10, 2))
     ativo = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
+    
+    # Relacionamento com Contrato
+    contratos = db.relationship('Contrato', backref='produto', lazy=True)
 
 class Contrato(db.Model):
     __tablename__ = 'contratos'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    
-    # Dados básicos
     numero = db.Column(db.String(50), unique=True, nullable=False)
     cadastramento = db.Column(db.Date)
     atualizacao = db.Column(db.Date)
     tipo = db.Column(db.String(50))
     id_matriz_portal = db.Column(db.String(50))
     responsavel = db.Column(db.String(100))
-    
+    cnpj = db.Column(db.String(15))
+    tipo_pessoa = db.Column(db.String(40))
+
     # Dados do cliente
     razao_social = db.Column(db.String(100))
     nome_fantasia = db.Column(db.String(100))
     contato = db.Column(db.String(100))
     email = db.Column(db.String(100))
     telefone = db.Column(db.String(20))
-    
+
     # Endereço
     cep = db.Column(db.String(10))
     endereco = db.Column(db.String(200))
@@ -155,15 +178,7 @@ class Contrato(db.Model):
     bairro = db.Column(db.String(100))
     cidade = db.Column(db.String(100))
     estado = db.Column(db.String(2))
-    
-    # Endereço de cobrança
-    cobranca_cep = db.Column(db.String(10))
-    cobranca_endereco = db.Column(db.String(200))
-    cobranca_complemento = db.Column(db.String(100))
-    cobranca_bairro = db.Column(db.String(100))
-    cobranca_cidade = db.Column(db.String(100))
-    cobranca_estado = db.Column(db.String(2))
-    
+
     # Condições do contrato
     dia_vencimento = db.Column(db.Integer)
     fator_juros = db.Column(db.Numeric(5, 2))
@@ -172,12 +187,23 @@ class Contrato(db.Model):
     estado_contrato = db.Column(db.String(30))
     data_estado = db.Column(db.Date)
     motivo_estado = db.Column(db.String(200))
-    
+
+    # Chaves estrangeiras
+    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=True)
+    plano_id = db.Column(db.Integer, db.ForeignKey('planos.id'), nullable=True)
+
     # Relacionamentos
-    cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'))
-    produtos = db.relationship('Produto', secondary='contratos_produtos', backref=db.backref('contratos', lazy=True))
+    clientes = db.relationship(
+        'Cliente',
+        secondary=cliente_contrato,
+        back_populates='contratos',
+        lazy=True
+    )
     instalacoes = db.relationship('Instalacao', backref='contrato', lazy=True)
     notas_fiscais = db.relationship('NotaFiscal', backref='contrato', lazy=True)
+    plano = db.relationship('Plano', backref='contratos_associados', lazy=True)
+
+
 
 class ContratoProduto(db.Model):
     __tablename__ = 'contratos_produtos'
@@ -187,6 +213,8 @@ class ContratoProduto(db.Model):
     quantidade = db.Column(db.Integer, default=1)
     valor_unitario = db.Column(db.Numeric(10, 2))
     desconto = db.Column(db.Numeric(5, 2), default=0)
+
+
 
 class Instalacao(db.Model):
     __tablename__ = 'instalacoes'
@@ -242,3 +270,33 @@ class TituloInstalacao(db.Model):
     data_pagamento = db.Column(db.Date)
     status = db.Column(db.String(20), default='pendente')
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
+
+
+class Plano(db.Model):
+    __tablename__ = 'planos'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.String(20), nullable=False)  # Ex: H[10], H[11], etc.
+    nome = db.Column(db.String(200), nullable=False)
+    valor = db.Column(db.Numeric(10, 2), nullable=False)
+    id_portal = db.Column(db.Integer)
+    
+    # Licença
+    licenca_descricao = db.Column(db.String(200))
+    licenca_valor = db.Column(db.Numeric(10, 2))
+    
+    # Informações Fiscais
+    nf_descricao = db.Column(db.String(200))
+    aliquota = db.Column(db.Numeric(5, 2))
+    cod_servico = db.Column(db.String(20))
+    nf_sao_paulo = db.Column(db.Boolean, default=False)
+    nf_baxteri = db.Column(db.Boolean, default=False)
+    g_sim = db.Column(db.Boolean, default=False)
+    
+    # Datas
+    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+    data_atualizacao = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    contratos = db.relationship('Contrato', backref='plano_associado', lazy=True)
+    
+    def __repr__(self):
+        return f'<Plano {self.codigo} - {self.nome}>'
