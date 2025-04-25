@@ -1,0 +1,68 @@
+<script>
+    let timeoutId;
+    
+    function buscarDadosContrato(numeroContrato) {
+if (!numeroContrato) return;
+
+$('#loadingContrato').removeClass('d-none');
+clearTimeout(timeoutId);
+
+timeoutId = setTimeout(() => {
+    $.ajax({
+        url: '/clientes/buscar-por-numero/' + numeroContrato,
+        method: 'GET',
+        success: function(data) {
+            console.log("Dados recebidos:", data);
+            
+            // Mapeamento correto dos campos
+            const fieldMap = {
+                'numero': '#numeroContrato',
+                'sequencia': '#sequencia',
+                'razao_social': '#razao_social',
+                'nome_fantasia': '#nome_fantasia',
+                'atualizacao': '#atualizacao',
+                'cadastramento': '#cadastramento',
+                'tipo': '#tipo',
+                'contato': '#contato',
+                'email': '#email',
+                'telefone': '#telefone',
+                'cep': '#cep',
+                'endereco': '#endereco',
+                'complemento': '#complemento',
+                'bairro': '#bairro',
+                'cidade': '#cidade',
+                'estado': '#estado',
+                'dia_vencimento': '#dia_vencimento',
+                'fator_juros': '#fator_juros',
+                'estado_contrato': '#estado_contrato',
+                'tipo_cobranca': '#tipo_cobranca',
+                'data_estado': '#data_estado',
+                'motivo_estado': '#motivo_estado',
+                'plano_nome': '#plano_nome',
+                'valor_plano': '#valor_plano',
+                'valor_contrato': '#valor_contrato',
+                'observacao': '#observacao'
+            };
+
+            // Atualizar os campos com os valores recebidos
+            for (const key in fieldMap) {
+                if (fieldMap.hasOwnProperty(key)) {
+                    const fieldSelector = fieldMap[key];
+                    const fieldValue = data[key]; // A chave 'key' aqui corresponde ao valor esperado na resposta JSON
+                    
+                    if (fieldValue !== null && fieldValue !== undefined) {
+                        $(fieldSelector).val(fieldValue);
+                    }
+                }
+            }
+
+            $('#loadingContrato').addClass('d-none');
+        },
+        error: function(xhr, status, error) {
+            console.error("Erro na requisição:", status, error);
+            alert('Erro ao buscar contrato. Verifique o console para mais detalhes.');
+        }
+    });
+}, 500);
+}
+</script>

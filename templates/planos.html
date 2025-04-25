@@ -1,0 +1,193 @@
+{% include 'model-header.html' %}
+{% include 'links.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css' )}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_planos.css' )}}">
+
+{% block content %}
+<div class="container mt-4 mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Planos</h2>
+        <div class="d-flex gap-2">  <!-- Aumentei o gap para 3 (16px) -->
+            <button class="btn btn-danger me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#deletePlanoModal">
+                <i class="bi bi-trash me-2"></i>Excluir Plano
+            </button>
+            <button class="btn btn-secondary me-2 btn-sm rounded" onclick="window.location.href=this.getAttribute('action')" 
+                    action="{{ url_for('planos_bp.get_planos') }}">
+                <i class="bi bi-search me-2"></i>Listar Todos
+            </button>
+            <form class="d-flex" role="search" method="GET" action="{{ url_for('planos_bp.get_list_planos') }}">
+                <input class="form-control me-2" 
+                       type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Localizar</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="planos-container">
+        <div class="planos-list">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Nome do Plano</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if planos %}
+                        {% for plano in planos %}
+                        <tr class="{% if plano_selecionado and plano.id == plano_selecionado.id %}table-primary{% endif %}">
+                            <td><a href="/planos/{{ plano.id }}" class="text-decoration-none">{{ plano.nome }}</a></td>
+                            <td>R$ {{ "%0.2f"|format(plano.valor|float) }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="2" class="text-center">Nenhum plano cadastrado</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            
+            {% if pagination and pagination.pages > 1 %}
+            <div class="compact-pagination mt-2">
+                {% if pagination.has_prev %}
+                    <a href="{{ url_for('home_bp.render_planos', page=pagination.prev_num) }}" class="page-link" title="Página anterior">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                {% endif %}
+                
+                <span class="current-page mx-2">
+                    Página {{ pagination.page }} de {{ pagination.pages }}
+                </span>
+                
+                {% if pagination.has_next %}
+                    <a href="{{ url_for('home_bp.render_planos', page=pagination.next_num) }}" class="page-link" title="Próxima página">
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="planos-form">
+            <h2>Criar Novo Plano</h2><br>
+            
+            <form method="POST" action="{{ url_for('planos_bp.insert_planos')}}">
+                <div class="form-header">
+                    <div class="form-group">
+                        <label for="nome">Nome do Plano</label>
+                        <input type="text" id="nome" name="nome" class="form-control" 
+                               value="{{ plano.nome }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="valor">Valor</label>
+                        <input type="text" id="valor" name="valor" class="form-control" 
+                               value="{{ plano.valor }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_produto">Id Produto Portal</label>
+                        <input type="text" id="id_produto" name="id_produto" class="form-control" 
+                               value="{{ planos.id_portal }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="id_produto">Código</label>
+                        <input type="text" id="codigo" name="codigo" class="form-control" value="{{ planos.codigo }}">
+                    </div>
+                </div>
+
+                <div class="form-sections">
+                    <div class="collapse-section">
+                        <button type="button" class="collapse-toggle" onclick="toggleCollapse('licenca-collapse')">
+                            <h3>Licença <i class="bi bi-chevron-down"></i></h3>
+                        </button>
+                        <div id="licenca-collapse" class="collapse-content show">
+                            <div class="form-group">
+                                <label for="licenca_descricao">Descrição p/ boleto</label>
+                                <input type="text" id="licenca_descricao" name="licenca_descricao" class="form-control" 
+                                       value="{{ plano.licenca_descricao }}">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Incluir na NF</label>
+                                    <div class="form-check mt-2">
+                                        <input class="form-check-input" type="checkbox" name="licenca_nf" value="sp" id="nfSp" {% if plano_selecionado and plano_selecionado.licenca_nf == 'sp' %}checked{% endif %}>
+                                        <label class="form-check-label" for="nfSp">
+                                            NF São Paulo
+                                        </label>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="licenca_aliquota">Alíquota</label>
+                                    <input type="text" id="licenca_aliquota" name="aliquota" class="form-control" 
+                                           value="{{ plano_selecionado.licenca_aliquota if plano_selecionado else '0,00' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="licenca_cod_servico">Cód. Serviço</label>
+                                    <input type="text" id="licenca_cod_servico" name="cod_servico" id="cod_servico" class="form-control" 
+                                           value="{{ plano_selecionado.licenca_cod_servico if plano_selecionado else '0' }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="licenca_valor">Valor</label>
+                                <input type="text" id="licenca_valor" name="licenca_valor" class="form-control" 
+                                       value="{{ "%0.2f"|format(plano_selecionado.licenca_valor|float) if plano_selecionado else '0,00' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="licenca_descricao_nf">Descrição para NF</label>
+                                <input type="text" id="licenca_descricao_nf" name="nf_descricao" id="nf_descricao" class="form-control" 
+                                       value="{{ plano_selecionado.licenca_descricao_nf if plano_selecionado else 'Licença do Serviço Connect Link' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="licenca_aliquota_total">Alíquota (federal e municipal)</label>
+                                <input type="text" id="licenca_aliquota_total" name="licenca_aliquota_total" class="form-control" 
+                                       value="{{ plano_selecionado.licenca_aliquota_total if plano_selecionado else '0,00' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção de Suporte como Collapse -->
+                    <div class="collapse-section">
+                        <button type="button" class="collapse-toggle" onclick="toggleCollapse('suporte-collapse')">
+                            <h3>Suporte <i class="bi bi-chevron-down"></i></h3>
+                        </button>
+                        <div id="suporte-collapse" class="collapse-content">
+                            <div class="form-group">
+                                <label for="suporte_descricao">Descrição p/ boleto</label>
+                                <input type="text" id="suporte_descricao" name="suporte_descricao" class="form-control" value="{{ plano_selecionado.suporte_descricao if plano_selecionado else 'Suporte' }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Seção de Gerenciamento como Collapse -->
+                    <div class="collapse-section">
+                        <button type="button" class="collapse-toggle" onclick="toggleCollapse('gerenciamento-collapse')">
+                            <h3>Gerenciamento <i class="bi bi-chevron-down"></i></h3>
+                        </button>
+                        <div id="gerenciamento-collapse" class="collapse-content">
+                            <div class="form-group">
+                                <label for="gerenciamento_descricao">Descrição p/ boleto</label>
+                                <input type="text" id="gerenciamento_descricao" name="gerenciamento_descricao" class="form-control" value="{{ plano_selecionado.gerenciamento_descricao if plano_selecionado else 'Gerenciamento' }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Salvar</button> <a href="/planos" class="btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% include 'popup/popup_delete_planos.html' %}
+
+</div>
+
+
+{% include 'js/planos_js.html' %}
+
+
+{% endblock %}
+<br><br><br><br><br><br><br>

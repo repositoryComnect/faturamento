@@ -1,0 +1,49 @@
+{% include "model-header.html" %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+
+
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="clientes-title m-0">Lista de Produtos</h2>
+        <div class="d-flex gap-2">  
+            <button class="btn btn-primary btn-sm rounded" data-bs-toggle="modal" data-bs-target="#createProdutoModal">
+                <i class="bi bi-plus-circle me-2"></i>Adicionar Produto
+            </button>
+            <button class="btn btn-danger btn-sm rounded" data-bs-toggle="modal" data-bs-target="#deleteProdutoModal">
+                <i class="bi bi-trash me-2"></i>Excluir Produto
+            </button>
+        </div>
+    </div>
+
+    <div class="clientes-container p-4">
+        <div class="table-responsive-lg">
+            <table class="clientes-table table-hover w-100">
+                <thead class="table-light">
+                    <tr>
+                        <th class="py-3 px-4">Código</th>
+                        <th class="py-3 px-4">Nome Produto</th>
+                        <th class="py-3 px-4">Descrição</th>
+                        <th class="py-3 px-4">Preço</th>
+                        <th class="py-3 px-4">Status</th>
+                        <th class="py-3 px-4">Data de Criação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for produto in produtos %}
+                    <tr>
+                        <td class="py-3 px-4">{{ produto.codigo }}</td>
+                        <td class="py-3 px-4">{{ produto.nome }}</td>
+                        <td class="py-3 px-4">{{ produto.descricao }}</td>
+                        <td class="py-3 px-4">{{ produto.preco_base }}</td>
+                        <td class="py-3 px-4">{{ produto.ativo }}</td>
+                        <td class="py-3 px-4">{{ produto.created_at }}</td>   
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% include 'popup/popup_produto.html' %}
+{% include 'popup/popup_delete_produto.html' %}

@@ -1,0 +1,119 @@
+<script>
+    let timeoutId;
+    
+    function buscarDadosContrato(numeroContrato) {
+        if (!numeroContrato) return;
+
+        $('#loadingContrato').removeClass('d-none');
+        clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => {
+            $.ajax({
+                url: '/contratos/buscar-por-numero/' + numeroContrato,
+                method: 'GET',
+                success: function(data) {
+                    console.log("Dados recebidos:", data);
+
+                    // Verifica se os dados do cliente foram retornados
+                    if (!data.cliente) {
+                        console.warn("Cliente não encontrado na resposta.");
+                    }
+
+                    const fieldMap = {
+                        'numero': '#numeroContrato',
+                        'razao_social': '#razao_social',
+                        'nome_fantasia': '#nome_fantasia',
+                        'atualizacao': '#atualizacao',
+                        'cadastramento': '#cadastramento',
+                        'tipo': '#tipo',
+                        'contato': '#contato',
+                        'id_matriz_portal': '#id_matriz_portal',
+                        'email': '#email',
+                        'telefone': '#telefone',
+                        'responsavel': '#responsavel',
+                        'cep': '#cep',
+                        'cnpj': '#cnpj',
+                        'endereco': '#endereco',
+                        'complemento': '#complemento',
+                        'bairro': '#bairro',
+                        'cidade': '#cidade',
+                        'estado': '#estado',
+                        'dia_vencimento': '#dia_vencimento',
+                        'fator_juros': '#fator_juros',
+                        'estado_contrato': '#estado_contrato',
+                        'data_estado': '#data_estado',
+                        'motivo_estado': '#motivo_estado',
+                        'plano_nome': '#plano_nome',
+                        'valor_plano': '#valor_plano',
+                        'valor_contrato': '#valor_contrato'
+                    };
+
+                    // Limpa os campos antes de preencher
+                    Object.values(fieldMap).forEach(selector => {
+                        const element = $(selector);
+                        if (element.length) {
+                            if (element.is('input[type="checkbox"]')) {
+                                element.prop('checked', false);
+                            } else {
+                                element.val('').trigger('change');
+                            }
+                        }
+                    });
+
+                    // Atualiza os campos
+                    Object.keys(fieldMap).forEach(key => {
+                        const value = data[key];
+                        const selector = fieldMap[key];
+                        const element = $(selector);
+
+                        if (!element.length) {
+                            console.warn(`Elemento ${selector} não encontrado.`);
+                            return;
+                        }
+
+                        if (key === 'estado_contrato') {
+                            element.val(value || '')
+                                .removeClass('status-ativo status-inativo')
+                                .addClass(value ? 'status-' + value.toLowerCase() : '');
+                        } else {
+                            element.val(value || '');
+                        }
+                    });
+
+                    // Atualiza a TABELA DO CLIENTE dinamicamente
+                    if (data.clientes && Array.isArray(data.clientes)) {
+                        const linhasClientes = data.clientes.map(cliente => `
+                            <tr>
+                                <td>${cliente.nome_fantasia || ''}</td>
+                                <td>${cliente.razao_social || ''}</td>
+                                <td>${cliente.localidade || ''}</td>
+                                <td>${cliente.atividade || ''}</td>
+                                <td>${cliente.regiao || ''}</td>
+                                <td>
+                                    <span class="status-badge ${cliente.estado_atual === 'Ativo' ? 'status-ativo' : 'status-inativo'}">
+                                        ${cliente.estado_atual || 'N/A'}
+                                    </span>
+                                </td>
+                            </tr>
+                        `).join('');
+                        $('.clientes-table tbody').html(linhasClientes);
+                    } else {
+                        $('.clientes-table tbody').html(`
+                            <tr>
+                                <td colspan="6" class="text-center">Nenhum cliente relacionado ao contrato encontrado.</td>
+                            </tr>
+                        `);
+                    }
+                },
+                error: function(xhr) {
+                    console.error("Erro na requisição:", xhr);
+                    alert('Erro ao buscar contrato. Verifique o console para detalhes.');
+                },
+                complete: function() {
+                    console.log("Requisição finalizada.");
+                    $('#loadingContrato').addClass('d-none');
+                }
+            });
+        }, 500);
+    }
+</script>

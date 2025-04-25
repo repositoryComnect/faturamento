@@ -1,0 +1,30 @@
+<div class="modal fade" id="deleteClientModal" tabindex="-1" aria-labelledby="deleteClientModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteClientModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <!-- Modal de Exclusão -->
+                    <form id="deletContractForm" action="{{ url_for('cliente_bp.delete_cliente') }}" method="POST">
+                        <label for="delete_numero_cliente" class="form-label">Código do Cliente</label>
+                        <input type="text" class="form-control" id="delete_numero_cliente" name="numero">
+                        <div class="alert alert-warning mt-3">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            Atenção! Esta ação é irreversível. Todos os dados do cliente serão permanentemente excluídos.
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <!-- Botão dentro do formulário para submeter -->
+                <button type="submit" class="btn btn-danger" form="deletContractForm">
+                    <i class="bi bi-trash me-2"></i>Confirmar Exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

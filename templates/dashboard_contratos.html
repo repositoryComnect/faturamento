@@ -1,0 +1,146 @@
+{% include 'model-header.html' %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css')}}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
+<style>
+    .chart-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+        margin: 20px auto;
+        max-width: 1200px;
+    }
+    
+    .chart-box {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 20px;
+        width: 45%;
+        min-width: 400px;
+    }
+    
+    .chart-title {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 18px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="chart-container">
+    <div class="chart-box">
+        <div class="chart-title">Cadastros de Contratos por Mês</div>
+        <div id="barChart" style="height: 400px;"></div>
+    </div>
+    
+    <div class="chart-box">
+        <div class="chart-title">Status dos Cadastros</div>
+        <div id="pieChart" style="height: 400px;"></div>
+    </div>
+</div>
+
+<script>
+    // Gráfico de barras (mantendo o existente)
+    fetch('/api/chart_data')
+        .then(response => response.json())
+        .then(data => {
+            $('#barChart').dxChart({
+                dataSource: data,
+                series: [{
+                    argumentField: 'month',
+                    valueField: 'count',
+                    type: 'bar', 
+                    name: 'Cadastros',
+                    color: '#4CAF50'
+                }],
+                title: {
+                    text: 'Cadastros por Mês',
+                    font: { size: 14 }
+                },
+                argumentAxis: {
+                    title: 'Mês',
+                    label: { rotationAngle: -45 }
+                },
+                valueAxis: {
+                    title: 'Quantidade',
+                    allowDecimals: false
+                },
+                tooltip: {
+                    enabled: true,
+                    customizeTooltip: function (pointInfo) {
+                        return {
+                            text: `<strong>${pointInfo.argumentText}</strong><br>${pointInfo.valueText} cadastros`
+                        };
+                    }
+                },
+                legend: {
+                    visible: false
+                },
+                export: {
+                    enabled: true
+                },
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados do gráfico de barras:', error);
+        });
+
+    fetch('/api/chart_pie')
+        .then(response => response.json())
+        .then(data => {
+            $('#pieChart').dxPieChart({
+                dataSource: data,
+                palette: 'bright',
+                title: {
+                    text: 'Distribuição por Status',
+                    font: { size: 14 }
+                },
+                series: [{
+                    argumentField: 'status',
+                    valueField: 'count',
+                    type: 'pie',
+                    label: {
+                        visible: true,
+                        format: 'percent',
+                        connector: {
+                            visible: true,
+                            width: 1
+                        },
+                        customizeText: function(point) {
+                            return `${point.argumentText}: ${point.valueText}`;
+                        }
+                    }
+                }],
+                tooltip: {
+                    enabled: true,
+                    customizeTooltip: function(pointInfo) {
+                        return {
+                            text: `<strong>${pointInfo.argumentText}</strong><br>
+                                   ${pointInfo.valueText} cadastros<br>
+                                   ${pointInfo.percentText} do total`
+                        };
+                    }
+                },
+                legend: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'bottom',
+                    itemTextPosition: 'right'
+                },
+                export: {
+                    enabled: true
+                },
+                onPointClick: function(e) {
+                    e.target.isVisible() ? e.target.hide() : e.target.show();
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados do gráfico de pizza:', error);
+            $('#pieChart').html('<div class="alert alert-danger">Erro ao carregar dados do status</div>');
+        });
+</script>

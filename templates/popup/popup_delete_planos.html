@@ -1,0 +1,33 @@
+{% include 'links.html' %}
+
+<!-- Modal de Exclusão -->
+<div class="modal fade" id="deletePlanoModal" tabindex="-1" aria-labelledby="deletePlanoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deletePlanoModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deletePlanoForm" action="{{ url_for('planos_bp.delete_planos') }}" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="delete_numero_plano" class="form-label">Número do Plano</label>
+                        <input type="text" class="form-control" id="delete_codigo_plano" name="delete_codigo_plano" required>
+                    </div>
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Atenção! Esta ação é irreversível. Todos os dados do plano serão permanentemente excluídos.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>Confirmar Exclusão
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

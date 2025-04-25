@@ -1,0 +1,46 @@
+{% include "model-header.html" %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+
+
+<div class="clientes-container">
+    <h2 class="clientes-title">Lista de Planos</h2>
+    
+    <div class="table-responsive">
+        <table class="clientes-table">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome Plano</th>
+                    <th>Valor</th>
+                    <th>Id Portal</th>
+                    <th>Licença</th>
+                    <th>Licença Valor</th>
+                    <th>NF</th>
+                    <th>Aliquota</th>
+                    <th>Data Criação</th>
+                    <th>Data Atualização</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for plano in planos %}
+                <tr>
+                    <td>{{ plano.codigo }}</td>
+                    <td>{{ plano.nome }}</td>
+                    <td>{{ plano.valor }}</td>
+                    <td>{{ plano.id_portal }}</td>
+                    <td>{{ plano.licenca_descricao }}</td>
+                    <td>{{ plano.liceca_valor }}</td>
+                    <td>{{ plano.nf_descricao }}</td>
+                    <td>{{ plano.aliquota }}</td>
+                    <td>{{ plano.data_criacao }}</td>
+                    <td>{{ plano.data_atualizacao }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>  
+
+</div>    
+    
+        
+        

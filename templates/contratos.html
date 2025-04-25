@@ -1,11 +1,10 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
     {% include 'model-header.html' %}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_contratos.css')}}">
-    <!-- Adicionando jQuery para facilitar o AJAX -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% include 'links.html' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+
 </head>
 <body>
     <!-- Mensagens Flash -->
@@ -19,10 +18,31 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <div class="container mt-6 mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-6">
-            {% include 'popup_contratos.html' %}
+     
+    <div class="container mt-5 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Contratos</h2>
+            <div class="d-flex gap-2"> <!-- Adicionei a classe gap-2 para espaçamento uniforme -->    
+                <button class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createContractModal">
+                    <i class="bi bi-plus-circle me-2"></i>Criar Novo Contrato
+                </button>
+                <button class="btn btn-warning me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#updateContractModal">
+                    <i class="bi bi-gear-wide-connected me-2"></i>Editar Contrato
+                </button>
+                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteContractModal">
+                    <i class="bi bi-trash me-2"></i>Excluir Contrato
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="window.location.href=this.getAttribute('action')" action="{{ url_for('contratos_bp.listar_contratos') }}">
+                        <i class="bi bi-search me-2"></i>Listar Todos
+                </button>
+            <form class="d-flex" role="search" method="GET" action="{{ url_for('contratos_bp.get_id_contratos') }}">
+                <input class="form-control me-2" 
+                       type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Localizar</button>
+            </form>
         </div>
+    </div>   
+        
         
         {% if not contrato %}
             <div class="alert alert-warning">
@@ -38,100 +58,111 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-3">
-                                <label class="form-label">Nº Contrato</label>
+                                <label class="form-label">Nº Contrato:</label>
                                 <div class="input-group">
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="numeroContrato"
-                                           value="{{ contrato.numero if contrato else '' }}"
-                                           onchange="buscarDadosContrato(this.value)">
+                                    <input type="text" class="form-control" id="numeroContrato" value="{{ contrato.numero if contrato else '' }}" onchange="buscarDadosContrato(this.value)">
                                     <div id="loadingContrato" class="input-group-text d-none">
                                         <div class="spinner-border spinner-border-sm" role="status">
-                                            <span class="visually-hidden">Carregando...</span>
+                
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-9">
-                                <label class="form-label">Razão Social</label>
-                                <input type="text" class="form-control" id="razaoSocial" value="{{ contrato.razao_social }}" readonly>
+                                <label class="form-label">Razão Social:</label>
+                                <input type="text" class="form-control" id="razao_social" name="razao_social" value="{{ contrato.razao_social }}" readonly>
                             </div>
                             
                             <div class="col-md-4">
-                                <label class="form-label">Cadastramento</label>
-                                <input type="text" class="form-control" id="cadastramento" value="{{ contrato.cadastramento.strftime('%d/%m/%Y') if contrato.cadastramento else '' }}" readonly>
+                                <label class="form-label">Cadastramento:</label>
+                                <input type="text" class="form-control" id="cadastramento" name="cadastramento" value="{{ contrato.cadastramento.strftime('%d/%m/%Y') if contrato.cadastramento else '' }}" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Nome Fantasia</label>
-                                <input type="text" class="form-control" id="nomeFantasia" value="{{ contrato.nome_fantasia }}" readonly>
+                                <label class="form-label">Nome Fantasia:</label>
+                                <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" value="{{ contrato.nome_fantasia }}" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Atualização</label>
-                                <input type="text" class="form-control" id="atualizacao" value="{{ contrato.atualizacao.strftime('%d/%m/%Y') if contrato.atualizacao else '' }}" readonly>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label">Tipo de Contrato</label>
-                                <input type="text" class="form-control" id="tipoContrato" value="{{ contrato.tipo }}" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Contato</label>
-                                <input type="text" class="form-control" id="contato" value="{{ contrato.contato }}" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Id Matriz Portal</label>
-                                <input type="text" class="form-control" id="idMatrizPortal" value="{{ contrato.id_matriz_portal }}" readonly>
+                                <label class="form-label">Atualização:</label>
+                                <input type="text" class="form-control" id="atualizacao" name="atualizacao" value="{{ contrato.atualizacao.strftime('%d/%m/%Y') if contrato.atualizacao else '' }}" readonly>
                             </div>
                             
                             <div class="col-md-4">
-                                <label class="form-label">E-mail</label>
-                                <input type="text" class="form-control" id="email" value="{{ contrato.email }}" readonly>
+                                <label class="form-label">Tipo de Contrato:</label>
+                                <input type="text" class="form-control" id="tipo" name="tipo" value="{{ contrato.tipo }}" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Fone</label>
-                                <input type="text" class="form-control" id="telefone" value="{{ contrato.telefone }}" readonly>
+                                <label class="form-label">Contato:</label>
+                                <input type="text" class="form-control" id="contato" name="contato" value="{{ contrato.contato }}" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Responsável</label>
-                                <input type="text" class="form-control" id="responsavel" value="{{ contrato.responsavel }}" readonly>
+                                <label class="form-label">Id Matriz Portal:</label>
+                                <input type="text" class="form-control" id="id_matriz_portal" name="id_matriz_portal" value="{{ contrato.id_matriz_portal }}" readonly>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">E-mail:</label>
+                                <input type="text" class="form-control" id="email" name="email" value="{{ contrato.email }}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Fone:</label>
+                                <input type="text" class="form-control" id="telefone" name="telefone" value="{{ contrato.telefone }}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Responsável:</label>
+                                <input type="text" class="form-control" id="responsavel" name="responsavel" value="{{ contrato.responsavel }}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">CNPJ:</label>
+                                <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ contrato.cnpj }}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo:</label>
+                                <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa" value="{{ contrato.tipo_pessoa }}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Revenda:</label>
+                                <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa" value="{{ contrato.revenda_contrato }}" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Vendedor:</label>
+                                <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa" value="{{ contrato.vendedor_contrato }}" readonly>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Contract Address -->
             <div class="card mb-2">
-                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#addressCollapse" role="button">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#addressCollapse">
                     <h5 class="mb-0">Endereço do Contrato</h5>
                 </div>
                 <div class="collapse" id="addressCollapse">
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-2">
-                                <label class="form-label">CEP</label>
-                                <input type="text" class="form-control" id="cep" value="{{ contrato.cep }}" readonly>
+                                <label class="form-label">CEP:</label>
+                                <input type="text" class="form-control" name="cep"  id="cep" value="{{ contrato.cep }}" readonly>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Endereço</label>
-                                <input type="text" class="form-control" id="endereco" value="{{ contrato.endereco }}" readonly>
+                                <label class="form-label">Endereço:</label>
+                                <input type="text" class="form-control" name="endereco" id="endereco" value="{{ contrato.endereco }}" readonly>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Compl.</label>
-                                <input type="text" class="form-control" id="complemento" value="{{ contrato.complemento }}" readonly>
+                                <label class="form-label">Complemento:</label>
+                                <input type="text" class="form-control" id="complemento" name="complemento" value="{{ contrato.complemento }}" readonly>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Bairro</label>
-                                <input type="text" class="form-control" id="bairro" value="{{ contrato.bairro }}" readonly>
+                                <label class="form-label">Bairro:</label>
+                                <input type="text" class="form-control" id="bairro" name="bairro" value="{{ contrato.bairro }}" readonly>
                             </div>
                             
                             <div class="col-md-4">
-                                <label class="form-label">Cidade</label>
+                                <label class="form-label">Cidade:</label>
                                 <input type="text" class="form-control" id="cidade" value="{{ contrato.cidade }}" readonly>
                             </div>
                             <div class="col-md-1">
-                                <label class="form-label">UF</label>
-                                <input type="text" class="form-control" id="uf" value="{{ contrato.estado }}" readonly>
+                                <label class="form-label">UF:</label>
+                                <input type="text" class="form-control" id="estado" value="{{ contrato.estado }}" readonly>
                             </div>
                             <div class="col-md-12">
                                 <button class="btn btn-outline-primary">Localizar</button>
@@ -140,171 +171,109 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Contract Details -->
+
             <div class="card mb-2">
-                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#detailsCollapse" role="button">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#relationCollapse">
+                    <h5 class="mb-0">Relação de Clientes do Contrato</h5>
+                </div>
+                <div class="collapse" id="relationCollapse">
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                                <table class="clientes-table table table-striped table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Nome Fantasia</th>
+                                            <th>Razão Social</th>
+                                            <th>Localidade</th>
+                                            <th>Atividade</th>
+                                            <th>Região</th>
+                                            <th>Estado Atual</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if clientes %}
+                                            {% for cliente in clientes %}
+                                            <tr>
+                                                <td>{{ cliente.nome_fantasia }}</td>
+                                                <td>{{ cliente.razao_social }}</td>
+                                                <td>{{ cliente.localidade }}</td>
+                                                <td>{{ cliente.atividade }}</td>
+                                                <td>{{ cliente.regiao }}</td>
+                                                <td>
+                                                    <span class="status-badge {% if cliente.estado_atual == 'Ativo' %}status-ativo{% else %}status-inativo{% endif %}">
+                                                        {{ cliente.estado_atual or 'N/A' }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="6" class="text-center">Nenhum cliente relacionado ao contrato encontrado.</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mb-2">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#detailsCollapse">
                     <h5 class="mb-0">Detalhes do Contrato</h5>
                 </div>
                 <div class="collapse" id="detailsCollapse">
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-2">
-                                <label class="form-label">Dia Vencimento</label>
+                                <label class="form-label">Dia Vencimento:</label>
                                 <input type="text" class="form-control" id="dia_vencimento" value="{{ contrato.dia_vencimento }}" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Fator moderador da taxa de juros</label>
+                                <label class="form-label">Fator Moderador da Taxa de Juros:</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="fator_juros" value="{{ contrato.fator_juros }}" readonly>
                                     <span class="input-group-text">%</span>
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label">Estado</label>
-                                <input type="text" class="form-control status-{{ contrato.estado_contrato.lower() }}" id="estado" value="{{ contrato.estado_contrato }}" readonly>
+                                <label class="form-label">Estado:</label>
+                                <input type="text" class="form-control status-{{ contrato.estado_contrato.lower() }}" id="estado_contrato" value="{{ contrato.estado_contrato }}" readonly>
                             </div>
                             
                             <div class="col-md-3">
-                                <label class="form-label">Data</label>
+                                <label class="form-label">Data:</label>
                                 <input type="text" class="form-control" id="data_estado" value="{{ contrato.data_estado.strftime('%d/%m/%Y') if contrato.data_estado else '' }}" readonly>
                             </div>
                             <div class="col-md-9">
-                                <label class="form-label">Motivo</label>
+                                <label class="form-label">Motivo:</label>
                                 <input type="text" class="form-control" id="motivo_estado" value="{{ contrato.motivo_estado }}" readonly>
                             </div>
-                            
-
                             <div class="col-md-4">
-                                <label class="form-label">Nome do Plano</label>
+                                <label class="form-label">Nome do Plano:</label>
                                 <input type="text" class="form-control" id="plano_nome" value="{{ contrato.plano_nome if contrato.plano_nome else '' }}" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Valor do Plano</label>
+                                <label class="form-label">Valor do Plano:</label>
                                 <input type="text" class="form-control" id="valor_plano" value="{{ contrato.valor_plano if contrato.valor_plano else '' }}" readonly>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Valor do Contrato</label>
+                                <label class="form-label">Valor do Contrato:</label>
                                 <input type="text" class="form-control" id="valor_contrato" value="{{ contrato.valor_contrato if contrato.valor_contrato else '' }}" readonly>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- Contract Clients -->
-            <div class="card mb-2">
-                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#clientsCollapse" role="button">
-                    <h5 class="mb-0">Relação de Clientes do Contrato</h5>
-                </div>
-                <div class="collapse" id="clientsCollapse">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Nome Fantasia</th>
-                                        <th>Razão Social</th>
-                                        <th>Localidade</th>
-                                        <th>Atividade</th>
-                                        <th>Região</th>
-                                        <th>Estado/Atual</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% if contrato.cliente %}
-                                    <tr>
-                                        <td>{{ contrato.cliente.nome_fantasia }}</td>
-                                        <td>{{ contrato.cliente.razao_social }}</td>
-                                        <td>{{ contrato.cliente.localidade }}</td>
-                                        <td>{{ contrato.cliente.atividade }}</td>
-                                        <td>{{ contrato.cliente.cidade }} - {{ contrato.cliente.estado }}</td>
-                                        <td><span class="badge bg-{% if contrato.cliente.estado_atual == 'ATIVO' %}success{% else %}danger{% endif %}">{{ contrato.cliente.estado_atual }}</span></td>
-                                    </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Observations -->
-            <div class="card">
-                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#obsCollapse" role="button">
-                    <h5 class="mb-0">Observações</h5>
-                </div>
-                <div class="collapse" id="obsCollapse">
-                    <div class="card-body">
-                        <textarea class="form-control" rows="4" readonly>{{ contrato.observacoes if contrato.observacoes else '' }}</textarea>
-                    </div>
-                </div>
-            </div>
         {% endif %}
-    </div>
-    <script>
-        // Função com debounce para evitar múltiplas requisições
-        let timeoutId;
-        
-        function buscarDadosContrato(numeroContrato) {
-            if (!numeroContrato) return;
-            
-            // Mostra o indicador de carregamento
-            $('#loadingContrato').removeClass('d-none');
-            
-            // Cancela o timeout anterior se existir
-            clearTimeout(timeoutId);
-            
-            // Configura um novo timeout
-            timeoutId = setTimeout(() => {
-                $.ajax({
-                    url: '/contratos/buscar-por-numero/' + numeroContrato,
-                    method: 'GET',
-                    success: function(data) {
-                        // Atualiza todos os campos com os dados retornados
-                        if (data.razao_social) $('#razaoSocial').val(data.razao_social);
-                        if (data.cadastramento) $('#cadastramento').val(data.cadastramento);
-                        if (data.nome_fantasia) $('#nomeFantasia').val(data.nome_fantasia);
-                        if (data.atualizacao) $('#atualizacao').val(data.atualizacao);
-                        if (data.tipo) $('#tipoContrato').val(data.tipo);
-                        if (data.contato) $('#contato').val(data.contato);
-                        if (data.id_matriz_portal) $('#idMatrizPortal').val(data.id_matriz_portal);
-                        if (data.email) $('#email').val(data.email);
-                        if (data.telefone) $('#telefone').val(data.telefone);
-                        if (data.responsavel) $('#responsavel').val(data.responsavel);
-                        if (data.cep) $('#cep').val(data.cep);
-                        if (data.endereco) $('#endereco').val(data.endereco);
-                        if (data.complemento) $('#complemento').val(data.complemento);
-                        if (data.bairro) $('#bairro').val(data.bairro);
-                        if (data.cidade) $('#cidade').val(data.cidade);
-                        if (data.estado) $('#uf').val(data.estado);
-                        if (data.cobranca_cep) $('#cobranca_cep').val(data.cobranca_cep);
-                        if (data.cobranca_endereco) $('#cobranca_endereco').val(data.cobranca_endereco);
-                        if (data.cobranca_bairro) $('#cobranca_bairro').val(data.cobranca_bairro);
-                        if (data.cobranca_cidade) $('#cobranca_cidade').val(data.cobranca_cidade);
-                        if (data.cobranca_estado) $('#cobranca_estado').val(data.cobranca_estado);
-                        if (data.dia_vencimento) $('#dia_vencimento').val(data.dia_vencimento);
-                        if (data.fator_juros) $('#fator_juros').val(data.fator_juros);
-                        if (data.contrato_revenda) $('#contrato_revenda').val(data.contrato_revenda);
-                        if (data.faturamento_contrato) $('#faturamento_contrato').val(data.faturamento_contrato);
-                        if (data.estado_contrato) $('#estado_contrato').val(data.estado_contrato);
-                        if (data.data_estado) $('#data_estado').val(data.data_estado);
-                        if (data.motivo_estado) $('#motivo_estado').val(data.motivo_estado);
-                    },
-                    error: function(xhr) {
-                        alert('Contrato não encontrado ou erro na consulta');
-                    },
-                    complete: function() {
-                        // Esconde o indicador de carregamento
-                        $('#loadingContrato').addClass('d-none');
-                    }
-                });
-            }, 500); // Espera 500ms após a última alteração
-        }
-        </script>
+        {% include 'popup/popup_delete_contrato.html' %}
+        {% include 'popup/popup_contratos.html' %}
+        {% include 'popup/popup_editar_contrato.html' %}
+    </div><br><br><br><br><br>
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+ {% include 'js/contratos_js.html' %}       
+        
 </body>
 </html>

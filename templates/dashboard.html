@@ -1,9 +1,10 @@
 {% include 'model-header.html' %}
+
 <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css')}}">
 
-    <h1>Faturamento</h1>
-
-    <div id="chartContainer" style="height: 400px; width: 600px;"></div>
+    <div id="chartContainer" 
+        style="height: 400px; width: 600px; margin: auto;">
+    </div>
 
     <script>
         fetch('/api/chart_data')
@@ -13,18 +14,33 @@
                     dataSource: data,
                     series: [{
                         argumentField: 'month',
-                        valueField: 'sales',
-                        type: 'line',
-                        name: 'Sales'
+                        valueField: 'count',
+                        type: 'bar', 
+                        name: 'Cadastros',
+                        color: '#4CAF50'
                     }],
-                    title: 'Monthly Sales',
+                    title: 'Cadastros de Contratos por Mês',
                     argumentAxis: {
-                        title: 'Month'
+                        title: 'Mês'
                     },
                     valueAxis: {
-                        title: 'Sales'
+                        title: 'Quantidade de Cadastros por Mês'
+                    },
+                    tooltip: {
+                        enabled: true,
+                        customizeTooltip: function (pointInfo) {
+                            return {
+                                text: `${pointInfo.argumentText}: ${pointInfo.valueText} cadastros`
+                            };
+                        }
+                    },
+                    legend: {
+                        visible: false
                     }
                 });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados do gráfico:', error);
             });
     </script>
 

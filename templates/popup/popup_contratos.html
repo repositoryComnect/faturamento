@@ -1,0 +1,212 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_contratos.css')}}">
+</head>
+<body>
+    <!-- Create Contract Modal -->
+    <div class="modal fade" id="createContractModal" tabindex="-1" aria-labelledby="createContractModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createContractModalLabel">Novo Contrato</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="contractForm" action="{{ url_for('contratos_bp.set_contrato') }}" method="POST">
+                        <!-- Basic Information Section -->
+                        <div class="modal-section-header">Informações Básicas</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Nº Contrato:</label>
+                                <input type="text" class="form-control" id="numero_contrato" name="numero_contrato" required>
+                            </div>
+                            <div class="col-md-9">
+                                <label class="form-label">Razão Social:</label>
+                                <input type="text" class="form-control" id="razao_social" name="razao_social" required>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Cadastramento:</label>
+                                <input type="date" class="form-control" id="cadastramento" name="cadastramento" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Nome Fantasia:</label>
+                                <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Atualização:</label>
+                                <input type="date" class="form-control" id="atualizacao" name="atualizacao">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo de Contrato:</label>
+                                <select class="form-select" id="tipo_contrato" name="tipo_contrato">
+                                    <option value="Hardware">Hardware</option>
+                                    <option value="Software">Software</option>
+                                    <option value="Serviço">Serviço</option>
+                                    <option value="Manutenção">Manutenção</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Contato:</label>
+                                <input type="text" class="form-control" id="contato" name="contato" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Id Matriz Portal:</label>
+                                <input type="text" class="form-control" id="portal_id" name="portal_id">
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">E-mail:</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Telefone:</label>
+                                <input type="tel" class="form-control" id="telefone" name="telefone" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Responsável:</label>
+                                <input type="text" class="form-control" id="responsavel" name="responsavel">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">CNPJ:</label>
+                                <input type="text" class="form-control" id="cnpj" name="cnpj">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo:</label>
+                                <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Revenda:</label>
+                                <input type="text" class="form-control" id="revenda_contrato" name="revenda_contrato">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Vendedor:</label>
+                                <input type="text" class="form-control" id="vendedor_contrato" name="vendedor_contrato">
+                            </div>
+                        </div>
+                        
+                        <!-- Address Section -->
+                        <div class="modal-section-header">Endereço do Contrato</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label">CEP:</label>
+                                <input type="text" class="form-control" id="cep" name="cep" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Endereço:</label>
+                                <input type="text" class="form-control" id="endereco" name="endereco" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Complemento:</label>
+                                <input type="text" class="form-control" id="complemento" name="complemento">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Bairro:</label>
+                                <input type="text" class="form-control" id="bairro" name="bairro" required>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <label class="form-label">Cidade:</label>
+                                <input type="text" class="form-control" id="cidade" name="cidade" required>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">UF</label>
+                                <select class="form-select" id="uf" name="uf" required>
+                                    <option value="RJ"></option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="SP">SP</option>
+                                    <option value="MG">MG</option>
+                                    <option value="DF">DF</option>
+                                    <option value="SC">SC</option>
+                                    <option value="ES">ES</option>
+                                    <option value="AC">AC</option>
+                                    <option value="CE">CE</option>
+                                    <option value="AL">AL</option>
+                                    <option value="BA">BA</option>
+                                    <option value="AM">AM</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-section-header">Detalhes do Contrato</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label">Dia Vencimento</label>
+                                <input type="number" class="form-control" id="dia_vencimento" name="dia_vencimento" min="1" max="31">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Fator moderador da taxa de juros</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="fator_juros" id="fator_juros" value="100">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Produto</label>
+                                <select class="form-select" name="produto" id="produto">
+                                    <option value="IPSEC">IPSEC</option>
+                                    <option value="TLS">TLS</option>
+                                    <option value="VPN">VPN</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" name="estado_contrato" id="estado_contrato">
+                                    <option value="ATIVO">ATIVO</option>
+                                    <option value="CANCELADO">CANCELADO</option>
+                                    <option value="SUSPENSO">SUSPENSO</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label">Data Status</label>
+                                <input type="date" class="form-control" id="data_estado" name="data_estado">
+                            </div>
+                            <div class="col-md-9">
+                                <label class="form-label">Motivo</label>
+                                <input type="text" class="form-control" id="motivo_estado" name="motivo_estado">
+                            </div>
+                        </div>
+                        
+                        <div class="modal-section-header">Relação de Planos</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">Nome do Plano</label>
+                                <input type="text" class="form-control" name="plan_name">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Valor do Plano</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" class="form-control" name="plan_value" step="0.01">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Valor do Contrato</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" class="form-control" name="contract_value" step="0.01">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="saveContractBtn">Salvar Contrato</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'links.html' %}
+</body>
+</html>

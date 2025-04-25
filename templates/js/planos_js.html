@@ -1,0 +1,23 @@
+<script>
+
+    function toggleCollapse(id) {
+        const collapse = document.getElementById(id);
+        const icon = collapse.previousElementSibling.querySelector('i');
+        
+        collapse.classList.toggle('show');
+        
+        if (collapse.classList.contains('show')) {
+            icon.classList.remove('bi-chevron-up');
+            icon.classList.add('bi-chevron-down');
+        } else {
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-up');
+        }
+    }
+    
+    function confirmarExclusao(planoId) {
+        if (confirm('Tem certeza que deseja excluir este plano?')) {
+            window.location.href = '/planos/excluir/' + planoId;
+        }
+    }
+    </script>

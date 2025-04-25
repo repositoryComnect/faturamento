@@ -1,0 +1,65 @@
+{% include "model-header.html" %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+
+
+<div class="clientes-container">
+    <h2 class="clientes-title">Lista de Clientes</h2>
+    
+    <div class="table-responsive">
+        <table class="clientes-table">
+            <thead>
+                <tr>
+                    <th>Contrato</th>
+                    <th>Sequência</th>
+                    <th>Cadastramento</th>
+                    <th>Atualização</th>
+                    <th>Razão Social</th>
+                    <th>Nome Fantasia</th>
+                    <th>Contato</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                    <th>CNPJ</th>
+                    <th>Revenda</th>
+                    <th>Vendedor</th>
+                    <th>Serviço</th>
+                    <th>CEP</th>
+                    <th>Endereço</th>
+                    <th>Cidade</th>
+                    <th>Status</th>
+                    <th>Plano</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente.numero_contrato }}</td>
+                    <td>{{ cliente.sequencia }}</td>
+                    <td>{{ cliente.cadastramento.strftime('%d/%m/%Y') if cliente.cadastramento else 'N/A' }}</td>
+                    <td>{{ cliente.atualizacao.strftime('%d/%m/%Y %H:%M') if cliente.atualizacao else 'N/A' }}</td>
+                    <td>{{ cliente.razao_social }}</td>
+                    <td>{{ cliente.nome_fantasia }}</td>
+                    <td>{{ cliente.contato_principal }}</td>
+                    <td>{{ cliente.email }}</td>
+                    <td>{{ cliente.telefone }}</td>
+                    <td>{{ cliente.cnpj }}</td>
+                    <td>{{ cliente.revenda_nome }}</td>
+                    <td>{{ cliente.vendedor_nome}}</td>
+                    <td>{{ cliente.tipo_servico }}</td>
+                    <td>{{ cliente.cep  }}</td>
+                    <td>{{ cliente.endereco }}</td>
+                    <td>{{ cliente.cidade}}</td>
+                    <td>
+                        <span class="status-badge {% if cliente.estado_atual == 'Ativo' %}status-ativo{% else %}status-inativo{% endif %}">
+                            {{ cliente.estado_atual or 'N/A' }}
+                        </span>
+                    </td>
+                    <td>{{ cliente.plano_nome or 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>  
+</div>    
+    
+        
+        
