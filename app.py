@@ -1,5 +1,3 @@
-# app.py
-
 from flask import Flask
 from flask_login import LoginManager
 from werkzeug.security import generate_password_hash
@@ -7,6 +5,10 @@ from modules.login.routes import login_bp
 from modules.home.routes import home_bp
 from modules.clientes.routes import cliente_bp
 from modules.contratos.routes import contratos_bp
+from modules.produtos.routes import produtos_bp
+from flask_migrate import Migrate
+from modules.planos.routes import planos_bp
+from application.models.models import db, User
 import os
 
 # Inicializa o Flask app
@@ -18,18 +20,17 @@ app.register_blueprint(login_bp)
 app.register_blueprint(home_bp)
 app.register_blueprint(cliente_bp)
 app.register_blueprint(contratos_bp)
+app.register_blueprint(planos_bp)
+app.register_blueprint(produtos_bp)
 
 
-# Configuração do MySQL (CODIFIQUE o @ na senha como %40)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%40Slink1205@localhost/faturamento'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.urandom(24)
 
-# Importa o db e a classe User de models.py
-from application.models.models import db, User
-
 # Inicializa o db com o app
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # Inicialização do LoginManager
 login_manager = LoginManager(app)
