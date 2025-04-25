@@ -1,0 +1,160 @@
+.planos-container {
+    display: flex;
+    gap: 20px;
+}
+
+.planos-list {
+    flex: 1;
+    max-width: 40%;
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+.planos-form {
+    flex: 2;
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 20px;
+}
+
+.data-table th, .data-table td {
+    padding: 8px 12px;
+    border: 1px solid #dee2e6;
+}
+
+.data-table th {
+    background-color: #f8f9fa;
+    text-align: left;
+}
+
+.compact-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 0;
+    font-size: 0.9rem;
+}
+
+.page-link {
+    color: #007bff;
+    text-decoration: none;
+    padding: 2px 8px;
+    border-radius: 3px;
+    margin: 0 2px;
+}
+
+.page-link:hover {
+    background-color: #f0f0f0;
+}
+
+.current-page {
+    color: #6c757d;
+    font-size: 0.85rem;
+}
+
+.form-header {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    flex: 1;
+    min-width: 200px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.collapse-section {
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.collapse-toggle {
+    width: 100%;
+    padding: 15px;
+    text-align: left;
+    background: #f8f9fa;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.collapse-toggle h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.collapse-content {
+    padding: 15px;
+    display: none;
+}
+
+.collapse-content.show {
+    display: block;
+}
+
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px; /* Adiciona espaço à direita de cada botão */
+    
+}
+
+.btn-primary:last-child {
+    margin-right: 0; /* Remove a margem do último botão */
+}
+
+
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.table-primary {
+    background-color: #e6f7ff;
+}
+
+.form-check {
+    margin-bottom: 8px;
+}
+
+.form-check-input {
+    margin-right: 8px;
+}

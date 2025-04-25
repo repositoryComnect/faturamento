@@ -74,12 +74,3 @@
     opacity: 1;
 }
 
-/* Estilos para status */
-.status-ativo {
-    background-color: #d4edda;
-    color: #155724;
-}
-.status-inativo {
-    background-color: #f8d7da;
-    color: #721c24;
-}
