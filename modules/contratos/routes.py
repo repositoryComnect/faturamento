@@ -1,60 +1,164 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, request
-from application.models.models import Contrato, db
+from application.models.models import Contrato, db, Cliente
 from datetime import datetime
+from sqlalchemy import text
 
 contratos_bp = Blueprint('contratos_bp', __name__)
 
 
-@contratos_bp.route('/contratos/<int:contrato_id>', methods=['GET'])
-def get_contrato(contrato_id):
+@contratos_bp.route('/contratos/delete', methods=['POST'])
+def delete_contrato():
+    numero = request.form.get('numero')
     try:
-        contrato = Contrato.query.get(contrato_id)
-        if not contrato:
-            return jsonify({"error": "Contrato não encontrado"}), 404
-        
-        print(contrato)
-        
-        # Converter para dicionário
-        contrato_data = {
-            'id': contrato.id,
-            'numero': contrato.numero,
-            # Adicione todos os outros campos aqui
-        }
-        return jsonify(contrato_data)
+        db.session.execute(
+            text("DELETE FROM contratos WHERE numero = :numero"),
+            {'numero': numero}
+        )
+        db.session.commit()
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Alerta: Não foi possível realizar a exclusão do contrato: {str(e)}")
+    
+    return redirect(url_for(('home_bp.render_contratos')))
 
 
 
-# Renderiza a página de contratos com as informações
-@contratos_bp.route('/contratos')
-def list_contratos():
+
+@contratos_bp.route('/contratos/alterar', methods=['POST'])
+def alterar_contrato():
     try:
-        contrato = Contrato.query.first()
-        if contrato:
-            return redirect(url_for('contratos_bp.view_contrato', contrato_id=contrato.id))
-        else:
-            flash('Nenhum contrato encontrado no banco de dados', 'info')
-            return render_template('contratos.html', contrato=None)
+        numero = request.form.get('numeroContrato')
+        razao_social = request.form.get('razao_social')
+        nome_fantasia = request.form.get('nome_fantasia')
+        tipo = request.form.get('tipo')
+        responsavel = request.form.get('responsavel')
+        contato = request.form.get('contato')
+        email = request.form.get('email')
+        telefone = request.form.get('telefone')
+        cep = request.form.get('cep')
+        endereco = request.form.get('endereco')
+        complemento = request.form.get('complemento')
+        bairro = request.form.get('bairro')
+        cidade = request.form.get('cidade')
+        estado = request.form.get('estado')
+        dia_vencimento = request.form.get('dia_vencimento')
+        fator_juros = request.form.get('fator_juros')
+        contrato_revenda = request.form.get('contrato_revenda')
+        faturamento_contrato = request.form.get('faturamento_contrato')
+        estado_contrato = request.form.get('estado_contrato')
+        data_estado = request.form.get('data_estado')
+        motivo_estado = request.form.get('motivo_estado')
+
+        if not numero:
+            return jsonify({'success': False, 'message': 'Número do contrato é obrigatório'}), 400
+
+        db.session.execute(
+            text("""
+                UPDATE contratos SET
+                    razao_social = :razao_social,
+                    nome_fantasia = :nome_fantasia,
+                    tipo = :tipo,
+                    responsavel = :responsavel,
+                    contato = :contato,
+                    email = :email,
+                    telefone = :telefone,
+                    cep = :cep,
+                    endereco = :endereco,
+                    complemento = :complemento,
+                    bairro = :bairro,
+                    cidade = :cidade,
+                    estado = :estado,
+                    dia_vencimento = :dia_vencimento,
+                    fator_juros = :fator_juros,
+                    contrato_revenda = :contrato_revenda,
+                    faturamento_contrato = :faturamento_contrato,
+                    estado_contrato = :estado_contrato,
+                    data_estado = :data_estado,
+                    motivo_estado = :motivo_estado,
+                    atualizacao = CURRENT_TIMESTAMP
+                WHERE numero = :numero
+            """),
+            {
+                'numero': numero,
+                'razao_social': razao_social,
+                'nome_fantasia': nome_fantasia,
+                'tipo': tipo,
+                'responsavel': responsavel,
+                'contato': contato,
+                'email': email,
+                'telefone': telefone,
+                'cep': cep,
+                'endereco': endereco,
+                'complemento': complemento,
+                'bairro': bairro,
+                'cidade': cidade,
+                'estado': estado,
+                'dia_vencimento': dia_vencimento,
+                'fator_juros': fator_juros,
+                'contrato_revenda': contrato_revenda,
+                'faturamento_contrato': faturamento_contrato,
+                'estado_contrato': estado_contrato,
+                'data_estado': data_estado,
+                'motivo_estado': motivo_estado
+            }
+        )
+        db.session.commit()
+
+        return render_template('contratos.html')
+
     except Exception as e:
-        flash(f'Erro ao acessar contratos: {str(e)}', 'error')
-        return render_template('contratos.html', contrato=None)
+        db.session.rollback()
+        print(f"Erro ao atualizar contrato: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Erro ao atualizar contrato: {str(e)}'
+        }), 500
 
 
-# Realiza a consulta com o número do contrato.
+
+
+@contratos_bp.route('/listar/contratos')
+def listar_contratos():
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = 10  
+        
+        offset = (page - 1) * per_page
+        resultado = db.session.execute(
+            text("SELECT * FROM contratos ORDER BY numero LIMIT :limit OFFSET :offset"),
+            {'limit': per_page, 'offset': offset}
+        )
+        
+        contratos = [dict(row._mapping) for row in resultado]
+        total = db.session.execute(text("SELECT COUNT(*) FROM contratos")).scalar()
+        
+        return render_template('listar_contratos.html', 
+                            contratos=contratos,
+                            page=page,
+                            per_page=per_page,
+                            total=total)
+        
+    except Exception as e:
+        print(f"Erro ao listar clientes: {str(e)}")
+        return render_template('listar_contratos.html', 
+                            error="Não foi possível carregar os clientes")
+
+
+
+
 @contratos_bp.route('/contratos/buscar-por-numero/<numero>', methods=['GET'])
 def buscar_contrato_por_numero(numero):
     try:
-        numero = str(numero).strip()
+        # 1. Busca o contrato pelo número exato
         contrato = Contrato.query.filter_by(numero=numero).first()
         
         if not contrato:
             return jsonify({'error': f'Contrato {numero} não encontrado'}), 404
-        
-        # Função auxiliar para formatar datas
+
         def format_date(date):
             return date.strftime('%d/%m/%Y') if date else None
-        
+
+        # 2. Monta os dados do contrato
         data = {
             'id': contrato.id,
             'numero': contrato.numero,
@@ -69,46 +173,54 @@ def buscar_contrato_por_numero(numero):
             'telefone': contrato.telefone or None,
             'responsavel': contrato.responsavel or None,
             'cep': contrato.cep or None,
+            'cnpj': contrato.cnpj or None,
             'endereco': contrato.endereco or None,
             'complemento': contrato.complemento or None,
             'bairro': contrato.bairro or None,
             'cidade': contrato.cidade or None,
             'estado': contrato.estado or None,
-            'cobranca_cep': contrato.cobranca_cep or None,
-            'cobranca_endereco': contrato.cobranca_endereco or None,
-            'cobranca_bairro': contrato.cobranca_bairro or None,
-            'cobranca_cidade': contrato.cobranca_cidade or None,
-            'cobranca_estado': contrato.cobranca_estado or None,
             'dia_vencimento': contrato.dia_vencimento or None,
-            'fator_juros': contrato.fator_juros or None,
+            'fator_juros': float(contrato.fator_juros) if contrato.fator_juros else None,
             'contrato_revenda': contrato.contrato_revenda or None,
             'faturamento_contrato': contrato.faturamento_contrato or None,
             'estado_contrato': contrato.estado_contrato or None,
             'data_estado': format_date(contrato.data_estado),
-            'motivo_estado': contrato.motivo_estado or None
+            'motivo_estado': contrato.motivo_estado or None,
         }
-        print(data)
+
+        # 3. Adiciona dados do(s) cliente(s) associados (se houver)
+        if contrato.clientes:
+            data['clientes'] = [{
+                'nome_fantasia': c.nome_fantasia or None,
+                'razao_social': c.razao_social or None,
+                'localidade': c.localidade or None,
+                'atividade': c.atividade or None,
+                'regiao': c.regiao or None,
+                'estado_atual': c.estado_atual or None,
+                'numero_contrato_cadastrado': c.numero_contrato
+            } for c in contrato.clientes]
+
         return jsonify(data)
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
     
+    except Exception as e:
+        print(f"ERRO: {str(e)}")
+        return jsonify({'error': 'Erro ao processar a requisição'}), 500
+
+    
+
+
 
 
 @contratos_bp.route('/set_contrato', methods=['POST'])
 def set_contrato():
     try:
-        # Verificar e resetar transações pendentes
         db.session.rollback()
-        
-        # Pegar todos os dados do formulário
         form_data = request.form.to_dict()
         
-        # Função melhorada para converter datas
         def parse_date(date_str):
             if not date_str:
                 return None
             try:
-                # Tenta vários formatos de data
                 for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
                     try:
                         return datetime.strptime(date_str, fmt).date()
@@ -118,7 +230,6 @@ def set_contrato():
             except Exception:
                 return None
         
-        # Funções para conversão segura de tipos
         def parse_int(value):
             try:
                 return int(value) if value else None
@@ -136,7 +247,6 @@ def set_contrato():
                 return value.lower() in ('true', '1', 'yes', 'y', 't')
             return bool(value)
         
-        # Criar dicionário com os dados formatados
         contrato_data = {
             'numero': form_data.get('numero_contrato'),
             'cadastramento': parse_date(form_data.get('cadastramento')),
@@ -155,37 +265,26 @@ def set_contrato():
             'bairro': form_data.get('bairro'),
             'cidade': form_data.get('cidade'),
             'estado': form_data.get('uf'),
-            'cobranca_cep': form_data.get('cobranca_cep'),
-            'cobranca_endereco': form_data.get('cobranca_endereco'),
-            'cobranca_complemento': form_data.get('cobranca_complemento'),
-            'cobranca_bairro': form_data.get('cobranca_bairro'),
-            'cobranca_cidade': form_data.get('cobranca_cidade'),
-            'cobranca_estado': form_data.get('cobranca_uf'),
             'dia_vencimento': parse_int(form_data.get('dia_vencimento')),
             'fator_juros': parse_float(form_data.get('fator_juros')),
             'contrato_revenda': parse_bool(form_data.get('contrato_revenda')),
             'faturamento_contrato': parse_bool(form_data.get('faturamento_contrato')),
-            'estado_contrato': form_data.get('estado_contrato'),
+            'estado_contrato': form_data.get('produto'),
             'data_estado': parse_date(form_data.get('data_estado')),
             'motivo_estado': form_data.get('motivo_estado'),
             'cliente_id': parse_int(form_data.get('cliente_id'))
         }
         
-        # Verificar se o número do contrato já existe
         if Contrato.query.filter_by(numero=contrato_data['numero']).first():
             return jsonify({
                 'success': False,
                 'message': 'Já existe um contrato com este número'
             }), 400
         
-        # Criar novo contrato (deixe o ID ser auto-incrementado)
         novo_contrato = Contrato(**contrato_data)
-        
-        # Adicionar e commitar no banco
         db.session.add(novo_contrato)
         db.session.commit()
         
-        # Atualizar o auto-increment se necessário (apenas para MySQL)
         try:
             db.session.execute(
                 "ALTER TABLE contratos AUTO_INCREMENT = : id",
@@ -195,7 +294,7 @@ def set_contrato():
         except Exception as e:
             print(f"Alerta: Não foi possível realizar o autoincremento: {str(e)}")
         
-        return render_template('contratos.html')
+        return redirect(url_for(('home_bp.render_contratos')))
         
     except Exception as e:
         db.session.rollback()
@@ -203,4 +302,35 @@ def set_contrato():
             'success': False,
             'message': f'Erro ao criar contrato: {str(e)}',
             'error_details': str(e)
+        }), 500
+    
+
+
+
+
+@contratos_bp.route('/get/id/contatos', methods=['GET'])
+def get_id_contratos():
+    search_term = request.args.get('search', '').strip()
+    
+    if not search_term:
+        return jsonify({'erro': 'Termo de pesquisa não fornecido'}), 400
+
+    try:
+        query = text("""
+            SELECT * FROM contratos
+            WHERE razao_social LIKE :term 
+               OR numero LIKE :term 
+               OR nome_fantasia LIKE :term
+               OR cnpj LIKE :term
+        """)
+
+        result = db.session.execute(query, {'term': f'%{search_term}%'})
+        contratos = [dict(row._asdict()) for row in result]
+        
+        return render_template('listar_contratos.html', contratos=contratos)
+        
+    except Exception as e:
+        return jsonify({
+            'erro': str(e),
+            'sucesso': False
         }), 500
