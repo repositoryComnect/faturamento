@@ -1,68 +1,86 @@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- CSS Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- JS Bootstrap Bundle (com Popper incluído) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-    let timeoutId;
+    let timeoutSequencia;
     
-    function buscarDadosContrato(numeroContrato) {
-if (!numeroContrato) return;
+    function buscarDadosCliente(numeroSequencia) {
+        if (!numeroSequencia) return;
 
-$('#loadingContrato').removeClass('d-none');
-clearTimeout(timeoutId);
+        $('#loadingCliente').removeClass('d-none');
+        clearTimeout(timeoutSequencia);
 
-timeoutId = setTimeout(() => {
-    $.ajax({
-        url: '/clientes/buscar-por-numero/' + numeroContrato,
-        method: 'GET',
-        success: function(data) {
-            console.log("Dados recebidos:", data);
-            
-            // Mapeamento correto dos campos
-            const fieldMap = {
-                'numero': '#numeroContrato',
-                'sequencia': '#sequencia',
-                'razao_social': '#razao_social',
-                'nome_fantasia': '#nome_fantasia',
-                'atualizacao': '#atualizacao',
-                'cadastramento': '#cadastramento',
-                'tipo': '#tipo',
-                'contato': '#contato',
-                'email': '#email',
-                'telefone': '#telefone',
-                'cep': '#cep',
-                'endereco': '#endereco',
-                'complemento': '#complemento',
-                'bairro': '#bairro',
-                'cidade': '#cidade',
-                'estado': '#estado',
-                'dia_vencimento': '#dia_vencimento',
-                'fator_juros': '#fator_juros',
-                'estado_contrato': '#estado_contrato',
-                'tipo_cobranca': '#tipo_cobranca',
-                'data_estado': '#data_estado',
-                'motivo_estado': '#motivo_estado',
-                'plano_nome': '#plano_nome',
-                'valor_plano': '#valor_plano',
-                'valor_contrato': '#valor_contrato',
-                'observacao': '#observacao'
-            };
-
-            // Atualizar os campos com os valores recebidos
-            for (const key in fieldMap) {
-                if (fieldMap.hasOwnProperty(key)) {
-                    const fieldSelector = fieldMap[key];
-                    const fieldValue = data[key]; // A chave 'key' aqui corresponde ao valor esperado na resposta JSON
+        timeoutSequencia = setTimeout(() => {
+            $.ajax({
+                url: '/clientes/buscar-por-numero/' + numeroSequencia,
+                method: 'GET',
+                success: function(data) {
+                    console.log("Dados recebidos:", data);
                     
-                    if (fieldValue !== null && fieldValue !== undefined) {
-                        $(fieldSelector).val(fieldValue);
-                    }
-                }
-            }
+                    // Mapeamento correto dos campos
+                    const fieldMap = {
+                        'numero': '#numeroContrato',
+                        'sequencia': '#sequencia',
+                        'razao_social': '#razao_social',
+                        'nome_fantasia': '#nome_fantasia',
+                        'atualizacao': '#atualizacao',
+                        'cadastramento': '#cadastramento',
+                        'tipo': '#tipo',
+                        'contato': '#contato',
+                        'email': '#email',
+                        'telefone': '#telefone',
+                        'cep': '#cep',
+                        'endereco': '#endereco',
+                        'complemento': '#complemento',
+                        'bairro': '#bairro',
+                        'cidade': '#cidade',
+                        'estado': '#estado',
+                        'dia_vencimento': '#dia_vencimento',
+                        'fator_juros': '#fator_juros',
+                        'estado_contrato': '#estado_contrato',
+                        'tipo_cobranca': '#tipo_cobranca',
+                        'data_estado': '#data_estado',
+                        'motivo_estado': '#motivo_estado',
+                        'plano_nome': '#plano_nome',
+                        'valor_plano': '#valor_plano',
+                        'valor_contrato': '#valor_contrato',
+                        'observacao': '#observacao'
+                    };
 
-            $('#loadingContrato').addClass('d-none');
-        },
-        error: function(xhr, status, error) {
-            console.error("Erro na requisição:", status, error);
-            alert('Erro ao buscar contrato. Verifique o console para mais detalhes.');
+                    // Atualizar os campos com os valores recebidos
+                    for (const key in fieldMap) {
+                        if (fieldMap.hasOwnProperty(key)) {
+                            const fieldSelector = fieldMap[key];
+                            const fieldValue = data[key]; // A chave 'key' aqui corresponde ao valor esperado na resposta JSON
+                            
+                            if (fieldValue !== null && fieldValue !== undefined) {
+                                $(fieldSelector).val(fieldValue);
+                            }
+                        }
+                    }
+
+                    $('#loadingCliente').addClass('d-none');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Erro na requisição:", status, error);
+                    alert('Erro ao buscar contrato. Verifique o console para mais detalhes.');
+                }
+            });
+        }, 500);
         }
-    });
-}, 500);
-}
+
 </script>
+
+
+
+
+
+
+
+    

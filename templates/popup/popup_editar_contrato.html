@@ -1,199 +1,181 @@
-{% if not contrato %}
-<div class="alert alert-warning">
-    Nenhum contrato encontrado. Por favor, crie um novo contrato ou selecione um existente.
-</div>
-{% else %}
-<!-- Create Contract Modal -->
-<div class="modal fade" id="updateContractModal" tabindex="-1" aria-labelledby="updateContractModal" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title" id="updateContractModal">Editar Contrato</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="contractForm" action="{{ url_for('contratos_bp.alterar_contrato') }}" method="POST">
-                    <!-- Basic Information Section -->
-                    <div class="modal-section-header">Informações Básicas</div>
-                    <div class="row g-3 mb-1">
-                        <div class="col-md-3">
-                            <label class="form-label">Nº Contrato</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="numeroContrato" name="numeroContrato" value="{{ contrato.numero if contrato else '' }}" onchange="buscarDadosContrato(this.value)">
-                                    <div id="loadingContrato" class="input-group-text d-none">
-                                        <div class="spinner-border spinner-border-sm" role="status">
+    <!-- Modal de Edição de Contrato -->
+    <div class="modal fade" id="updateContractModal" tabindex="-1" aria-labelledby="updateContractModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <!-- Cabeçalho do Modal -->
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="updateContractModalLabel">Editar Contrato</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Corpo do Modal -->
+                <div class="modal-body">
+                    <form id="contractForm" action="{{ url_for('contratos_bp.alterar_contrato') }}" method="POST">
+                        <!-- Seção de Busca de Contratos -->
+                        <div class="card mb-2">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0">Procurar Contratos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-12">
+                                        <label for="search_contract" class="form-label">Insira o Número ou Nome do Contrato:</label>
+                                        <input type="text" class="form-control" id="search_contract" name="search_contract" placeholder="Buscar contratos...">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-9">
-                            <label class="form-label">Razão Social</label>
-                            <input type="text" class="form-control" id="razao_social" name="razao_social" 
-                                   value="{{ contrato.razao_social }}">
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label">Cadastramento</label>
-                            <input type="date" class="form-control" id="cadastramento" name="cadastramento" 
-                                   value="{{ contrato.cadastramento.strftime('%Y-%m-%d') if contrato.cadastramento else '' }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Nome Fantasia</label>
-                            <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" 
-                                   value="{{ contrato.nome_fantasia }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Atualização</label>
-                            <input type="date" class="form-control" id="atualizacao" name="atualizacao" 
-                                   value="{{ contrato.atualizacao.strftime('%Y-%m-%d') if contrato.atualizacao else '' }}">
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label">Tipo de Contrato</label>
-                            <select class="form-select" id="tipo" name="tipo">
-                                <option value="Hardware" {% if contrato.tipo == 'Hardware' %}selected{% endif %}>Hardware</option>
-                                <option value="Software" {% if contrato.tipo == 'Software' %}selected{% endif %}>Software</option>
-                                <option value="Serviço" {% if contrato.tipo == 'Serviço' %}selected{% endif %}>Serviço</option>
-                                <option value="Manutenção" {% if contrato.tipo == 'Manutenção' %}selected{% endif %}>Manutenção</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Contato</label>
-                            <input type="text" class="form-control" id="contato" name="contato" 
-                                   value="{{ contrato.contato }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Id Matriz Portal</label>
-                            <input type="text" class="form-control" id="id_matriz_portal" name="id_matriz_portal" 
-                                   value="{{ contrato.id_matriz_portal }}">
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label">E-mail</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   value="{{ contrato.email }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Fone</label>
-                            <input type="tel" class="form-control" id="telefone" name="telefone" 
-                                   value="{{ contrato.telefone }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Responsável</label>
-                            <input type="text" class="form-control" id="responsavel" name="responsavel" 
-                                   value="{{ contrato.responsavel }}">
-                        </div>
-                    </div>
-                    
-                    <!-- Address Section -->
-                    <div class="modal-section-header mb-3">
-                        <h5>Endereço do Contrato</h5>
-                    </div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-2">
-                            <label class="form-label">CEP</label>
-                            <input type="text" class="form-control" id="cep" name="cep" 
-                                   value="{{ contrato.cep }}">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Endereço</label>
-                            <input type="text" class="form-control" id="endereco" name="endereco" 
-                                   value="{{ contrato.endereco }}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Compl.</label>
-                            <input type="text" class="form-control" id="complemento" name="complemento" 
-                                   value="{{ contrato.complemento }}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Bairro</label>
-                            <input type="text" class="form-control" id="bairro" name="bairro" 
-                                   value="{{ contrato.bairro }}">
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label">Cidade</label>
-                            <input type="text" class="form-control" id="cidade" name="cidade" 
-                                   value="{{ contrato.cidade }}">
-                        </div>
-                        <div class="col-md-1">
-                            <label class="form-label">UF</label>
-                            <select class="form-select" id="estado" name="estado">
-                                <option value="RJ" {% if contrato.estado == 'RJ' %}selected{% endif %}>RJ</option>
-                                <option value="SP" {% if contrato.estado == 'SP' %}selected{% endif %}>SP</option>
-                                <!-- Adicione outros estados conforme necessário -->
-                            </select>
-                        </div>
-                    </div>
 
-                    <!-- Contract Details Section -->
-                    <div class="modal-section-header mb-3">
-                        <h5>Detalhes do Contrato</h5>
-                    </div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-2">
-                            <label class="form-label">Dia Vencimento</label>
-                            <input type="number" class="form-control" id="dia_vencimento" name="dia_vencimento" 
-                                   value="{{ contrato.dia_vencimento }}" min="1" max="31">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Fator moderador da taxa de juros</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="fator_juros" name="fator_juros" 
-                                       value="{{ contrato.fator_juros }}">
-                                <span class="input-group-text">%</span>
+                        <!-- Informações Básicas -->
+                        <div class="modal-section-header"><h5>Informações Básicas</h5></div>
+                        <div class="row g-3 mb-1">
+                            <div class="col-md-3">
+                                <label class="form-label">Nº Contrato</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="contract_number" name="contract_number" value="">
+                                    
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <label class="form-label">Razão Social</label>
+                                <input type="text" class="form-control" id="company_name" name="company_name" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Cadastramento</label>
+                                <input type="date" class="form-control" id="registration" name="registration" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Nome Fantasia</label>
+                                <input type="text" class="form-control" id="trade_name" name="trade_name" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Atualização</label>
+                                <input type="date" class="form-control" id="update" name="update" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tipo de Contrato</label>
+                                <select class="form-select" id="type" name="type">
+                                    <option value="Hardware">Hardware</option>
+                                    <option value="Software">Software</option>
+                                    <option value="Serviço">Serviço</option>
+                                    <option value="Manutenção">Manutenção</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Contato</label>
+                                <input type="text" class="form-control" id="contact" name="contact" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Id Matriz Portal</label>
+                                <input type="text" class="form-control" id="id_matriz_portal" name="id_matriz_portal" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">E-mail</label>
+                                <input type="email" class="form-control" id="email" name="email" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Fone</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Responsável</label>
+                                <input type="text" class="form-control" id="responsible" name="responsible" value="">
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Estado</label>
-                            <select class="form-select" id="estado_contrato" name="estado_contrato">
-                                <option value="ATIVO" {% if contrato.estado_contrato == 'ATIVO' %}selected{% endif %}>ATIVO</option>
-                                <option value="CANCELADO" {% if contrato.estado_contrato == 'CANCELADO' %}selected{% endif %}>CANCELADO</option>
-                                <option value="SUSPENSO" {% if contrato.estado_contrato == 'SUSPENSO' %}selected{% endif %}>SUSPENSO</option>
-                            </select>
-                        </div>
-                        
-                        <div class="col-md-3">
-                            <label class="form-label">Data Status</label>
-                            <input type="date" class="form-control" id="data_estado" name="data_estado" 
-                                   value="{{ contrato.data_estado.strftime('%Y-%m-%d') if contrato.data_estado else '' }}">
-                        </div>
-                        <div class="col-md-9">
-                            <label class="form-label">Motivo</label>
-                            <input type="text" class="form-control" id="motivo_estado" name="motivo_estado" 
-                                   value="{{ contrato.motivo_estado }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Nome do Plano</label>
-                            <input type="text" class="form-control" id="plano_nome" name="plano_nome" 
-                                   value="{{ contrato.plano_nome if contrato.plano_nome else '' }}">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Valor do Plano</label>
-                            <div class="input-group">
-                                <span class="input-group-text">R$</span>
-                                <input type="number" step="0.01" class="form-control" id="valor_plano" name="valor_plano" 
-                                       value="{{ contrato.valor_plano if contrato.valor_plano else '' }}">
+
+                        <!-- Endereço -->
+                        <div class="modal-section-header mb-3"><h5>Endereço do Contrato</h5></div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label">CEP</label>
+                                <input type="text" class="form-control" id="cep" name="cep" value="">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Endereço</label>
+                                <input type="text" class="form-control" id="address" name="address" value="">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Compl.</label>
+                                <input type="text" class="form-control" id="complement" name="complement" value="">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Bairro</label>
+                                <input type="text" class="form-control" id="neighborhood" name="neighborhood" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Cidade</label>
+                                <input type="text" class="form-control" id="city" name="city" value="">
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-label">UF:</label>
+                                <select class="form-select" id="state" name="state">
+                                    {% set states = ['RJ', 'SP', 'MG', 'DF', 'SC', 'ES', 'AC', 'CE', 'AL', 'BA', 'AM', 'SE', 'TO', 'RR', 'PI', 'RN', 'RS', 'PB', 'PR'] %}
+                                    {% for state in states %}
+                                        <option value="{{ state }}">{{ state }}</option>
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Valor do Contrato</label>
-                            <div class="input-group">
-                                <span class="input-group-text">R$</span>
-                                <input type="number" step="0.01" class="form-control" id="valor_contrato" name="valor_contrato" 
-                                       value="{{ contrato.valor_contrato if contrato.valor_contrato else '' }}">
+
+                        <!-- Detalhes do Contrato -->
+                        <div class="modal-section-header mb-3"><h5>Detalhes do Contrato</h5></div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label">Dia Vencimento</label>
+                                <input type="number" class="form-control" id="last_day" name="last_day" value="" min="1" max="31">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Fator moderador da taxa de juros</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="interest_rate_factor" name="interest_rate_factor" value="">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" id="current_state" name="current_state">
+                                    <option value="Ativo">Ativo</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                    <option value="Suspenso">Suspenso</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Data Status</label>
+                                <input type="date" class="form-control" id="state_date" name="state_date" value="">
+                            </div>
+                            <div class="col-md-9">
+                                <label class="form-label">Motivo</label>
+                                <input type="text" class="form-control" id="reason" name="reason" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Nome do Plano</label>
+                                <input type="text" class="form-control" id="plan_name" name="plan_name" value="">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Valor do Plano</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" step="0.01" class="form-control" id="plan_value" name="plan_value" value="">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Valor do Contrato</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="number" step="0.01" class="form-control" id="contract_value" name="contract_value" value="">
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-                    </div>
-                </form>
-                {% endif %}
+
+                        <!-- Rodapé -->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-</div>
-</body>
-</html>
+
+
+{% include 'js/contratos_js.html' %}

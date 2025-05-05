@@ -3,8 +3,7 @@
 <head>
     {% include 'model-header.html' %}
     {% include 'links.html' %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_contratos.css' )}}">
 </head>
 <body>
     <!-- Mensagens Flash -->
@@ -22,7 +21,7 @@
     <div class="container mt-5 mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <h2>Contratos</h2>
-            <div class="d-flex gap-2"> <!-- Adicionei a classe gap-2 para espaçamento uniforme -->    
+            <div class="d-flex gap-2">    
                 <button class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createContractModal">
                     <i class="bi bi-plus-circle me-2"></i>Criar Novo Contrato
                 </button>
@@ -33,38 +32,36 @@
                     <i class="bi bi-trash me-2"></i>Excluir Contrato
                 </button>
                 <button class="btn btn-secondary btn-sm" onclick="window.location.href=this.getAttribute('action')" action="{{ url_for('contratos_bp.listar_contratos') }}">
-                        <i class="bi bi-search me-2"></i>Listar Todos
+                    <i class="bi bi-search me-2"></i>Listar Todos
                 </button>
-            <form class="d-flex" role="search" method="GET" action="{{ url_for('contratos_bp.get_id_contratos') }}">
-                <input class="form-control me-2" 
-                       type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Localizar</button>
-            </form>
-        </div>
-    </div>   
-        
+                <form class="d-flex" role="search" method="GET" action="{{ url_for('contratos_bp.get_id_contratos') }}">
+                    <input class="form-control me-2" 
+                           type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Localizar</button>
+                </form>
+            </div>
+        </div>   
         
         {% if not contrato %}
             <div class="alert alert-warning">
                 Nenhum contrato encontrado. Por favor, crie um novo contrato ou selecione um existente.
             </div>
         {% else %}
+        
             <!-- Basic Contract Information -->
             <div class="card mb-2">
-                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#basicInfoCollapse" role="button">
-                    <h5 class="mb-0">Informações Básicas do Contrato</h5>
+                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" aria-expanded="true" aria-controls="basicInfoCollapse">
+                    <h5 class="mb-0">Informações Básicas</h5>
                 </div>
                 <div class="collapse show" id="basicInfoCollapse">
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Nº Contrato:</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="numeroContrato" value="{{ contrato.numero if contrato else '' }}" onchange="buscarDadosContrato(this.value)">
                                     <div id="loadingContrato" class="input-group-text d-none">
-                                        <div class="spinner-border spinner-border-sm" role="status">
-                
-                                        </div>
+                                        <div class="spinner-border spinner-border-sm" role="status"></div>
                                     </div>
                                 </div>
                             </div>
@@ -164,9 +161,6 @@
                                 <label class="form-label">UF:</label>
                                 <input type="text" class="form-control" id="estado" value="{{ contrato.estado }}" readonly>
                             </div>
-                            <div class="col-md-12">
-                                <button class="btn btn-outline-primary">Localizar</button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -174,7 +168,7 @@
 
             <div class="card mb-2">
                 <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#relationCollapse">
-                    <h5 class="mb-0">Relação de Clientes do Contrato</h5>
+                    <h5 class="mb-0">Relação de Clientes Vinculados ao Contrato</h5>
                 </div>
                 <div class="collapse" id="relationCollapse">
                     <div class="card-body">
@@ -201,7 +195,7 @@
                                                 <td>{{ cliente.atividade }}</td>
                                                 <td>{{ cliente.regiao }}</td>
                                                 <td>
-                                                    <span class="status-badge {% if cliente.estado_atual == 'Ativo' %}status-ativo{% else %}status-inativo{% endif %}">
+                                                    <span class="status-badge {% if cliente.estado_atual and cliente.estado_atual|upper == 'ATIVO' %}status-ativo{% else %}status-inativo{% endif %}">
                                                         {{ cliente.estado_atual or 'N/A' }}
                                                     </span>
                                                 </td>
@@ -214,6 +208,12 @@
                                         {% endif %}
                                     </tbody>
                                 </table>
+                                <!-- Paginação -->
+                                <div id="clientes-pagination" class="d-flex justify-content-center mt-3">
+                                    <button id="prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                    <span id="pageInfo" class="align-self-center"></span>
+                                    <button id="nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -251,29 +251,69 @@
                                 <label class="form-label">Motivo:</label>
                                 <input type="text" class="form-control" id="motivo_estado" value="{{ contrato.motivo_estado }}" readonly>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Nome do Plano:</label>
-                                <input type="text" class="form-control" id="plano_nome" value="{{ contrato.plano_nome if contrato.plano_nome else '' }}" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Valor do Plano:</label>
-                                <input type="text" class="form-control" id="valor_plano" value="{{ contrato.valor_plano if contrato.valor_plano else '' }}" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Valor do Contrato:</label>
-                                <input type="text" class="form-control" id="valor_contrato" value="{{ contrato.valor_contrato if contrato.valor_contrato else '' }}" readonly>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Seção de Planos Associados SIMPLIFICADA -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#plansCollapse">
+                <h5 class="mb-0">Plano Associado ao Contrato</h5>  <!-- Singular agora -->
+            </div>
+            <div class="collapse" id="plansCollapse">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                            <table class="planos-table table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Código</th>
+                                        <th>Nome do Plano</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if contrato.planos and contrato.planos|length > 0 %}
+
+                                        {% for plano in contrato.planos %}
+                                        <tr>
+                                            <td>{{ plano.id }}</td>
+                                            <td>{{ plano.codigo }}</td>
+                                            <td>{{ plano.nome }}</td>
+                                            <td>R$ {{ "%.2f"|format(plano.valor) }}</td>
+                                            <td>
+                                                <span class="badge {% if plano.status == 'Ativo' %}bg-success{% else %}bg-danger{% endif %}">
+                                                    {{ plano.status }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <i class="bi bi-exclamation-circle me-2"></i>
+                                                Nenhum plano associado encontrado
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endif %}
+        
         {% include 'popup/popup_delete_contrato.html' %}
         {% include 'popup/popup_contratos.html' %}
         {% include 'popup/popup_editar_contrato.html' %}
-    </div><br><br><br><br><br>
-
- {% include 'js/contratos_js.html' %}       
-        
+    </div>
+    
+    <br><br><br><br><br>
+    {% include 'js/contratos_js.html' %}
 </body>
 </html>

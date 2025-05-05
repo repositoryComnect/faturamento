@@ -58,52 +58,52 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-2">
-                            <label class="form-label">Sequência</label>
-                            <input type="text" class="form-control" value="{{ cliente.sequencia }}" id="sequencia" onchange="buscarDadosContrato(this.value)">
-                            <div id="loadingContrato" class="input-group-text d-none">
+                            <label class="form-label">ID Cliente:</label>
+                            <input type="text" class="form-control" value="{{ cliente.sequencia }}" id="sequencia" onchange="buscarDadosCliente(this.value)">
+                            <div id="loadingCliente" class="input-group-text d-none">
                                 <div class="spinner-border spinner-border-sm" role="status"></div>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Cadastramento</label>
+                            <label class="form-label">Cadastramento:</label>
                             <input type="text" class="form-control" value="{{ cliente.cadastramento }}" id="cadastramento" readonly>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Atualização</label>
+                            <label class="form-label">Atualização:</label>
                             <input type="text" class="form-control" value="{{ cliente.atualizacao }}" id="atualizacao" readonly>
                         </div>
         
                         <div class="col-md-6">
-                            <label class="form-label">Razão Social</label>
+                            <label class="form-label">Razão Social:</label>
                             <input type="text" class="form-control" value="{{ cliente.razao_social }}" id="razao_social" readonly>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Nome Fantasia</label>
+                            <label class="form-label">Nome Fantasia:</label>
                             <input type="text" class="form-control" value="{{ cliente.nome_fantasia }}" id="nome_fantasia" readonly>
                         </div>
         
                         <div class="col-md-3">
-                            <label class="form-label">Tipo</label>
+                            <label class="form-label">Tipo:</label>
                             <input type="text" class="form-control" value="{{ cliente.tipo }}" id="tipo" readonly>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">CNPJ</label>
+                            <label class="form-label">CNPJ:</label>
                             <input type="text" class="form-control" value="{{ cliente.cnpj }}" id="cnpj" readonly>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">IE</label>
+                            <label class="form-label">IE:</label>
                             <input type="text" class="form-control" value="{{ cliente.ie }}" id="ie" readonly>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">IM</label>
+                            <label class="form-label">IM:</label>
                             <input type="text" class="form-control" value="{{ cliente.im }}" id="im" readonly>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">E-mail</label>
+                            <label class="form-label">E-mail:</label>
                             <input type="text" class="form-control" value="{{ cliente.email }}" id="email" readonly>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Fone</label>
+                            <label class="form-label">Fone:</label>
                             <input type="text" class="form-control" value="{{ cliente.telefone }}" id="telefone" readonly>
                         </div>
                     </div>
@@ -120,28 +120,28 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-2">
-                            <label class="form-label">CEP</label>
+                            <label class="form-label">CEP:</label>
                             <input type="text" class="form-control" value="{{ cliente.cep }}" id="cep" readonly>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">Endereço</label>
+                            <label class="form-label">Endereço:</label>
                             <input type="text" class="form-control" value="{{ cliente.endereco }}" id="endereco" readonly>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Compl.</label>
+                            <label class="form-label">Complemento:</label>
                             <input type="text" class="form-control" value="{{ cliente.complemento }}" id="complemento" readonly>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Bairro</label>
+                            <label class="form-label">Bairro:</label>
                             <input type="text" class="form-control" value="{{ cliente.bairro }}" id="bairro" readonly>
                         </div>
                         
                         <div class="col-md-4">
-                            <label class="form-label">Cidade</label>
+                            <label class="form-label">Cidade:</label>
                             <input type="text" class="form-control" value="{{ cliente.cidade }}" id="cidade" readonly>
                         </div>
                         <div class="col-md-1">
-                            <label class="form-label">UF</label>
+                            <label class="form-label">UF:</label>
                             <input type="text" class="form-control" value="{{ cliente.estado }}" id="estado" readonly>
                         </div>
                     </div>
@@ -158,31 +158,31 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-3">
-                            <label class="form-label">Fator moderador da taxa de juros</label>
+                            <label class="form-label">Fator moderador da taxa de juros:</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" value="{{ cliente.fator_juros }}" id="fator_juros" readonly>
                                 <span class="input-group-text">%</span>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Estado</label>
+                            <label class="form-label">Estado:</label>
                             <input type="text" class="form-control status-ativo" value="{{ cliente.estado_atual }}" id="estado_atual" readonly>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Tipo Cobrança</label>
+                            <label class="form-label">Tipo Cobrança:</label>
                             <input type="text" class="form-control status-ativo" value="{{ cliente.cobranca_tipo }}" id="cobranca_tipo" readonly>
                         </div>
                         
                         <div class="col-md-3">
-                            <label class="form-label">Data</label>
+                            <label class="form-label">Data:</label>
                             <input type="text" class="form-control" value="{{ cliente.data_estado }}" id="data_estado" readonly>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Plano</label>
+                            <label class="form-label">Plano:</label>
                             <input type="text" class="form-control" value="{{ cliente.plano_nome }}" id="plano_nome" readonly>
                         </div>
                         <div class="col-md-3">
-                            <label class="form-label">Dia Vencimento</label>
+                            <label class="form-label">Dia Vencimento:</label>
                             <input type="text" class="form-control" value="{{ cliente.dia_vencimento }}" id="dia_vencimento" readonly>
                         </div>
                     </div>
@@ -199,7 +199,7 @@
                 <div class="card-body">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label">Observações</label>
+                            <label class="form-label">Observações:</label>
                             <textarea class="form-control" rows="3" id="observacao" readonly>{{ cliente.observacao }}</textarea>
                         </div>
                     </div>
@@ -211,10 +211,9 @@
     {% include 'popup/popup_cliente.html' %}
     {% include 'popup/popup_delete_cliente.html' %}
     {% include 'popup/popup_editar_cliente.html' %}
+    {% include 'js/clientes_js.html' %}
 
     </div><br><br><br><br><br>
-
-{% include 'js/clientes_js.html' %}
 
 </body>
 </html>

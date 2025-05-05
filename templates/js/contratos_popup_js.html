@@ -1,0 +1,107 @@
+<!-- Módulo que busca o próximo número de Contrato disponível -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('createContractModal');
+    
+        modal.addEventListener('show.bs.modal', function () {
+            fetch('{{ url_for("contratos_bp.proximo_numero_contrato") }}')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('numero_contrato').value = data.proximo_numero;
+                })
+                .catch(error => console.error('Erro ao buscar número de contrato:', error));
+        });
+    });
+</script>
+
+<!-- Módulo que busca dinâmicamente os produtos disponíveis -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('createContractModal');
+    
+        modal.addEventListener('show.bs.modal', function () {
+            // Carrega o próximo número do contrato
+            fetch('{{ url_for("contratos_bp.proximo_numero_contrato") }}')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('numero_contrato').value = data.proximo_numero;
+                });
+    
+            // Carrega os produtos ativos
+            fetch('{{ url_for("contratos_bp.produtos_ativos") }}')
+                .then(response => response.json())
+                .then(produtos => {
+                    const select = document.getElementById('produto');
+                    select.innerHTML = '<option value=""></option>';
+                    produtos.forEach(prod => {
+                        const option = document.createElement('option');
+                        option.value = prod.id;
+                        option.textContent = prod.nome;
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar produtos:', error));
+        });
+    });
+</script>
+
+
+<!-- Módulo que encontra o plano e o valor do plano para o cadastro de contrato -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const planoSelect = document.getElementById('plano');
+        const valorInput = document.getElementById('plan_value');
+
+        fetch('/planos_ativos')
+            .then(response => response.json())
+            .then(planos => {
+                planoSelect.innerHTML = '<option value="">Selecione um plano</option>';
+                planos.forEach(plano => {
+                    const option = document.createElement('option');
+                    option.value = plano.id;
+                    option.textContent = `${plano.nome} - R$ ${parseFloat(plano.valor).toFixed(2)}`;
+                    option.dataset.valor = plano.valor;  // <- Aqui guardamos o valor
+                    planoSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao carregar os planos:', error);
+            });
+
+        planoSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const valor = selectedOption.dataset.valor;
+            valorInput.value = valor ? parseFloat(valor).toFixed(2) : '';
+        });
+    });
+</script>
+
+
+<!-- Módulo para trazer a data atual para poder realizar o cadastro -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const createModal = document.getElementById('createContractModal');
+
+        if (createModal) {
+            createModal.addEventListener('shown.bs.modal', function () {
+                const hoje = new Date();
+                const dia = String(hoje.getDate()).padStart(2, '0');
+                const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                const ano = hoje.getFullYear();
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                const camposData = ['cadastramento', 'atualizacao'];
+                camposData.forEach(id => {
+                    const campo = document.getElementById(id);
+                    if (campo && !campo.value) {
+                        campo.value = dataFormatada;
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+       

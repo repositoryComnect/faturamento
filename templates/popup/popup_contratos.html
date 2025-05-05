@@ -17,7 +17,7 @@
                         <div class="row g-3 mb-4">
                             <div class="col-md-3">
                                 <label class="form-label">Nº Contrato:</label>
-                                <input type="text" class="form-control" id="numero_contrato" name="numero_contrato" required>
+                                <input type="text" class="form-control" id="numero_contrato" name="numero_contrato" required readonly>
                             </div>
                             <div class="col-md-9">
                                 <label class="form-label">Razão Social:</label>
@@ -26,7 +26,7 @@
                             
                             <div class="col-md-4">
                                 <label class="form-label">Cadastramento:</label>
-                                <input type="date" class="form-control" id="cadastramento" name="cadastramento" required>
+                                <input type="text" class="form-control" id="cadastramento" name="cadastramento" readonly>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Nome Fantasia:</label>
@@ -34,7 +34,7 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label">Atualização:</label>
-                                <input type="date" class="form-control" id="atualizacao" name="atualizacao">
+                                <input type="text" class="form-control" id="atualizacao" name="atualizacao" readonly>
                             </div>
                             
                             <div class="col-md-4">
@@ -151,18 +151,16 @@
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Produto</label>
-                                <select class="form-select" name="produto" id="produto">
-                                    <option value="IPSEC">IPSEC</option>
-                                    <option value="TLS">TLS</option>
-                                    <option value="VPN">VPN</option>
+                                <select class="form-select" name="produto_id" id="produto">
+                                    <option value="">Carregando...</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Estado</label>
                                 <select class="form-select" name="estado_contrato" id="estado_contrato">
-                                    <option value="ATIVO">ATIVO</option>
-                                    <option value="CANCELADO">CANCELADO</option>
-                                    <option value="SUSPENSO">SUSPENSO</option>
+                                    <option value="Ativo">Ativo</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                    <option value="Suspenso">Suspenso</option>
                                 </select>
                             </div>
                             
@@ -179,23 +177,20 @@
                         <div class="modal-section-header">Relação de Planos</div>
                         <div class="row g-3 mb-4">
                             <div class="col-md-4">
-                                <label class="form-label">Nome do Plano</label>
-                                <input type="text" class="form-control" name="plan_name">
+                                <label class="form-label">Plano</label>
+                                <select class="form-select" name="plano_id" id="plano">
+                                    <option value="">Carregando planos...</option>
+                                </select>
                             </div>
+                            
                             <div class="col-md-4">
                                 <label class="form-label">Valor do Plano</label>
                                 <div class="input-group">
                                     <span class="input-group-text">R$</span>
-                                    <input type="number" class="form-control" name="plan_value" step="0.01">
+                                    <input type="number" class="form-control" name="plan_value" id="plan_value" step="0.01" readonly>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Valor do Contrato</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">R$</span>
-                                    <input type="number" class="form-control" name="contract_value" step="0.01">
-                                </div>
-                            </div>
+                            
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -208,5 +203,34 @@
     </div>
 
     {% include 'links.html' %}
+    {% include 'js/contratos_popup_js.html' %}
+
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modalElement = document.getElementById('createContractModal');
+    
+            // Se Bootstrap não estiver disponível, evita erro
+            if (!modalElement || typeof bootstrap === 'undefined') return;
+    
+            // Usa Bootstrap 5 Modal API para garantir que está funcionando corretamente
+            modalElement.addEventListener('shown.bs.modal', function () {
+                const hoje = new Date();
+                const dia = String(hoje.getDate()).padStart(2, '0');
+                const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                const ano = hoje.getFullYear();
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+    
+                ['cadastramento', 'atualizacao'].forEach(id => {
+                    const campo = document.getElementById(id);
+                    if (campo && !campo.value) {
+                        campo.value = dataFormatada;
+                    }
+                });
+            });
+        });
+    </script>
+    
+        
 </body>
 </html>
