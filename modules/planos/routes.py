@@ -1,11 +1,10 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
-from application.models.models import db, Plano
+from application.models.models import db, Plano, Contrato
 from sqlalchemy import text
 from datetime import datetime
 
 
 planos_bp = Blueprint('planos_bp', __name__)
-
 
 
 @planos_bp.route('/get/planos', methods=['GET'])
@@ -25,63 +24,59 @@ def get_planos():
         
     return render_template('listar_planos.html', planos=planos, page=page, per_page=per_page, total=total)
 
-
-
-
-
 @planos_bp.route('/insert/planos', methods=['POST'])
 def insert_planos():
     try:
-        # Verificar e resetar transações pendentes
         db.session.rollback()
-        
-        # Pegar todos os dados do formulário
         form_data = request.form.to_dict()
 
-        # Converter valores monetários e tratar campos
         nf_sao_paulo = True if form_data.get('nf_sao_paulo') == 'on' else False
-        
+
+        # Ajustar para garantir que o valor é tratado como string antes de aplicar replace
         plano_data = {
             'codigo': form_data.get('codigo'),
             'nome': form_data.get('nome'),
-            'valor': float(form_data.get('valor', 0).replace(',', '.')),
+            # Corrigir aqui: garantir que 'valor' seja tratado como string antes do replace
+            'valor': float(str(form_data.get('valor', 0)).replace(',', '.')),
             'id_portal': form_data.get('id_portal'),
             'licenca_descricao': form_data.get('licenca_descricao'),
-            'licenca_valor': float(form_data.get('licenca_valor', 0).replace(',', '.')),
-            'nf_descricao': form_data.get('nf_descricao'),
-            'aliquota': float(form_data.get('aliquota', 0).replace(',', '.')),
+            # Corrigir aqui: garantir que 'licenca_valor' seja tratado como string antes do replace
+            'licenca_valor': float(str(form_data.get('licenca_valor', 0)).replace(',', '.')),
+            # Corrigir aqui: garantir que 'aliquota' seja tratado como string antes do replace
+            'aliquota': float(str(form_data.get('aliquota', 0)).replace(',', '.')),
             'cod_servico': form_data.get('cod_servico'),
             'nf_sao_paulo': nf_sao_paulo,
             'data_criacao': datetime.now(),
             'data_atualizacao': datetime.now()
         }
-        
-       
-        # Criar novo plano
+
+        # Criar o plano
         novo_plano = Plano(**plano_data)
-        
-        # Adicionar e commitar no banco
         db.session.add(novo_plano)
         db.session.commit()
-        
+
+        # Associar com contrato (se selecionado)
+        contrato_id = form_data.get('contrato_id')
+        if contrato_id:
+            contrato = Contrato.query.get(int(contrato_id))
+            # Associa o plano ao contrato através da tabela intermediária
+            contrato.planos.append(novo_plano)
+            db.session.commit()
+
         return redirect(url_for('home_bp.render_planos'))
-        
-    except ValueError as e:
-        db.session.rollback()
-        return jsonify({
-            'success': False,
-            'message': f'Erro na conversão de valores: {str(e)}'
-        }), 400
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({
             'success': False,
             'message': f'Erro ao criar plano: {str(e)}'
         }), 500
-    
 
-
+@planos_bp.route('/contratos_ativos', methods=['GET'])
+def contratos_ativos():
+    contratos = Contrato.query.order_by(Contrato.numero).all()
+    resultado = [{'id': c.id, 'numero': c.numero, 'razao_social': c.razao_social} for c in contratos]
+    return jsonify(resultado)    
 
 @planos_bp.route('/get/id/planos', methods=['GET'])
 def get_list_planos():
@@ -107,8 +102,6 @@ def get_list_planos():
             'erro': str(e),
             'sucesso': False
         }), 500
-
-
 
 @planos_bp.route('/delete/planos', methods=['POST'])
 def delete_planos():

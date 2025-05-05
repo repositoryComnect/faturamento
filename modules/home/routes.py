@@ -4,7 +4,6 @@ from flask_login import login_required
 from sqlalchemy import text, extract, func
 from datetime import datetime
 
-
 home_bp = Blueprint('home_bp', __name__)
 
 @home_bp.route('/api/chart_data')
@@ -38,7 +37,6 @@ def chart_data():
     except Exception as e:
         print(f"Erro ao gerar dados do gráfico: {str(e)}")
         return jsonify({"error": "Erro ao gerar dados do gráfico"}), 500
-
 
 @home_bp.route('/api/chart_pie')
 def chart_pie():
@@ -74,26 +72,20 @@ def chart_pie():
         print(f"Erro ao gerar dados do gráfico de pizza: {str(e)}")
         return jsonify({"error": "Erro ao gerar dados do gráfico"}), 500
 
-
-
 @home_bp.route('/contratos', methods=['GET'])
 @login_required
 def render_contratos():
     try:
-        # Usando a nova sintaxe do SQLAlchemy 2.0
         contrato = db.session.execute(db.select(Contrato).limit(1)).scalar_one_or_none()
-        
         if contrato:
             return render_template('contratos.html', contrato=contrato)
         else:
             return render_template('contratos.html', contrato=None)
+        
     except Exception as e:
         print(f"Erro ao acessar contratos: {str(e)}")
         return render_template('contratos.html', contrato=None)
     
-
-
-
 @home_bp.route('/clientes', methods=['GET'])
 @login_required
 def render_clientes():
@@ -108,9 +100,6 @@ def render_clientes():
         print(f"Erro ao acessar clientes: {str(e)}")
         return render_template('clientes.html', cliente=None)
 
-
-
-
 @home_bp.route('/planos', methods=['GET'])
 def render_planos():
     planos = db.session.execute(db.select(Plano).limit(1)).scalar_one_or_none()
@@ -122,13 +111,9 @@ def render_planos():
     
     return render_template('planos.html', plano=planos, planos=planos_paginados.items, pagination=planos_paginados)
 
-
-
-
 @home_bp.route('/ferramentas', methods=['GET'])
-def render_titulos():
+def render_ferramentas():
     return render_template('ferramentas.html')
-
 
 @home_bp.route('/produtos', methods=['GET'])
 def render_produtos():
@@ -140,11 +125,9 @@ def render_produtos():
 
     return render_template('produtos.html', produtos=produtos_paginados.items, pagination=produtos_paginados)
 
-
-
-@home_bp.route('/comis_rev', methods=['GET'])
-def render_comis_rev():
-    return render_template('comis_rev.html')
+@home_bp.route('/revendas', methods=['GET'])
+def render_revendas():
+    return render_template('revendas.html')
 
 @home_bp.route('/comis_resp', methods=['GET'])
 def render_comis_resp():
