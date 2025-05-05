@@ -1,5 +1,3 @@
-# models.py
-
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from datetime import datetime
@@ -14,6 +12,10 @@ cliente_contrato = db.Table(
     db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id'), primary_key=True)
 )
 
+contrato_plano = db.Table('contrato_plano',
+    db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id'), primary_key=True),
+    db.Column('plano_id', db.Integer, db.ForeignKey('planos.id'), primary_key=True)
+)
 
 
 class User(db.Model, UserMixin):
@@ -28,6 +30,7 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f'<Usuario {self.username}>'
+
 
 class Revenda(db.Model):
     __tablename__ = 'revendas'
@@ -48,6 +51,7 @@ class Revenda(db.Model):
     vendedores = db.relationship('Vendedor', backref='revenda_associada', lazy=True)
     clientes = db.relationship('Cliente', backref='vendedor_associado', lazy=True)
 
+
 class Vendedor(db.Model):
     __tablename__ = 'vendedores'
     
@@ -61,6 +65,7 @@ class Vendedor(db.Model):
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
     
     clientes = db.relationship('Cliente', backref='vendedor', lazy=True)
+
 
 class Cliente(db.Model):
     __tablename__ = 'clientes'
@@ -136,7 +141,6 @@ class Cliente(db.Model):
     instalacoes = db.relationship('Instalacao', backref='cliente', lazy=True)
 
 
-
 class Produto(db.Model):
     __tablename__ = 'produtos'
     
@@ -150,6 +154,7 @@ class Produto(db.Model):
     
     # Relacionamento com Contrato
     contratos = db.relationship('Contrato', backref='produto', lazy=True)
+
 
 class Contrato(db.Model):
     __tablename__ = 'contratos'
@@ -184,27 +189,39 @@ class Contrato(db.Model):
     fator_juros = db.Column(db.Numeric(5, 2))
     contrato_revenda = db.Column(db.Boolean, default=False)
     faturamento_contrato = db.Column(db.Boolean, default=False)
+    estado_produto = db.Column(db.String(20))
     estado_contrato = db.Column(db.String(30))
     data_estado = db.Column(db.Date)
     motivo_estado = db.Column(db.String(200))
 
     # Chaves estrangeiras
     produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=True)
-    plano_id = db.Column(db.Integer, db.ForeignKey('planos.id'), nullable=True)
 
     # Relacionamentos
+    # Relacionamento N:N com Cliente
     clientes = db.relationship(
         'Cliente',
         secondary=cliente_contrato,
         back_populates='contratos',
         lazy=True
     )
+
+    # Relacionamento 1:N com Instalação
     instalacoes = db.relationship('Instalacao', backref='contrato', lazy=True)
+
+    # Relacionamento 1:N com NotaFiscal
     notas_fiscais = db.relationship('NotaFiscal', backref='contrato', lazy=True)
-    plano = db.relationship('Plano', backref='contratos_associados', lazy=True)
 
+    # Relacionamento N:N com Plano (muitos-para-muitos)
+    planos = db.relationship(
+        'Plano',
+        secondary=contrato_plano,
+        back_populates='contratos',
+        lazy=True
+    )
 
-
+    def __repr__(self):
+        return f'<Contrato {self.id}>'
 class ContratoProduto(db.Model):
     __tablename__ = 'contratos_produtos'
     
@@ -213,7 +230,6 @@ class ContratoProduto(db.Model):
     quantidade = db.Column(db.Integer, default=1)
     valor_unitario = db.Column(db.Numeric(10, 2))
     desconto = db.Column(db.Numeric(5, 2), default=0)
-
 
 
 class Instalacao(db.Model):
@@ -234,6 +250,7 @@ class Instalacao(db.Model):
     titulos = db.relationship('TituloInstalacao', backref='instalacao', lazy=True)
     cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'))
 
+
 class NotaFiscal(db.Model):
     __tablename__ = 'notas_fiscais'
     
@@ -250,6 +267,7 @@ class NotaFiscal(db.Model):
     
     produtos = db.relationship('Produto', secondary='produtos_notas', backref=db.backref('notas_fiscais', lazy=True))
 
+
 class ProdutoNota(db.Model):
     __tablename__ = 'produtos_notas'
     
@@ -258,6 +276,7 @@ class ProdutoNota(db.Model):
     quantidade = db.Column(db.Integer, default=1)
     valor_unitario = db.Column(db.Numeric(10, 2))
     desconto = db.Column(db.Numeric(5, 2), default=0)
+
 
 class TituloInstalacao(db.Model):
     __tablename__ = 'titulos_instalacoes'
@@ -296,7 +315,14 @@ class Plano(db.Model):
     # Datas
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     data_atualizacao = db.Column(db.DateTime, onupdate=datetime.utcnow)
-    contratos = db.relationship('Contrato', backref='plano_associado', lazy=True)
+    
+    # Relacionamento N:N com Contratos
+    contratos = db.relationship(
+        'Contrato',
+        secondary=contrato_plano,
+        back_populates='planos',
+        lazy=True
+    )
     
     def __repr__(self):
         return f'<Plano {self.codigo} - {self.nome}>'
