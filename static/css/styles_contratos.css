@@ -1,11 +1,12 @@
+/* Seções colapsáveis */
 .section-header {
     background-color: #f8f9fa;
-    padding: 5px 10px;
+    padding: 10px 15px;
     margin-bottom: 0;
     border-left: 4px solid #0d6efd;
     cursor: pointer;
-    transition: background-color 0.3s ease;
 }
+
 .form-label {
     font-weight: 500;
 }
@@ -37,40 +38,46 @@
     color: white;
 }
 
-.section-header:hover {
-    background-color: #e9ecef;
+/* Estilos para a tabela de planos */
+.planos-table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
 }
 
-.form-control[readonly] {
+.planos-table th {
     background-color: #f8f9fa;
-    opacity: 1;
-    border: 1px solid #ced4da;
+    font-weight: 600;
 }
 
-/* Badges */
-.badge {
-    font-size: 0.9em;
-    padding: 0.35em 0.65em;
-    font-weight: 500;
+.planos-table td:nth-child(4) {
+    text-align: right;
+    font-family: 'Courier New', monospace;
 }
 
-/* Espaçamentos */
-.mt-6 {
-    margin-top: 4rem;
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
 }
 
-.mb-6 {
-    margin-bottom: 4rem;
+.status-ativo {
+    background-color: #d1e7dd;
+    color: #0f5132;
 }
 
-/* Botões */
-.btn-outline-primary {
-    transition: all 0.3s ease;
+.status-inativo {
+    background-color: #f8d7da;
+    color: #842029;
 }
 
-/* Garanta que os campos readonly tenham estilo consistente */
-.form-control[readonly] {
+.section-header {
+    cursor: pointer;
     background-color: #f8f9fa;
-    opacity: 1;
 }
 
+.clientes-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
