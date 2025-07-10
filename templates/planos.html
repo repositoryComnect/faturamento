@@ -36,7 +36,10 @@
                     {% if planos %}
                         {% for plano in planos %}
                         <tr class="{% if plano_selecionado and plano.id == plano_selecionado.id %}table-primary{% endif %}">
-                            <td><a href="/planos/{{ plano.id }}" class="text-decoration-none">{{ plano.nome }}</a></td>
+                            <td><a href="/planos/{{ plano.id }}" class="text-decoration-none">{{ plano.nome }}</a>
+                                <br>
+                                <small class="text-muted">Código: {{ plano.codigo }}</small></td>
+                            
                             <td>R$ {{ "%0.2f"|format(plano.valor|float) }}</td>
                         </tr>
                         {% endfor %}
@@ -70,55 +73,335 @@
         </div>
 
         <div class="planos-form">
-            <h2>Criar Novo Plano</h2><br>
-            
-            <form method="POST" action="{{ url_for('planos_bp.insert_planos')}}">
-
-                <div class="form-header">
-                    <div class="form-group">
-                        <label for="nome">Nome do Plano</label>
-                        <input type="text" id="nome" name="nome" class="form-control" 
-                               value="{{ plano.nome }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="valor">Valor</label>
-                        <input type="text" id="valor" name="valor" class="form-control" 
-                               value="{{ plano.valor }}" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="id_produto">Id Produto Portal</label>
-                        <input type="text" id="id_produto" name="id_produto" class="form-control" 
-                               value="{{ planos.id_portal }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="codigo">Código</label>
-                        <input type="text" id="codigo" name="codigo" class="form-control" value="{{ planos.codigo }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="contrato_id">Vincular a Contrato</label>
-                        <select id="contrato_id" name="contrato_id" class="form-control">
-                            <option value="">Carregando contratos...</option>
-                        </select>
+            <div class="card mb-2">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" 
+                     data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" 
+                     aria-expanded="true" aria-controls="basicInfoCollapse">
+                    <h5 class="mb-0">Informações Básicas</h5>
+                </div>
+                <div class="collapse show" id="basicInfoCollapse">
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('planos_bp.insert_planos') }}">
+                <div class="collapse show" id="sec-infos">
+                    <div class="card card-body border-0">
+                        <div class="row">
+                            <div class="form-group col-md-2">
+                                <label for="codigo">Código:</label>
+                                <input type="text" id="codigo" name="codigo" class="form-control" value="" placeholder="000" readonly>
+                            </div>
+                            
+                            <div class="form-group col-md-5">
+                                <label for="nome">Nome do Plano:</label>
+                                <input type="text" id="nome" name="nome" class="form-control" value="" required>
+                            </div>
+                            <div class="form-group col-md-1">
+                                <label for="valor">Valor:</label>
+                                <input type="text" id="valor" name="valor" class="form-control" value="" placeholder="0.00" required>
+                            </div>
+                            <div class="form-group col-md-1">
+                                <label for="id_produto">Id Produto Portal:</label>
+                                <input type="text" id="id_produto" name="id_produto" class="form-control" value="" required>
+                            </div>
+                            
+                            <div class="form-group col-md-4">
+                                <label for="contrato_id">Vincular a Contrato:</label>
+                                <select id="contrato_id" name="contrato_id" class="form-select">
+                                    <option value="">Carregando contratos...</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="contrato_id">Produto:</label>
+                                <select id="contrato_id" name="contrato_id" class="form-select">
+                                    <option value="">Carregando contratos...</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-sections">
-                    <!-- Seções (Licença, Suporte, etc.) permanecem as mesmas -->
-                    <!-- ... (sem alterações nessas seções) ... -->
+                <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#sec-licenca" >
+                    Licença 
+                </div>
+                <div class="collapse" id="sec-licenca">
+                    <div class="card card-body border-0">
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label for="desc_boleto">Descrição Boleto:</label>
+                                <input type="text" id="desc_boleto_licenca" name="desc_boleto_licenca" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <label for="">NF São Paulo</label>
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_sp">Alíquota:</label>
+                                <input type="text" id="aliquota_sp_licenca" name="aliquota_sp_licenca" class="form-control" placeholder="0.00">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_sp">Código Serviço:</label>
+                                <input type="text" id="cod_servico_sp_licenca" name="cod_servico_sp_licenca" class="form-control" placeholder="000">
+                            </div>
+                            <label for="">NF Barueri</label>
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_barueri">Alíquota:</label>
+                                <input type="text" id="aliquota_barueri_licenca" name="aliquota_barueri_licenca" class="form-control" placeholder="0.00">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_barueri">Código Serviço:</label>
+                                <input type="text" id="cod_servico_barueri_licenca" name="cod_servico_barueri_licenca" class="form-control" placeholder="000">
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="desc_nf">Descrição para NF:</label>
+                                <input type="text" id="desc_nf_licenca" name="desc_nf_licenca" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            
+                        </div>
+
+                        <div class="row mt-3">
+                            
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-actions">
-                    <button type="submit" class="btn-primary">Salvar</button> 
-                    <a href="/planos" class="btn-secondary">Cancelar</a>
+                <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#sec-suporte" aria-expanded="false">
+                    Suporte
+                </div>
+                <div class="collapse" id="sec-suporte">
+                    <div class="card card-body border-0">
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label for="desc_boleto">Descrição Boleto:</label>
+                                <input type="text" id="desc_boleto_suporte" name="desc_boleto_suporte" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF São Paulo</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_sp">Alíquota:</label>
+                                <input type="text" id="aliquota_sp_suporte" name="aliquota_sp_suporte" class="form-control" value="0,00">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_sp">Código Serviço:</label>
+                                <input type="text" id="cod_servico_sp_suporte" name="cod_servico_sp_suporte" class="form-control" value="0">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF Barueri</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_barueri">Alíquota:</label>
+                                <input type="text" id="aliquota_barueri_suporte" name="aliquota_barueri_suporte" class="form-control" value="0,00">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_barueri">Código Serviço:</label>
+                                <input type="text" id="cod_servico_barueri_suporte" name="cod_servico_barueri_suporte" class="form-control" value="0">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="form-group col-md-12">
+                                <label for="desc_nf">Descrição para NF:</label>
+                                <input type="text" id="desc_nf_suporte" name="desc_nf_suporte" class="form-control" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#sec-gerenciamento" aria-expanded="false">
+                    Gerenciamento
+                </div>
+                <div class="collapse" id="sec-gerenciamento">
+                    <div class="card card-body border-0">
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label for="desc_boleto">Descrição Boleto:</label>
+                                <input type="text" id="desc_boleto_gerenciamento" name="desc_boleto_gerenciamento" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF São Paulo</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_sp">Alíquota:</label>
+                                <input type="text" id="aliquota_sp_gerenciamento" name="aliquota_sp_gerenciamento" class="form-control" value="0,00">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_sp">Código Serviço:</label>
+                                <input type="text" id="cod_servico_sp_gerenciamento" name="cod_servico_sp_gerenciamento" class="form-control" value="0">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF Barueri</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_barueri">Alíquota:</label>
+                                <input type="text" id="aliquota_barueri_gerenciamento" name="aliquota_barueri_gerenciamento" class="form-control" value="0,00">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_barueri">Código Serviço:</label>
+                                <input type="text" id="cod_servico_barueri_gerenciamento" name="cod_servico_barueri_gerenciamento" class="form-control" value="0">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="form-group col-md-12">
+                                <label for="desc_nf">Descrição para NF:</label>
+                                <input type="text" id="desc_nf_gerenciamento" name="desc_nf_gerenciamento" class="form-control" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#sec-hospedagem" aria-expanded="false">
+                    Hospedagem
+                </div>
+                <div class="collapse" id="sec-hospedagem">
+                    <div class="card card-body border-0">
+                        <div class="row">
+                            <div class="form-group col-md-12">
+                                <label for="desc_boleto">Descrição Boleto:</label>
+                                <input type="text" id="desc_boleto_hospedagem" name="desc_boleto_hospedagem" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF São Paulo</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_sp">Alíquota:</label>
+                                <input type="text" id="aliquota_sp_hospedagem" name="aliquota_sp_hospedagem" class="form-control" value="0,00">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_sp">Código Serviço:</label>
+                                <input type="text" id="cod_servico_sp_hospedagem" name="cod_servico_sp_hospedagem" class="form-control" value="0">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF Barueri</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_barueri">Alíquota:</label>
+                                <input type="text" id="aliquota_barueri_hospedagem" name="aliquota_barueri_hospedagem" class="form-control" value="{{ planos.codigo }}">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_barueri">Código Serviço:</label>
+                                <input type="text" id="cod_servico_barueri_hospedagem" name="cod_servico_barueri_hospedagem" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="form-group col-md-12">
+                                <label for="desc_nf">Descrição para NF:</label>
+                                <input type="text" id="desc_nf_hospedagem" name="desc_nf_hospedagem" class="form-control" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#sec-manutencao" aria-expanded="false">
+                    Manutenção
+                </div>
+                <div class="collapse" id="sec-manutencao">
+                    <div class="card card-body border-0">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="desc_boleto">Descrição Boleto:</label>
+                                <input type="text" id="desc_boleto_manutencao" name="desc_boleto_manutencao" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF São Paulo</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_sp">Alíquota:</label>
+                                <input type="text" id="aliquota_sp_manutencao" name="aliquota_sp_manutencao" class="form-control" value="{{ plano.valor }}">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_sp">Código Serviço:</label>
+                                <input type="text" id="cod_servico_sp_manutencao" name="cod_servico_sp_manutencao" class="form-control" value="{{ planos.id_portal }}">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF Barueri</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_barueri">Alíquota:</label>
+                                <input type="text" id="aliquota_barueri_manutencao" name="aliquota_barueri_manutencao" class="form-control" value="{{ planos.codigo }}">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_barueri">Código Serviço:</label>
+                                <input type="text" id="cod_servico_barueri_manutencao" name="cod_servico_barueri_manutencao" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="form-group col-md-12">
+                                <label for="desc_nf">Descrição para NF:</label>
+                                <input type="text" id="desc_nf_manutencao" name="desc_nf_manutencao" class="form-control" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-toggle" data-bs-toggle="collapse" data-bs-target="#sec-monitoramento" aria-expanded="false">
+                    Monitoramento
+                </div>
+                <div class="collapse" id="sec-monitoramento">
+                    <div class="card card-body border-0">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="desc_boleto">Descrição Boleto:</label>
+                                <input type="text" id="desc_boleto_monitoramento" name="desc_boleto_monitoramento" class="form-control" value="">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF São Paulo</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_sp">Alíquota:</label>
+                                <input type="text" id="aliquota_sp_monitoramento" name="aliquota_sp_monitoramento" class="form-control" value="{{ plano.valor }}">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_sp">Código Serviço:</label>
+                                <input type="text" id="cod_servico_sp_monitoramento" name="cod_servico_sp_monitoramento" class="form-control" value="{{ planos.id_portal }}">
+                            </div>
+                        </div>
+
+                        <h6 class="mt-3">NF Barueri</h6>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="aliquota_barueri">Alíquota:</label>
+                                <input type="text" id="aliquota_barueri_monitoramento" name="aliquota_barueri_monitoramento" class="form-control" value="{{ planos.codigo }}">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cod_servico_barueri">Código Serviço:</label>
+                                <input type="text" id="cod_servico_barueri_monitoramento" name="cod_servico_barueri_monitoramento" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="form-group col-md-12">
+                                <label for="desc_nf">Descrição para NF:</label>
+                                <input type="text" id="desc_nf_monitoramento" name="desc_nf_monitoramento" class="form-control" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions mt-4">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <a href="/planos" class="btn btn-secondary">Cancelar</a>
                 </div>
             </form>
         </div>
     </div>
 
-    {% include 'popup/popup_delete_planos.html' %}
+    {% include 'popup/planos/popup_delete_planos.html' %}
 </div>
 
-
-
-{% include 'js/planos_js.html' %}
+{% include 'js/planos/planos_js.html' %}
 {% endblock %}
+<br><br><br><br><br><br>

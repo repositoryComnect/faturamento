@@ -1,54 +1,93 @@
 {% include "model-header.html" %}
 {% include "links.html" %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
 
 {% block content %}
 <div class="clientes-container">
     <h2 class="clientes-title">Lista de Contratos</h2>
-    
-    <div class="table-responsive">
-        <table class="clientes-table">
-            <thead>
-                <tr>
-                    <th>Contrato</th>
-                    <th>Cadastramento</th>
-                    <th>Atualização</th>
-                    <th>Serviço</th>
-                    <th>Razão Social</th>
-                    <th>Nome Fantasia</th>
-                    <th>Email</th>
-                    <th>Telefone</th>
-                    <th>CEP</th>
-                    <th>Endereço</th>
-                    <th>Cidade</th>
-                    <th>Status</th>
-                    <th>Plano</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for contrato in contratos %}
-                <tr>
-                    <td>{{ contrato.numero }}</td>
-                    <td>{{ contrato.cadastramento.strftime('%d/%m/%Y') if contrato.cadastramento else 'N/A' }}</td>
-                    <td>{{ contrato.atualizacao.strftime('%d/%m/%Y %H:%M') if contrato.atualizacao else 'N/A' }}</td>
-                    <td>{{ contrato.tipo }}</td>
-                    <td>{{ contrato.razao_social }}</td>
-                    <td>{{ contrato.nome_fantasia }}</td>
-                    <td>{{ contrato.email }}</td>
-                    <td>{{ contrato.telefone }}</td>
-                    <td>{{ contrato.cep  }}</td>
-                    <td>{{ contrato.endereco }}</td>
-                    <td>{{ contrato.cidade}}</td>
-                    <td>
-                        <span class="status-badge {% if contrato.estado_contrato == 'Ativo' %}status-ativo{% else %}status-inativo{% endif %}">
-                            {{ contrato.estado_contrato or 'N/A' }}
-                        </span>
-                    </td>
-                    <td>{{ contrato.plano_nome or 'N/A' }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <p class="total-registros">Total de Contratos: {{ total }}</p>
+
+
+    {% if total == 0 %}
+        <p class="no-results">Nenhum contrato encontrado.</p>
+    {% else %}
+        <div class="table-responsive">
+            <table class="clientes-table">
+                <thead>
+                    <tr>
+                        <th>Contrato</th>
+                        <th>Cadastramento</th>
+                        <th>Atualização</th>
+                        <th>Serviço</th>
+                        <th>Razão Social</th>
+                        <th>Nome Fantasia</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>CEP</th>
+                        <th>Endereço</th>
+                        <th>Cidade</th>
+                        <th>Status</th>
+                        <th>Plano</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrato in contratos %}
+                    <tr>
+                        <td>{{ contrato.numero }}</td>
+                        <td>{{ contrato.cadastramento.strftime('%d/%m/%Y') if contrato.cadastramento else 'N/A' }}</td>
+                        <td>{{ contrato.atualizacao.strftime('%d/%m/%Y %H:%M') if contrato.atualizacao else 'N/A' }}</td>
+                        <td>{{ contrato.tipo }}</td>
+                        <td>{{ contrato.razao_social }}</td>
+                        <td>{{ contrato.nome_fantasia }}</td>
+                        <td>{{ contrato.email }}</td>
+                        <td>{{ contrato.telefone }}</td>
+                        <td>{{ contrato.cep }}</td>
+                        <td>{{ contrato.endereco }}</td>
+                        <td>{{ contrato.cidade }}</td>
+                        <td>
+                            <span class="status-badge {% if contrato.estado_contrato == 'Ativo' %}status-ativo{% else %}status-inativo{% endif %}">
+                                {{ contrato.estado_contrato or 'N/A' }}
+                            </span>
+                        </td>
+                        <td>{{ contrato.plano_nome or 'N/A' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    </div>
+
+        {% if total > per_page %}
+        <div class="pagination">
+            {% set total_pages = (total // per_page) + (1 if total % per_page > 0 else 0) %}
+
+            {% if page > 1 %}
+                <a href="{{ url_for('contratos_bp.listar_contratos', page=page-1) }}">&laquo; Anterior</a>
+            {% endif %}
+
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == page %}
+                    <span class="current-page">{{ p }}</span>
+                {% else %}
+                    <a href="{{ url_for('contratos_bp.listar_contratos', page=p) }}">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page < total_pages %}
+                <a href="{{ url_for('contratos_bp.listar_contratos', page=page+1) }}">Próxima &raquo;</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% endif %}
+</div> <!-- clientes-container -->
 {% endblock %}
+
+
+<br>
+    <br>
+        <br>
+            <br>
+                <br>
+                    <br>
+                        <br>
+                            <br>
+                                <br>

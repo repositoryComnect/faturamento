@@ -1,0 +1,33 @@
+{% include 'links.html' %}
+
+<!-- Modal de Exclusão -->
+<div class="modal fade" id="deleteNotasModal" tabindex="-1" aria-labelledby="deleteNotasModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteNotasModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deletePlanoForm" action="" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="delete_numero_nota" class="form-label">Número da Nota</label>
+                        <input type="text" class="form-control" id="delete_numero_nota" name="delete_numero_nota" required>
+                    </div>
+                    <div class="alert alert-warning mt-3">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Atenção! Esta ação é irreversível. Todos os dados do plano serão permanentemente excluídos.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-2"></i>Confirmar Exclusão
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

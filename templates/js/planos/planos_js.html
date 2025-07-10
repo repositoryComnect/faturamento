@@ -1,0 +1,114 @@
+<script>
+
+    function toggleCollapse(id) {
+        const collapse = document.getElementById(id);
+        const icon = collapse.previousElementSibling.querySelector('i');
+        
+        collapse.classList.toggle('show');
+        
+        if (collapse.classList.contains('show')) {
+            icon.classList.remove('bi-chevron-up');
+            icon.classList.add('bi-chevron-down');
+        } else {
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-up');
+        }
+    }
+    
+    function confirmarExclusao(planoId) {
+        if (confirm('Tem certeza que deseja excluir este plano?')) {
+            window.location.href = '/planos/excluir/' + planoId;
+        }
+    }
+    </script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/contratos_ativos")
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById("contrato_id");
+                select.innerHTML = '<option value="">Selecione um contrato</option>';
+                const planoContratoId = "{{ plano.contrato_id or '' }}";
+    
+                data.forEach(contrato => {
+                    const option = document.createElement("option");
+                    option.value = contrato.id;
+                    option.text = `${contrato.numero} - ${contrato.razao_social}`;
+                    if (planoContratoId && planoContratoId == contrato.id.toString()) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("Erro ao carregar contratos:", error);
+                const select = document.getElementById("contrato_id");
+                select.innerHTML = '<option value="">Erro ao carregar contratos</option>';
+            });
+    });
+</script>
+
+<!--<script>
+    function parseRealToFloat(valor) {
+        if (!valor) return 0;
+        return parseFloat(valor.replace(/\./g, '').replace(',', '.')) || 0;
+    }
+    
+    function formatFloatToReal(valor) {
+        return valor.toFixed(2).replace('.', ',');
+    }
+    
+    function calcularValorComAliquotas() {
+        const campoValor = document.getElementById('valor');
+        const valorOriginal = parseFloat(campoValor.dataset.valorOriginal) || 0;
+    
+        const aliquotaSP = parseRealToFloat(document.getElementById('aliquota_sp_licenca').value);
+        const aliquotaBarueri = parseRealToFloat(document.getElementById('aliquota_barueri_licenca').value);
+    
+        const percentualTotal = aliquotaSP + aliquotaBarueri;
+        const valorFinal = valorOriginal * (1 + percentualTotal / 100);
+    
+        campoValor.value = formatFloatToReal(valorFinal);
+        campoValor.dataset.valorNumerico = valorFinal.toFixed(2);
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        const campoValor = document.getElementById('valor');
+        const valorInicial = parseRealToFloat(campoValor.value);
+        
+        campoValor.dataset.valorOriginal = valorInicial.toFixed(2);
+        campoValor.dataset.valorNumerico = valorInicial.toFixed(2);
+    
+        document.getElementById('aliquota_sp_licenca').addEventListener('input', calcularValorComAliquotas);
+        document.getElementById('aliquota_barueri_licenca').addEventListener('input', calcularValorComAliquotas);
+    
+        // Antes de enviar, sobrescreve o valor no formato numérico
+        document.querySelector('form').addEventListener('submit', function () {
+            campoValor.value = campoValor.dataset.valorNumerico || parseRealToFloat(campoValor.value).toFixed(2);
+        });
+    });
+    </script>-->
+    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            fetch('/proximo_codigo_plano')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.proximo_codigo) {
+                        document.getElementById('codigo').value = data.proximo_codigo;
+                    } else {
+                        console.warn("Código de plano não retornado pela API.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao buscar código de plano:", error);
+                });
+        });
+    </script>
+       
+    
+    

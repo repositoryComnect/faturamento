@@ -1,0 +1,163 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_contratos.css')}}">
+</head>
+<body>
+    <!-- Create Contract Modal -->
+    <div class="modal fade" id="createNotasModal" tabindex="-1" aria-labelledby="createNotasModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createNotasModalLabel">Nova Nota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="notasForm" action="" method="POST">
+                        <!-- Basic Information Section -->
+                        <div class="modal-section-header">Cadastros de Notas Fiscais</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label">Nº da Nota:</label>
+                                <input type="text" class="form-control" id="numero_contrato" name="numero_contrato" required readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Natureza Operação:</label>
+                                <input type="text" class="form-control" id="razao_social" name="razao_social" required>
+                            </div>
+                            
+                            <div class="col-md-1">
+                                <label class="form-label">CFOP:</label>
+                                <input type="text" class="form-control" id="current_datetime" name="current_datetime" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Data Emissão:</label>
+                                <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" required>
+                            </div>
+                        
+                        <!-- Address Section -->
+                        <div class="modal-section-header">Destinatário/Remetente</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label">Razão Social:</label>
+                                <input type="text" class="form-control" id="cep" name="cep" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Endereço:</label>
+                                <input type="text" class="form-control" id="endereco" name="endereco" required>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">CNPJ/CPF:</label>
+                                <input type="text" class="form-control" id="complemento" name="complemento">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">CEP:</label>
+                                <input type="text" class="form-control" id="bairro" name="bairro" required>
+                            </div>          
+                            <div class="col-md-4">
+                                <label class="form-label">Endereço:</label>
+                                <input type="text" class="form-control" id="cidade" name="cidade" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Municipio:</label>
+                                <input type="text" class="form-control" id="cidade" name="cidade" required>
+                            </div>
+
+                            <div class="col-md-1">
+                                <label class="form-label">UF</label>
+                                <select class="form-select" id="uf" name="uf" required>
+                                    <option value="RJ"></option>
+                                    <option value="RJ">RJ</option>
+                                    <option value="SP">SP</option>
+                                    <option value="MG">MG</option>
+                                    <option value="DF">DF</option>
+                                    <option value="SC">SC</option>
+                                    <option value="ES">ES</option>
+                                    <option value="AC">AC</option>
+                                    <option value="CE">CE</option>
+                                    <option value="AL">AL</option>
+                                    <option value="BA">BA</option>
+                                    <option value="AM">AM</option>
+                                    <option value="SE">SE</option>
+                                    <option value="TO">TO</option>
+                                    <option value="RR">RR</option>
+                                    <option value="PI">PI</option>
+                                    <option value="RN">RN</option>
+                                    <option value="RS">RS</option>
+                                    <option value="PB">PB</option>
+                                    <option value="PR">PR</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Telefone:</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">E-mail:</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">I.E:</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade" required>
+                        </div>
+
+                        <div class="modal-section-header">Cálculo Imposto</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label">Base ICMS:</label>
+                                <input type="text" class="form-control" value="" id="cep" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Valor ICMS:</label>
+                                <input type="text" class="form-control" value="" id="endereco" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Base C.ICMS:</label>
+                                <input type="text" class="form-control" value="" id="complemento" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Valor ICMS :</label>
+                                <input type="text" class="form-control" value="" id="bairro" readonly>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label">Valor Total Prod:</label>
+                                <input type="text" class="form-control" value="" id="cidade" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Valor Frete:</label>
+                                <input type="text" class="form-control" value="" id="estado" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Valor Seguro:</label>
+                                <input type="text" class="form-control" value="" id="estado" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Valor Total IPI:</label>
+                                <input type="text" class="form-control" value="" id="estado" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Valor Nota:</label>
+                                <input type="text" class="form-control" value="" id="estado" readonly>
+                            </div>
+
+                            <div class="modal-section-header">Observações</div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-12">
+                                        <textarea class="form-control" rows="3" id="observacao" readonly></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="saveContractBtn">Salvar Contrato</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

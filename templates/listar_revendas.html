@@ -1,0 +1,80 @@
+{% include "model-header.html" %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+
+<div class="clientes-container">
+    <h2 class="clientes-title">Lista de Revendas</h2>
+    <p class="total-registros">Total de Revendas: {{ total }}</p>
+
+    
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {% if revendas|length == 0 %}
+        <p class="text-muted">Nenhuma revenda encontrada.</p>
+    {% else %}
+        <div class="table-responsive">
+            <table class="clientes-table">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome Revenda</th>
+                        <th>ID Portal</th>
+                        <th>Tipo Conta Portal</th>
+                        <th>CNPJ</th>
+                        <th>Telefone</th>
+                        <th>E-mail</th>
+                        <th>CEP</th>
+                        <th>Endereço</th>
+                        <th>Bairro</th>
+                        <th>Cidade</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for revenda in revendas %}
+                    <tr>
+                        <td>{{ revenda.codigo }}</td>
+                        <td>{{ revenda.nome }}</td>
+                        <td>{{ revenda.id_conta }}</td>
+                        <td>{{ revenda.tipo_conta }}</td>
+                        <td>{{ revenda.cnpj }}</td>
+                        <td>{{ revenda.telefone }}</td>
+                        <td>{{ revenda.email }}</td>
+                        <td>{{ revenda.cep }}</td>
+                        <td>{{ revenda.endereco }}</td>
+                        <td>{{ revenda.bairro }}</td>
+                        <td>{{ revenda.cidade }}</td>
+                        <td>{{ revenda.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>  
+    {% endif %}
+
+    <!-- Paginação -->
+    <div class="pagination">
+        {% if total is defined and per_page is defined %}
+            {% set total_pages = (total // per_page) + (1 if total % per_page > 0 else 0) %}
+        {% else %}
+            {% set total_pages = 0 %}
+        {% endif %}
+
+        {% if page > 1 %}
+            <a href="{{ url_for('revendas_bp.get_revendas', page=page-1) }}">&laquo; Anterior</a>
+        {% endif %}
+
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+                <span class="current-page">{{ p }}</span>
+            {% else %}
+                <a href="{{ url_for('revendas_bp.get_revendas', page=p) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+            <a href="{{ url_for('revendas_bp.get_revendas', page=page+1) }}">Próxima &raquo;</a>
+        {% endif %}
+    </div>
+</div>

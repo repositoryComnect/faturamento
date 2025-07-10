@@ -1,0 +1,67 @@
+{% include "model-header.html" %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+
+<div class="clientes-container">
+    <h2 class="clientes-title">Lista de Instalações</h2>
+    <p class="total-registros">Total de Instalações: {{ total }}</p>
+
+    <div class="table-responsive">
+        <table class="clientes-table">
+            <thead>
+                <tr>
+                    <th>Código Instalação</th>
+                    <th>Razão Social</th>
+                    <th>CEP</th>
+                    <th>Endereço</th>
+                    <th>Bairro</th>
+                    <th>Cidade</th>
+                    <th>UF</th>
+                    <th>Cadastramento</th>
+                    <th>ID Portal</th>
+                    <th>Status</th>
+                    <th>Observação</th>
+                    <th>Criado em</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inst in instalacoes %}
+                <tr>
+                    <td>{{ inst.codigo_instalacao }}</td>
+                    <td>{{ inst.razao_social }}</td>
+                    <td>{{ inst.cep }}</td>
+                    <td>{{ inst.endereco }}</td>
+                    <td>{{ inst.bairro }}</td>
+                    <td>{{ inst.cidade }}</td>
+                    <td>{{ inst.uf }}</td>
+                    <td>{{ inst.cadastramento.strftime('%Y-%m-%d') if inst.cadastramento else '' }}</td>
+                    <td>{{ inst.id_portal }}</td>
+                    <td>{{ inst.status }}</td>
+                    <td>{{ inst.observacao }}</td>
+                    <td>{{ inst.created_at.strftime('%Y-%m-%d %H:%M:%S') if inst.created_at else '' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>  
+    
+    <!-- Paginação -->
+    <div class="pagination">
+        {% set total_pages = (total // per_page) + (1 if total % per_page > 0 else 0) %}
+
+        {% if page > 1 %}
+            <a href="{{ url_for('instalacoes_bp.listar_instalacoes', page=page-1) }}">&laquo; Anterior</a>
+        {% endif %}
+
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+                <span class="current-page">{{ p }}</span>
+            {% else %}
+                <a href="{{ url_for('instalacoes_bp.listar_instalacoes', page=p) }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+            <a href="{{ url_for('instalacoes_bp.listar_instalacoes', page=page+1) }}">Próxima &raquo;</a>
+        {% endif %}
+    </div>
+</div>

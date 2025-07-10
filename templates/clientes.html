@@ -64,37 +64,35 @@
                                 <div class="spinner-border spinner-border-sm" role="status"></div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Cadastramento:</label>
-                            <input type="text" class="form-control" value="{{ cliente.cadastramento }}" id="cadastramento" readonly>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Atualização:</label>
-                            <input type="text" class="form-control" value="{{ cliente.atualizacao }}" id="atualizacao" readonly>
-                        </div>
-        
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Razão Social:</label>
                             <input type="text" class="form-control" value="{{ cliente.razao_social }}" id="razao_social" readonly>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Nome Fantasia:</label>
                             <input type="text" class="form-control" value="{{ cliente.nome_fantasia }}" id="nome_fantasia" readonly>
                         </div>
-        
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <label class="form-label">Cadastramento:</label>
+                            <input type="text" class="form-control" value="{{ cliente.cadastramento }}" id="cadastramento" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Atualização:</label>
+                            <input type="text" class="form-control" value="{{ cliente.atualizacao }}" id="atualizacao" readonly>
+                        </div>
+                        <div class="col-md-2">
                             <label class="form-label">Tipo:</label>
                             <input type="text" class="form-control" value="{{ cliente.tipo }}" id="tipo" readonly>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">CNPJ:</label>
                             <input type="text" class="form-control" value="{{ cliente.cnpj }}" id="cnpj" readonly>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">IE:</label>
                             <input type="text" class="form-control" value="{{ cliente.ie }}" id="ie" readonly>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">IM:</label>
                             <input type="text" class="form-control" value="{{ cliente.im }}" id="im" readonly>
                         </div>
@@ -102,7 +100,7 @@
                             <label class="form-label">E-mail:</label>
                             <input type="text" class="form-control" value="{{ cliente.email }}" id="email" readonly>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label">Fone:</label>
                             <input type="text" class="form-control" value="{{ cliente.telefone }}" id="telefone" readonly>
                         </div>
@@ -123,7 +121,7 @@
                             <label class="form-label">CEP:</label>
                             <input type="text" class="form-control" value="{{ cliente.cep }}" id="cep" readonly>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Endereço:</label>
                             <input type="text" class="form-control" value="{{ cliente.endereco }}" id="endereco" readonly>
                         </div>
@@ -136,7 +134,7 @@
                             <input type="text" class="form-control" value="{{ cliente.bairro }}" id="bairro" readonly>
                         </div>
                         
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label class="form-label">Cidade:</label>
                             <input type="text" class="form-control" value="{{ cliente.cidade }}" id="cidade" readonly>
                         </div>
@@ -148,11 +146,46 @@
                 </div>
             </div>
         </div>
+
+
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#addressCollapse" aria-expanded="true" aria-controls="addressCollapse">
+                <h5 class="mb-0">Endereço de Cobrança do Cliente</h5>
+            </div>
+            <div class="collapse show" id="addressCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label">CEP Cobrança:</label>
+                            <input type="text" class="form-control" value="{{ cliente.cep_cobranca }}" id="cep_cobranca" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Endereço Cobrança:</label>
+                            <input type="text" class="form-control" value="{{ cliente.endereco_cobranca }}" id="endereco_cobranca" readonly>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label class="form-label">Bairro Cobrança:</label>
+                            <input type="text" class="form-control" value="{{ cliente.bairro_cobranca }}" id="bairro_cobranca" readonly>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label class="form-label">Cidade Cobrança:</label>
+                            <input type="text" class="form-control" value="{{ cliente.cidade_cobranca }}" id="cidade_cobranca" readonly>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">UF:</label>
+                            <input type="text" class="form-control" value="{{ cliente.uf_cobranca }}" id="uf_cobranca" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <!-- Contract Conditions Section -->
-        <div class="card mb-2">
+        <!--<div class="card mb-2">
             <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#contractCollapse" aria-expanded="true" aria-controls="contractCollapse">
-                <h5 class="mb-0">Condições do Contrato do Cliente</h5>
+                <h5 class="mb-0">Instalações</h5>
             </div>
             <div class="collapse show" id="contractCollapse">
                 <div class="card-body">
@@ -188,7 +221,60 @@
                     </div>
                 </div>
             </div>
+        </div>-->
+        <!-- Seção de Instalações Associadas -->
+<div class="card mb-2">
+    <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#instalacaoCollapse">
+        <h5 class="mb-0">Instalações Associadas ao Cliente</h5>
+    </div>
+    <div class="collapse" id="instalacaoCollapse">
+        <div class="card-body">
+            <div class="row g-2">
+                <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                    <table class="instalacao-table table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Código</th>
+                                <th>Endereço</th>
+                                <th>Bairro</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- O JS preencherá esta parte -->
+                        </tbody>
+                    </table>
+
+                    <!-- Paginação para instalações -->
+                    <div id="instalacao-pagination" class="d-flex justify-content-center mt-3">
+                        <button id="instalacao-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                        <span id="instalacao-pageInfo" class="align-self-center"></span>
+                        <button id="instalacao-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                    </div>
+
+                    <!-- Botões de ação -->
+                    <div class="container mt-5 mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
+                                    <i class="bi bi-diagram-2"></i> Vincular Instalação
+                                </button>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularInstalacaoModal">
+                                    <i class="bi bi-trash me-2"></i> Desvincular Instalação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
+    </div>
+</div>
+
         
         <!-- Other Details Section -->
         <div class="card">
@@ -198,7 +284,7 @@
             <div class="collapse show" id="otherDetailsCollapse">
                 <div class="card-body">
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <label class="form-label">Observações:</label>
                             <textarea class="form-control" rows="3" id="observacao" readonly>{{ cliente.observacao }}</textarea>
                         </div>
@@ -208,10 +294,13 @@
         </div>
         {% endif %}
     
-    {% include 'popup/popup_cliente.html' %}
-    {% include 'popup/popup_delete_cliente.html' %}
-    {% include 'popup/popup_editar_cliente.html' %}
+    {% include 'popup/clientes/popup_cliente.html' %}
+    {% include 'popup/clientes/popup_vincular_instalacao.html' %}
+    {% include 'popup/clientes/popup_desvincular_instalacoes.html' %}
+    {% include 'popup/clientes/popup_delete_cliente.html' %}
+    {% include 'popup/clientes/popup_editar_cliente.html' %}
     {% include 'js/clientes_js.html' %}
+    
 
     </div><br><br><br><br><br>
 

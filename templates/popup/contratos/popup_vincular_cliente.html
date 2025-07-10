@@ -1,0 +1,71 @@
+<!-- Modal de Vinculação de Clientes ao Contrato -->
+<div class="modal fade" id="vincularContractModal" tabindex="-1" aria-labelledby="vincularContractModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-x3">
+      <form method="POST" action="{{ url_for('contratos_bp.vincular_clientes') }}">
+        <div class="modal-content">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="vincularContractModalLabel">Vincular Cliente ao Contrato</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+  
+            <!-- Seletor de contrato -->
+            <div class="mb-3">
+              <label for="selecione_contrato" class="form-label">Selecione um Contrato:</label>
+              <select class="form-select" name="selecione_contrato" id="selecione_contrato" required>
+              </select>
+            </div>
+            <!-- Seletor múltiplo de clientes -->
+            <div class="mb-3">
+              <label for="cliente_ids" class="form-label">Selecione Cliente(s):</label>
+              <select class="form-select" name="cliente_ids" id="cliente_ids" multiple required size="10">
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Vincular</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const clienteSelect = document.getElementById("cliente_ids");
+        const contratoSelect = document.getElementById("selecione_contrato");
+        const modal = document.getElementById('vincularContractModal');
+    
+        modal.addEventListener('show.bs.modal', function () {
+            fetch("/contratos_ativos")
+                .then(response => response.json())
+                .then(data => {
+                    contratoSelect.innerHTML = "<option value='' disabled selected>Selecione um contrato</option>";
+                    data.forEach(contrato => {
+                        const option = document.createElement("option");
+                        option.value = contrato.id;
+                        option.text = `${contrato.numero} - ${contrato.razao_social}`;
+                        contratoSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Erro ao carregar contratos:", error));
+    
+            fetch("/get/list/clientes")
+                .then(response => response.json())
+                .then(data => {
+                    clienteSelect.innerHTML = "";
+                    data.forEach(cliente => {
+                        const option = document.createElement("option");
+                        option.value = cliente.id;
+                        option.text = cliente.razao_social;
+                        clienteSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Erro ao carregar clientes:", error));
+        });
+    });
+    </script>
+    
+
+    

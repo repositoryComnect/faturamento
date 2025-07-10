@@ -65,64 +65,65 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-9">
+                            <div class="col-md-5">
                                 <label class="form-label">Razão Social:</label>
                                 <input type="text" class="form-control" id="razao_social" name="razao_social" value="{{ contrato.razao_social }}" readonly>
                             </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label">Cadastramento:</label>
-                                <input type="text" class="form-control" id="cadastramento" name="cadastramento" value="{{ contrato.cadastramento.strftime('%d/%m/%Y') if contrato.cadastramento else '' }}" readonly>
-                            </div>
-                            <div class="col-md-4">
+                            <div class="col-md-5">
                                 <label class="form-label">Nome Fantasia:</label>
                                 <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" value="{{ contrato.nome_fantasia }}" readonly>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
+                                <label class="form-label">Cadastramento:</label>
+                                <input type="text" class="form-control" id="cadastramento" name="cadastramento" value="{{ contrato.cadastramento.strftime('%d/%m/%Y') if contrato.cadastramento else '' }}" readonly>
+                            </div>
+                            
+                            <div class="col-md-2">
                                 <label class="form-label">Atualização:</label>
                                 <input type="text" class="form-control" id="atualizacao" name="atualizacao" value="{{ contrato.atualizacao.strftime('%d/%m/%Y') if contrato.atualizacao else '' }}" readonly>
                             </div>
                             
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">Tipo de Contrato:</label>
                                 <input type="text" class="form-control" id="tipo" name="tipo" value="{{ contrato.tipo }}" readonly>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">Contato:</label>
                                 <input type="text" class="form-control" id="contato" name="contato" value="{{ contrato.contato }}" readonly>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Id Matriz Portal:</label>
+                            <div class="col-md-1">
+                                <label class="form-label">Id Portal:</label>
                                 <input type="text" class="form-control" id="id_matriz_portal" name="id_matriz_portal" value="{{ contrato.id_matriz_portal }}" readonly>
                             </div>
                             
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">E-mail:</label>
                                 <input type="text" class="form-control" id="email" name="email" value="{{ contrato.email }}" readonly>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">Fone:</label>
                                 <input type="text" class="form-control" id="telefone" name="telefone" value="{{ contrato.telefone }}" readonly>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">Responsável:</label>
                                 <input type="text" class="form-control" id="responsavel" name="responsavel" value="{{ contrato.responsavel }}" readonly>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">CNPJ:</label>
                                 <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ contrato.cnpj }}" readonly>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">Tipo:</label>
                                 <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa" value="{{ contrato.tipo_pessoa }}" readonly>
                             </div>
+                            
                             <div class="col-md-4">
                                 <label class="form-label">Revenda:</label>
-                                <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa" value="{{ contrato.revenda_contrato }}" readonly>
+                                <input type="text" class="form-control" id="revenda" name="revenda" value="{{ contrato.revenda_contrato }}" readonly>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">Vendedor:</label>
-                                <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa" value="{{ contrato.vendedor_contrato }}" readonly>
+                                <input type="text" class="form-control" id="vendedor" name="vendedor" value="{{ contrato.vendedor_contrato }}" readonly>
                             </div>
                         </div>
                     </div>
@@ -138,13 +139,13 @@
                         <div class="row g-3">
                             <div class="col-md-2">
                                 <label class="form-label">CEP:</label>
-                                <input type="text" class="form-control" name="cep"  id="cep" value="{{ contrato.cep }}" readonly>
+                                <input type="text" class="form-control" name="code_residence"  id="code_residence" value="{{ contrato.cep }}" readonly>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-5">
                                 <label class="form-label">Endereço:</label>
                                 <input type="text" class="form-control" name="endereco" id="endereco" value="{{ contrato.endereco }}" readonly>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label class="form-label">Complemento:</label>
                                 <input type="text" class="form-control" id="complemento" name="complemento" value="{{ contrato.complemento }}" readonly>
                             </div>
@@ -153,7 +154,7 @@
                                 <input type="text" class="form-control" id="bairro" name="bairro" value="{{ contrato.bairro }}" readonly>
                             </div>
                             
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">Cidade:</label>
                                 <input type="text" class="form-control" id="cidade" value="{{ contrato.cidade }}" readonly>
                             </div>
@@ -179,10 +180,10 @@
                                         <tr>
                                             <th>Nome Fantasia</th>
                                             <th>Razão Social</th>
-                                            <th>Localidade</th>
+                                            <th>CNPJ</th>
                                             <th>Atividade</th>
-                                            <th>Região</th>
-                                            <th>Estado Atual</th>
+                                            <th>Cidade</th>
+                                            <th>Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -193,7 +194,7 @@
                                                 <td>{{ cliente.razao_social }}</td>
                                                 <td>{{ cliente.localidade }}</td>
                                                 <td>{{ cliente.atividade }}</td>
-                                                <td>{{ cliente.regiao }}</td>
+                                                <td>{{ cliente.cidade }}</td>
                                                 <td>
                                                     <span class="status-badge {% if cliente.estado_atual and cliente.estado_atual|upper == 'ATIVO' %}status-ativo{% else %}status-inativo{% endif %}">
                                                         {{ cliente.estado_atual or 'N/A' }}
@@ -214,12 +215,27 @@
                                     <span id="pageInfo" class="align-self-center"></span>
                                     <button id="nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
                                 </div>
+
+                                <div class="container mt-5 mb-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        
+                                            <div class="d-flex gap-2">    
+                                                <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularContractModal">
+                                                    <i class="fas fa-users"></i>  Vincular Cliente
+                                                </button>
+                                            </div>
+                                            <div class="d-flex gap-2">    
+                                                <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularContractModal">
+                                                    <i class="bi bi-trash me-2"></i>Desvincular Cliente
+                                                </button>
+                                            </div>
+                                    </div>   
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            
             <div class="card mb-2">
                 <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#detailsCollapse">
                     <h5 class="mb-0">Detalhes do Contrato</h5>
@@ -238,25 +254,31 @@
                                     <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Estado:</label>
                                 <input type="text" class="form-control status-{{ contrato.estado_contrato.lower() }}" id="estado_contrato" value="{{ contrato.estado_contrato }}" readonly>
                             </div>
                             
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Data:</label>
                                 <input type="text" class="form-control" id="data_estado" value="{{ contrato.data_estado.strftime('%d/%m/%Y') if contrato.data_estado else '' }}" readonly>
                             </div>
-                            <div class="col-md-9">
+                            <div class="col-md-2">
                                 <label class="form-label">Motivo:</label>
                                 <input type="text" class="form-control" id="motivo_estado" value="{{ contrato.motivo_estado }}" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Valor Total do Contrato:</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="valor_contrato" value="{{ contrato.valor_contrato }}" readonly>
+                                            <span class="input-group-text">R$</span>
+                                    </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Seção de Planos Associados SIMPLIFICADA -->
+        <!-- Seção de Planos Associados SIMPLIFICADA -->
         <div class="card mb-2">
             <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#plansCollapse">
                 <h5 class="mb-0">Plano Associado ao Contrato</h5>  <!-- Singular agora -->
@@ -277,7 +299,6 @@
                                 </thead>
                                 <tbody>
                                     {% if contrato.planos and contrato.planos|length > 0 %}
-
                                         {% for plano in contrato.planos %}
                                         <tr>
                                             <td>{{ plano.id }}</td>
@@ -301,19 +322,123 @@
                                     {% endif %}
                                 </tbody>
                             </table>
+        
+                            <!-- Paginação específica para Planos -->
+                            <div id="planos-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="planos-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="planos-pageInfo" class="align-self-center"></span>
+                                <button id="planos-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                            </div>
+                            <div class="container mt-5 mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    
+                                        <div class="d-flex gap-2">    
+                                            <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularPlanoContractModal">
+                                                <i class="fas fa-list-alt"></i>  Vincular Plano
+                                            </button>
+                                        </div>
+                                        <div class="d-flex gap-2">    
+                                            <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularPlanoContractModal">
+                                                <i class="bi bi-trash me-2"></i>Desvincular Plano
+                                            </button>
+                                        </div>
+                                </div>   
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        {% endif %}
         
-        {% include 'popup/popup_delete_contrato.html' %}
-        {% include 'popup/popup_contratos.html' %}
-        {% include 'popup/popup_editar_contrato.html' %}
+        
+        <!-- Seção de Produtos Associados -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#productsCollapse">
+                <h5 class="mb-0">Produtos Associados ao Contrato</h5>
+            </div>
+            <div class="collapse" id="productsCollapse">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                            <table class="produtos-table table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome do Produto</th>
+                                        <th>Descrição</th>
+                                        <th>Quantidade</th>
+                                        <th>Preço Unitário</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if contrato.produtos_associados %}
+                                        {% for assoc in contrato.produtos_associados %}
+                                        <tr>
+                                            <td>{{ assoc.produto.id }}</td>
+                                            <td>{{ assoc.produto.nome }}</td>
+                                            <td>{{ assoc.produto.descricao or 'N/A' }}</td>
+                                            <td>{{ assoc.quantidade }}</td>
+                                            <td>R$ {{ "%.2f"|format(assoc.valor_unitario|float) if assoc.valor_unitario else '0.00' }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <i class="bi bi-exclamation-circle me-2"></i>
+                                                Nenhum produto associado encontrado
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                            <!-- Paginação específica para Planos -->
+                            <div id="produto-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="produto-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="produto-pageInfo" class="align-self-center"></span>
+                                <button id="produto-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                            </div>
+                            <div class="container mt-5 mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    
+                                        <div class="d-flex gap-2">    
+                                            <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularProdutoContractModal">
+                                                <i class="bi bi-shop"></i>  Vincular Produto
+                                            </button>
+                                        </div>
+                                        <div class="d-flex gap-2">    
+                                            <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularProdutoContractModal">
+                                                <i class="bi bi-trash me-2"></i>Desvincular Produto
+                                            </button>
+                                        </div>
+                                    </div>   
+                                </div>  
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        
+        
+        {% endif %}
+
+        
+        
     </div>
+       
     
-    <br><br><br><br><br>
+    <br><br><br><br><br><br><br><br><br>
     {% include 'js/contratos_js.html' %}
+    {% include 'popup/contratos/popup_vincular_produto.html' %}
+    {% include 'popup/contratos/popup_vincular_plano.html' %}
+    {% include 'popup/contratos/popup_vincular_cliente.html' %}
+    {% include 'popup/contratos/popup_desvincular_cliente.html' %}
+    {% include 'popup/contratos/popup_desvincular_produto.html' %}
+    {% include 'popup/contratos/popup_desvincular_plano.html' %}
+    {% include 'popup/contratos/popup_delete_contrato.html' %}
+    {% include 'popup/contratos/popup_contratos.html' %}
+    {% include 'popup/contratos/popup_editar_contrato.html' %}
+
+   
+
 </body>
 </html>

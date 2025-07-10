@@ -1,0 +1,84 @@
+<!-- Modal de Desvinculação de Produtos de um Contrato -->
+<div class="modal fade" id="desvincularProdutoContractModal" tabindex="-1" aria-labelledby="desvincularProdutoContractModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <form method="POST" action="{{ url_for('contratos_bp.desvincular_produtos') }}">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="desvincularProdutoContractModalLabel">Desvincular Produto(s) do Contrato</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+  
+            <!-- Seletor de contrato -->
+            <div class="mb-3">
+              <label for="desvincular_contrato_id_produtos" class="form-label">Selecione um Contrato:</label>
+              <select class="form-select" name="contrato_id" id="desvincular_contrato_id_produtos" required>
+              </select>
+            </div>
+  
+            <!-- Seletor múltiplo de produtos vinculados -->
+            <div class="mb-3">
+              <label for="produtos_vinculados" class="form-label">Produtos Vinculados:</label>
+              <select class="form-select" name="produto_ids" id="produtos_vinculados" multiple required size="10">
+              </select>
+            </div>
+  
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-danger">Desvincular</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const contratoSelect = document.getElementById("desvincular_contrato_id_produtos");
+      const produtoSelect = document.getElementById("produtos_vinculados");
+      const modal = document.getElementById('desvincularProdutoContractModal');
+  
+      modal.addEventListener('show.bs.modal', function () {
+        fetch("/contratos_ativos")
+          .then(response => response.json())
+          .then(data => {
+            contratoSelect.innerHTML = "<option disabled selected value=''>Selecione um contrato</option>";
+            data.forEach(contrato => {
+              const option = document.createElement("option");
+              option.value = contrato.id;
+              option.text = `${contrato.numero} - ${contrato.razao_social}`;
+              contratoSelect.appendChild(option);
+            });
+          })
+          .catch(error => console.error("Erro ao carregar contratos:", error));
+      });
+  
+      contratoSelect.addEventListener("change", function () {
+        const contratoId = this.value;
+  
+        if (!contratoId) return;
+  
+        fetch(`/get/produtos_por_contrato/${contratoId}`)
+          .then(response => response.json())
+          .then(data => {
+            produtoSelect.innerHTML = "";
+            if (data.length === 0) {
+              const option = document.createElement("option");
+              option.disabled = true;
+              option.text = "Nenhum produto vinculado.";
+              produtoSelect.appendChild(option);
+            } else {
+              data.forEach(produto => {
+                const option = document.createElement("option");
+                option.value = produto.id;
+                option.text = `${produto.nome} - R$ ${produto.valor}`;
+                produtoSelect.appendChild(option);
+              });
+            }
+          })
+          .catch(error => console.error("Erro ao carregar produtos vinculados:", error));
+      });
+    });
+  </script>
+  

@@ -1,0 +1,86 @@
+<!-- Modal de Desvinculação de Instalações -->
+<div class="modal fade" id="desvincularInstalacaoModal" tabindex="-1" aria-labelledby="desvincularInstalacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <form method="POST" action="{{ url_for('cliente_bp.desvincular_instalacoes') }}">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title" id="desvincularInstalacaoModalLabel">Desvincular Instalações do Cliente</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+  
+            <!-- Seletor de Cliente -->
+            <div class="mb-3">
+              <label for="desvincular_cliente_id" class="form-label">Selecione um Cliente:</label>
+              <select class="form-select" name="cliente_id" id="desvincular_cliente_id" required>
+                <option disabled selected value="">Carregando clientes...</option>
+              </select>
+            </div>
+  
+            <!-- Seletor múltiplo de instalações -->
+            <div class="mb-3">
+              <label for="instalacoes_vinculadas" class="form-label">Instalações Vinculadas:</label>
+              <select class="form-select" name="instalacao_ids" id="instalacoes_vinculadas" multiple required size="10">
+                <!-- Instalacoes serão carregadas via JavaScript -->
+              </select>
+            </div>
+  
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-danger">Desvincular</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const modal = document.getElementById('desvincularInstalacaoModal');
+      const clienteSelect = document.getElementById("desvincular_cliente_id");
+      const instalacaoSelect = document.getElementById("instalacoes_vinculadas");
+  
+      modal.addEventListener('show.bs.modal', function () {
+        // Carrega clientes com instalações
+        fetch("/get/clientes_com_instalacoes")
+          .then(response => response.json())
+          .then(clientes => {
+            clienteSelect.innerHTML = "<option disabled selected value=''>Selecione um cliente</option>";
+            clientes.forEach(cliente => {
+              const option = document.createElement("option");
+              option.value = cliente.id;
+              option.text = `${cliente.sequencia} - ${cliente.razao_social}`;
+              clienteSelect.appendChild(option);
+            });
+          });
+  
+        instalacaoSelect.innerHTML = "<option disabled>Selecione um cliente para ver as instalações</option>";
+      });
+  
+      // Quando um cliente é selecionado, carregar as instalações dele
+      clienteSelect.addEventListener("change", function () {
+        const clienteId = this.value;
+        fetch(`/get/instalacoes_por_cliente/${clienteId}`)
+          .then(response => response.json())
+          .then(data => {
+            instalacaoSelect.innerHTML = "";
+  
+            if (data.length === 0) {
+              const option = document.createElement("option");
+              option.disabled = true;
+              option.text = "Nenhuma instalação vinculada.";
+              instalacaoSelect.appendChild(option);
+            } else {
+              data.forEach(inst => {
+                const option = document.createElement("option");
+                option.value = inst.id;
+                option.text = `${inst.codigo_instalacao} - ${inst.endereco}`;
+                instalacaoSelect.appendChild(option);
+              });
+            }
+          });
+      });
+    });
+  </script>
+  

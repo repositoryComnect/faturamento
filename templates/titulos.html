@@ -1,0 +1,169 @@
+{% include 'model-header.html' %}
+{% include 'links.html' %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_revendas.css') }}">
+
+{% block content %}
+
+<div class="container mt-5 mb-4">
+    <!-- Cabeçalho com botões -->
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Títulos</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRevendaModal">
+                <i class="bi bi-trash me-2"></i>Excluir
+            </button>
+            <button class="btn btn-secondary" onclick="window.location.href=this.getAttribute('action')" 
+                    action="{{ url_for('revendas_bp.get_revendas') }}">
+                <i class="bi bi-search me-2"></i>Listar Todos
+            </button>
+            <form class="d-flex" role="search" method="GET" action="{{ url_for('revendas_bp.get_id_revendas') }}">
+                <input class="form-control me-2" type="search" name="search" id="search" 
+                       placeholder="Nome/CNPJ/Código" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Localizar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Seção de Informações Básicas -->
+    <div class="card mb-2">
+        <div class="card-header section-header d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" 
+             aria-expanded="true" aria-controls="basicInfoCollapse">
+            <h5 class="mb-0">Informações Básicas</h5>
+        </div>
+        <div class="collapse show" id="basicInfoCollapse">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('revendas_bp.set_revendas') }}">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label for="nome">Código:</label>
+                            <input type="text" id="codigo_revenda" name="codigo_revenda" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="nome">Nome da Revenda:</label>
+                            <input type="text" id="nome_revenda" name="nome_revenda" class="form-control" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="cnpj">CNPJ:</label>
+                            <input type="text" id="cnpj" name="cnpj" class="form-control" required>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="status">Status:</label>
+                            <select id="status" name="status" class="form-select">
+                                <option value="Ativo" selected>Ativo</option>
+                                <option value="Inativo">Inativo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="id_conta">ID Conta Portal:</label>
+                            <input type="text" id="id_conta" name="id_conta" class="form-control"required>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Dados da Conta -->
+    <div class="card mb-2">
+        <div class="card-header section-header d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" data-bs-target="#accountInfoCollapse" 
+             aria-expanded="true" aria-controls="accountInfoCollapse">
+            <h5 class="mb-0">Dados da Conta</h5>
+        </div>
+        <div class="collapse show" id="accountInfoCollapse">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="tipo_conta">Tipo de Conta Portal:</label>
+                        <select id="tipo_conta" name="tipo_conta" class="form-select">
+                            <option value="Nenhum" selected>Nenhum</option>
+                            <option value="Distribuidor" >Distribuidor</option>
+                            <option value="Revenda">Revenda</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" name="email" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="ie">IE:</label>
+                        <input type="text" id="ie" name="ie" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="telefone">Telefone:</label>
+                        <input type="text" id="telefone" name="telefone" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Endereço -->
+    <div class="card mb-2">
+        <div class="card-header section-header d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" data-bs-target="#addressCollapse" 
+             aria-expanded="true" aria-controls="addressCollapse">
+            <h5 class="mb-0">Endereço</h5>
+        </div>
+        <div class="collapse show" id="addressCollapse">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label for="cep">CEP:</label>
+                        <input type="text" id="cep" name="cep" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endereco">Endereço:</label>
+                        <input type="text" id="endereco" name="endereco" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="bairro">Bairro:</label>
+                        <input type="text" id="bairro" name="bairro" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="cidade">Cidade:</label>
+                        <input type="text" id="cidade" name="cidade" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Vendedores -->
+    <div class="card mb-2">
+        <div class="card-header section-header d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" data-bs-target="#vendedoresCollapse" 
+             aria-expanded="true" aria-controls="vendedoresCollapse">
+            <h5 class="mb-0">Vendedores</h5>
+        </div>
+        <div class="collapse show" id="vendedoresCollapse">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="vendedor_selecionado">Selecionar Vendedor</label>
+                        <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
+                            <option value="">-- Selecione um vendedor --</option>
+                            {% for vendedor in vendedores %}
+                                <option value="{{ vendedor.id }}">{{ vendedor.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="d-flex justify-content-end mt-3 gap-2">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="/revendas" class="btn btn-secondary">Cancelar</a>
+    </div>
+    </form>
+</div>
+<br><br><br><br><br><br>
+{% include 'js/revendas_js.html' %}
+
+{% endblock %}

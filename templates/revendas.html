@@ -1,190 +1,189 @@
 {% include 'model-header.html' %}
 {% include 'links.html' %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css' )}}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style_revendas.css' )}}">
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_revendas.css') }}">
 
 {% block content %}
-<div class="container mt-4 mb-3">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Cadastro de Revendas</h2>
-        <div class="d-flex gap-3">
-            <button class="btn btn-danger me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#deleteRevendaModal">
+
+<div class="container mt-5 mb-4">
+    <!-- Cabeçalho com botões -->
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Revendas</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRevendaModal">
                 <i class="bi bi-trash me-2"></i>Excluir
             </button>
-            <button class="btn btn-secondary me-2 btn-sm rounded" onclick="window.location.href=this.getAttribute('action')" 
-                    action="">
+            <button class="btn btn-secondary" onclick="window.location.href=this.getAttribute('action')" 
+                    action="{{ url_for('revendas_bp.get_revendas') }}">
                 <i class="bi bi-search me-2"></i>Listar Todos
             </button>
-            <form class="d-flex" role="search" method="GET" action="">
-                <input class="form-control me-2" 
-                       type="search" name="search" id="search" placeholder="Nome/CNPJ/Cidade" aria-label="Search">
+            <form class="d-flex" role="search" method="GET" action="{{ url_for('revendas_bp.get_id_revendas') }}">
+                <input class="form-control me-2" type="search" name="search" id="search" 
+                       placeholder="Nome/CNPJ/Código" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Localizar</button>
             </form>
         </div>
     </div>
 
-    <div class="revendas-container">
-        <div class="revendas-form">
-            <form method="POST" action="">
-                <div class="form-header">
-                    <div class="form-group">
-                        <label for="nome">Nome da Revenda</label>
-                        <input type="text" id="nome" name="nome" class="form-control" 
-                               value="Angeil Automacao M" required>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="id_conta">ID Conta Portal</label>
-                            <input type="text" id="id_conta" name="id_conta" class="form-control" 
-                                   value="196">
+    <!-- Seção de Informações Básicas -->
+    <div class="card mb-2">
+        <div class="card-header section-header d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" 
+             aria-expanded="true" aria-controls="basicInfoCollapse">
+            <h5 class="mb-0">Informações Básicas</h5>
+        </div>
+        <div class="collapse show" id="basicInfoCollapse">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('revendas_bp.set_revendas') }}">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label for="nome">Código:</label>
+                            <input type="text" id="codigo_revenda" name="codigo_revenda" class="form-control" readonly>
                         </div>
-                        <div class="form-group col-md-3">
-                            <label for="status">Status</label>
-                            <select id="status" name="status" class="form-control">
-                                <option value="ativo" selected>ATIVO</option>
-                                <option value="inativo">INATIVO</option>
+                        <div class="col-md-4">
+                            <label for="nome">Nome da Revenda:</label>
+                            <input type="text" id="nome_revenda" name="nome_revenda" class="form-control" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="cnpj">CNPJ:</label>
+                            <input type="text" id="cnpj" name="cnpj" class="form-control" required>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label for="status">Status:</label>
+                            <select id="status" name="status" class="form-select">
+                                <option value="Ativo" selected>Ativo</option>
+                                <option value="Inativo">Inativo</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-3">
-                            <label for="cep">CEP</label>
-                            <input type="text" id="cep" name="cep" class="form-control" 
-                                   value="88101000">
+                        <div class="col-md-2">
+                            <label for="id_conta">ID Conta Portal:</label>
+                            <input type="text" id="id_conta" name="id_conta" class="form-control"required>
                         </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="endereco">Endereço</label>
-                        <input type="text" id="endereco" name="endereco" class="form-control" 
-                               value="Av. Pres Kennedy, 306 SL 108">
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="bairro">Bairro</label>
-                            <input type="text" id="bairro" name="bairro" class="form-control" 
-                                   value="Baixo Campinas">
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="cidade">Cidade</label>
-                            <input type="text" id="cidade" name="cidade" class="form-control" 
-                                   value="São José">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="cnpj">CNPJ</label>
-                            <input type="text" id="cnpj" name="cnpj" class="form-control" 
-                                   value="16.581.137/0001-17">
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="ie">Inscrição Estadual</label>
-                            <input type="text" id="ie" name="ie" class="form-control" 
-                                   value="256.786.771">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-sections">
-                    <!-- Seção de Vendedores -->
-                    <div class="collapse-section">
-                        <button type="button" class="collapse-toggle" onclick="toggleCollapse('vendedores-collapse')">
-                            <h3>Vendedores <i class="bi bi-chevron-down"></i></h3>
-                        </button>
-                        <div id="vendedores-collapse" class="collapse-content show">
-                            <div class="form-group">
-                                <label>Vendedores Cadastrados</label>
-                                <ul class="list-group mt-2">
-                                    <li class="list-group-item">Fábio Cabiri</li>
-                                    <li class="list-group-item">Fernando Amitati</li>
-                                    <li class="list-group-item">Oswaldo</li>
-                                </ul>
-                            </div>
-                            
-                            <div class="form-row mt-3">
-                                <div class="form-group col-md-8">
-                                    <label for="novo_vendedor">Adicionar Vendedor</label>
-                                    <input type="text" id="novo_vendedor" name="novo_vendedor" class="form-control">
-                                </div>
-                                <div class="form-group col-md-4 d-flex align-items-end">
-                                    <button type="button" class="btn btn-primary btn-sm">Adicionar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Seção de Contatos -->
-                    <div class="collapse-section">
-                        <button type="button" class="collapse-toggle" onclick="toggleCollapse('contatos-collapse')">
-                            <h3>Contatos <i class="bi bi-chevron-down"></i></h3>
-                        </button>
-                        <div id="contatos-collapse" class="collapse-content">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="contato_nome">Nome do Contato</label>
-                                    <input type="text" id="contato_nome" name="contato_nome" class="form-control" 
-                                           value="Anderson Angeli">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="contato_telefone">Telefone</label>
-                                    <input type="text" id="contato_telefone" name="contato_telefone" class="form-control" 
-                                           value="48 3034-6533">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="contato_email">E-mail</label>
-                                <input type="email" id="contato_email" name="contato_email" class="form-control" 
-                                       value="anderson.a@centerssystem.int.br">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Seção de Remuneração -->
-                    <div class="collapse-section">
-                        <button type="button" class="collapse-toggle" onclick="toggleCollapse('remuneracao-collapse')">
-                            <h3>Remuneração <i class="bi bi-chevron-down"></i></h3>
-                        </button>
-                        <div id="remuneracao-collapse" class="collapse-content">
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="pot_contrato">Pot Contrato</label>
-                                    <input type="text" id="pot_contrato" name="pot_contrato" class="form-control" 
-                                           value="0,00">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="pot_instalacao">Pot Instalação</label>
-                                    <input type="text" id="pot_instalacao" name="pot_instalacao" class="form-control" 
-                                           value="0,00">
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-6">
-                                    <label for="pelo_suporte">Pelo Suporte</label>
-                                    <input type="text" id="pelo_suporte" name="pelo_suporte" class="form-control" 
-                                           value="0,00">
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="pela_venda">X Pela Venda</label>
-                                    <input type="text" id="pela_venda" name="pela_venda" class="form-control" 
-                                           value="0,00">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-actions mt-4">
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                    <a href="/revendas" class="btn btn-secondary">Cancelar</a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
+
+    <!-- Seção de Dados da Conta -->
+    <div class="card mb-2">
+        <div class="card-header section-header d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" data-bs-target="#accountInfoCollapse" 
+             aria-expanded="true" aria-controls="accountInfoCollapse">
+            <h5 class="mb-0">Dados da Conta</h5>
+        </div>
+        <div class="collapse show" id="accountInfoCollapse">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="tipo_conta">Tipo de Conta Portal:</label>
+                        <select id="tipo_conta" name="tipo_conta" class="form-select">
+                            <option value="Nenhum" selected>Nenhum</option>
+                            <option value="Distribuidor" >Distribuidor</option>
+                            <option value="Revenda">Revenda</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" name="email" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="ie">IE:</label>
+                        <input type="text" id="ie" name="ie" class="form-control">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="telefone">Telefone:</label>
+                        <input type="text" id="telefone" name="telefone" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Endereço -->
+    <div class="card mb-2">
+        <div class="card-header section-header d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" data-bs-target="#addressCollapse" 
+             aria-expanded="true" aria-controls="addressCollapse">
+            <h5 class="mb-0">Endereço</h5>
+        </div>
+        <div class="collapse show" id="addressCollapse">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label for="cep">CEP:</label>
+                        <input type="text" id="cep" name="cep" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="endereco">Endereço:</label>
+                        <input type="text" id="endereco" name="endereco" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="bairro">Bairro:</label>
+                        <input type="text" id="bairro" name="bairro" class="form-control">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="cidade">Cidade:</label>
+                        <input type="text" id="cidade" name="cidade" class="form-control">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seção de Vendedores -->
+    <div class="card mb-2">
+        <div class="card-header section-header d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" data-bs-target="#vendedoresCollapse" 
+             aria-expanded="true" aria-controls="vendedoresCollapse">
+            <h5 class="mb-0">Vendedores</h5>
+        </div>
+        <div class="collapse show" id="vendedoresCollapse">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="vendedor_selecionado">Selecionar Vendedor</label>
+                        <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
+                            <option value="">-- Selecione um vendedor --</option>
+                            {% for vendedor in vendedores %}
+                                <option value="{{ vendedor.id }}">{{ vendedor.nome }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="d-flex justify-content-end mt-3 gap-2">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+        <a href="/revendas" class="btn btn-secondary">Cancelar</a>
+    </div>
+    </form>
 </div>
 
 
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/proximo_codigo_revenda')
+            .then(response => response.json())
+            .then(data => {
+                if (data.proximo_codigo_revenda) {
+                    document.getElementById('codigo_revenda').value = data.proximo_codigo_revenda;
+                } else {
+                    console.warn("Código de revenda não retornado pela API.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao buscar código de revenda:", error);
+            });
+    });
+</script>
 
+
+<br><br><br><br><br><br>
+{% include 'js/revendas/revendas_js.html' %}
+{% include 'popup/revenda/popup_delete_revenda.html' %}
 {% endblock %}
-
-<br><br><br><br><br><br><br><br><br>

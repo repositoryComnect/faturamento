@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% include "model-header.html" %}
+    {% include "links.html" %}
+</head>
+<body>
+    <!-- Mensagens Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="container mt-5 mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Nota Fiscal</h2>
+            <div class="d-flex gap-2"> <!-- Adicionei a classe gap-2 para espaçamento uniforme -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createNotasModal">
+                    <i class="bi bi-plus-circle me-2"></i>Criar Nova Nota
+                </button>
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateNotasModal">
+                    <i class="bi bi-gear-wide-connected me-2"></i>Editar Nota
+                </button>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteNotasModal">
+                    <i class="bi bi-trash me-2"></i>Excluir Nota
+                </button>
+                <button class="btn btn-secondary" 
+                    onclick="window.location.href=this.getAttribute('action')" 
+                    action="{{ url_for('cliente_bp.listar_clientes') }}">
+                    <i class="bi bi-search me-2"></i>Listar Todos
+                </button>
+                <form class="d-flex" role="search" method="GET" action="">
+                    <input class="form-control me-2" 
+                           type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Localizar</button>
+                </form>
+            </div>
+        </div>
+    
+        
+        <!-- Basic Information Card -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" aria-expanded="true" aria-controls="basicInfoCollapse">
+                <h5 class="mb-0">Cadastros de Notas Fiscais</h5>
+            </div>
+            <div class="collapse show" id="basicInfoCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label">N° da Nota:</label>
+                            <input type="text" class="form-control" value="" id="sequencia" onchange="">
+                            <div id="loadingCliente" class="input-group-text d-none">
+                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Natureza Operação:</label>
+                            <input type="text" class="form-control" value="" id="cadastramento" readonly>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">CFOP:</label>
+                            <input type="text" class="form-control" value="" id="atualizacao" readonly>
+                        </div>
+        
+                        <div class="col-md-4">
+                            <label class="form-label">Data Emissão:</label>
+                            <input type="text" class="form-control" value="" id="razao_social" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Customer Address Section -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#addressCollapse" aria-expanded="true" aria-controls="addressCollapse">
+                <h5 class="mb-0">Destinatário/Remetente</h5>
+            </div>
+            <div class="collapse show" id="addressCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label">Razão Social:</label>
+                            <input type="text" class="form-control" value="" id="cep" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">CNPJ/CPF:</label>
+                            <input type="text" class="form-control" value="" id="endereco" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">CEP:</label>
+                            <input type="text" class="form-control" value="" id="complemento" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Endereço:</label>
+                            <input type="text" class="form-control" value="" id="bairro" readonly>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label class="form-label">Municipio:</label>
+                            <input type="text" class="form-control" value="" id="cidade" readonly>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">UF:</label>
+                            <input type="text" class="form-control" value="" id="estado" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Telefone:</label>
+                            <input type="text" class="form-control" value="" id="estado" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">E-mail:</label>
+                            <input type="text" class="form-control" value="" id="estado" readonly>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">I.E:</label>
+                            <input type="text" class="form-control" value="" id="estado" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Contract Conditions Section -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#relationCollapse">
+                <h5 class="mb-0">Dados do Produto</h5>
+            </div>
+            <div class="collapse" id="relationCollapse">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                            <table class="clientes-table table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Descrição</th>
+                                        <th>Fiscal</th>
+                                        <th>Tributária</th>
+                                        <th>Unidade</th>
+                                        <th>Quantidade</th>
+                                        <th>Valor Unitário</th>
+                                        <th>Valor Total</th>
+                                        <th>Aliquota</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if notas %}
+                                        {% for nota in notas %}
+                                        <tr>
+                                            <td>{{ nota.codigo }}</td>
+                                            <td>{{ nota.descricao }}</td>
+                                            <td>{{ nota.fiscal }}</td>
+                                            <td>{{ nota.tributaria }}</td>
+                                            <td>{{ nota.unidade }}</td>
+                                            <td>{{ nota.quantidade }}</td>
+                                            <td>{{ nota.valor_unitario }}</td>
+                                            <td>{{ nota.valor_total }}</td>
+                                            <td>{{ nota.aliquota }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                            <!-- Paginação -->
+                            <div id="clientes-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="pageInfo" class="align-self-center"></span>
+                                <button id="nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#relationCollapse">
+                <h5 class="mb-0">Prestação de Serviços</h5>
+            </div>
+            <div class="collapse" id="relationCollapse">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                            <table class="clientes-table table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>C.NFe</th>
+                                        <th>Descrição</th>
+                                        <th>Quantidade</th>
+                                        <th>Valor Total</th>
+                                        <th>ISS(%)</th>
+                                        <th>(ISS) Unitário</th>
+                                        <th>Valor Total (ISS)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if servicos %}
+                                        {% for servico in servicos %}
+                                        <tr>
+                                            <td>{{ servico.codigo }}</td>
+                                            <td>{{ servico.descricao }}</td>
+                                            <td>{{ servico.fiscal }}</td>
+                                            <td>{{ servico.tributaria }}</td>
+                                            <td>{{ servico.unidade }}</td>
+                                            <td>{{ servico.quantidade }}</td>
+                                            <td>{{ servico.valor_unitario }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                            <!-- Paginação -->
+                            <div id="clientes-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="pageInfo" class="align-self-center"></span>
+                                <button id="nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Address Section -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#addressCollapse" aria-expanded="true" aria-controls="addressCollapse">
+                <h5 class="mb-0">Cálculo Imposto</h5>
+            </div>
+            <div class="collapse show" id="addressCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label class="form-label">Base ICMS:</label>
+                            <input type="text" class="form-control" value="" id="cep" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Valor ICMS:</label>
+                            <input type="text" class="form-control" value="" id="endereco" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Base C.ICMS Sub:</label>
+                            <input type="text" class="form-control" value="" id="complemento" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Valor ICMS Sub:</label>
+                            <input type="text" class="form-control" value="" id="bairro" readonly>
+                        </div>
+                        
+                        <div class="col-md-2">
+                            <label class="form-label">Valor Total Prod:</label>
+                            <input type="text" class="form-control" value="" id="cidade" readonly>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">Valor Frete:</label>
+                            <input type="text" class="form-control" value="" id="estado" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Valor Seguro:</label>
+                            <input type="text" class="form-control" value="" id="estado" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Valor Total IPI:</label>
+                            <input type="text" class="form-control" value="" id="estado" readonly>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">Valor Nota:</label>
+                            <input type="text" class="form-control" value="" id="estado" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Other Details Section -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" aria-expanded="true" aria-controls="basicInfoCollapse">
+                <h5 class="mb-0">Observações</h5>
+            </div>
+            <div class="collapse show" id="basicInfoCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label">Observações:</label>
+                            <textarea class="form-control" rows="3" id="observacao" readonly></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% include 'popup/notas/popup_notas.html' %}
+    {% include 'popup/notas/popup_delete_notas.html' %}
+
+    </div><br><br><br><br><br>
+
+</body>
+</html>

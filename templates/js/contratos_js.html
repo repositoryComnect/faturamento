@@ -11,6 +11,10 @@
     let currentPage = 1;
     const rowsPerPage = 5;
 
+    let planosData = []; // Armazena os planos para paginação
+    let currentPlanoPage = 1;
+    const planoRowsPerPage = 5;
+
     function renderClientesPage() {
         const tbody = $('.clientes-table tbody');
         tbody.empty();
@@ -35,9 +39,9 @@
                 <tr>
                     <td>${cliente.nome_fantasia || ''}</td>
                     <td>${cliente.razao_social || ''}</td>
-                    <td>${cliente.localidade || ''}</td>
+                    <td>${cliente.cnpj || ''}</td>
                     <td>${cliente.atividade || ''}</td>
-                    <td>${cliente.regiao || ''}</td>
+                    <td>${cliente.cidade || ''}</td>
                     <td>
                         <span class="status-badge ${cliente.estado_atual === 'Ativo' ? 'status-ativo' : 'status-inativo'}">
                             ${cliente.estado_atual || 'N/A'}
@@ -65,6 +69,67 @@
             renderClientesPage();
         }
     });
+
+    // -------- PAGINAÇÃO DE PLANOS --------
+
+    function renderPlanosPage() {
+        const tbody = $('.planos-table tbody');
+        tbody.empty();
+
+        if (!planosData.length) {
+            tbody.html(`
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        Nenhum plano associado encontrado
+                    </td>
+                </tr>
+            `);
+            $('#planos-pageInfo').text('');
+            $('#planos-prevPage, #planos-nextPage').prop('disabled', true);
+            return;
+        }
+
+        const totalPages = Math.ceil(planosData.length / planoRowsPerPage);
+        const start = (currentPlanoPage - 1) * planoRowsPerPage;
+        const end = start + planoRowsPerPage;
+
+        planosData.slice(start, end).forEach(plano => {
+            tbody.append(`
+                <tr>
+                    <td>${plano.id}</td>
+                    <td>${plano.codigo}</td>
+                    <td>${plano.nome}</td>
+                    <td>R$ ${plano.valor.toFixed(2)}</td>
+                    <td>
+                        <span class="badge ${plano.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
+                            ${plano.status}
+                        </span>
+                    </td>
+                </tr>
+            `);
+        });
+
+        $('#planos-pageInfo').text(`Página ${currentPlanoPage} de ${totalPages}`);
+        $('#planos-prevPage').prop('disabled', currentPlanoPage === 1);
+        $('#planos-nextPage').prop('disabled', currentPlanoPage === totalPages);
+    }
+
+    $('#planos-prevPage').on('click', () => {
+        if (currentPlanoPage > 1) {
+            currentPlanoPage--;
+            renderPlanosPage();
+        }
+    });
+
+    $('#planos-nextPage').on('click', () => {
+        if (currentPlanoPage < Math.ceil(planosData.length / planoRowsPerPage)) {
+            currentPlanoPage++;
+            renderPlanosPage();
+        }
+    });
+
+    // -------- BUSCA DE CONTRATO --------
 
     function buscarDadosContrato(numeroContrato) {
         if (!numeroContrato) return;
@@ -95,8 +160,10 @@
                         'email': '#email',
                         'telefone': '#telefone',
                         'responsavel': '#responsavel',
-                        'cep': '#cep',
+                        'code_residence': '#code_residence',
                         'cnpj': '#cnpj',
+                        'revenda': '#revenda',
+                        'vendedor': '#vendedor',
                         'endereco': '#endereco',
                         'complemento': '#complemento',
                         'bairro': '#bairro',
@@ -152,32 +219,60 @@
                         renderClientesPage();
                     }
 
-                    // Atualiza a TABELA DE PLANOS
+                    // Atualiza a TABELA DE PLANOS com paginação
                     if (data.planos && Array.isArray(data.planos)) {
-                        const linhasPlanos = data.planos.map(plano => `
+                        planosData = data.planos;
+                        currentPlanoPage = 1;
+                        renderPlanosPage();
+                    } else {
+                        planosData = [];
+                        renderPlanosPage();
+                    }
+
+                    // Atualiza a TABELA DE PRODUTOS
+                    if (data.produtos && Array.isArray(data.produtos)) {
+                        const linhasProdutos = data.produtos.map(produto => `
                             <tr>
-                                <td>${plano.id}</td>
-                                <td>${plano.codigo}</td>
-                                <td>${plano.nome}</td>
-                                <td>R$ ${plano.valor.toFixed(2)}</td>
-                                <td>
-                                    <span class="badge ${plano.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
-                                        ${plano.status}
-                                    </span>
-                                </td>
+                                <td>${produto.id || ''}</td>
+                                <td>${produto.nome || ''}</td>
+                                <td>${produto.descricao || 'N/A'}</td>
+                                <td>${produto.quantidade || 0}</td>
+                                <td>R$ ${produto.valor_unitario ? produto.valor_unitario.toFixed(2) : '0.00'}</td>
                             </tr>
                         `).join('');
-                        $('.planos-table tbody').html(linhasPlanos);
+                        $('.produtos-table tbody').html(linhasProdutos);
                     } else {
-                        $('.planos-table tbody').html(`
+                        $('.produtos-table tbody').html(`
                             <tr>
                                 <td colspan="5" class="text-center">
                                     <i class="bi bi-exclamation-circle me-2"></i>
-                                    Nenhum plano associado encontrado
+                                    Nenhum produto associado encontrado
                                 </td>
                             </tr>
                         `);
                     }
+                // ======= SOMA DOS VALORES DE PLANOS E PRODUTOS =======
+
+                let totalPlanos = 0;
+                if (data.planos && Array.isArray(data.planos)) {
+                    totalPlanos = data.planos.reduce((acc, plano) => acc + (plano.valor || 0), 0);
+                }
+
+                let totalProdutos = 0;
+                if (data.produtos && Array.isArray(data.produtos)) {
+                    totalProdutos = data.produtos.reduce((acc, produto) => {
+                        const quantidade = produto.quantidade || 0;
+                        const valorUnitario = produto.valor_unitario || 0;
+                        return acc + (quantidade * valorUnitario);
+                    }, 0);
+                }
+
+                const valorTotalContrato = totalPlanos + totalProdutos;
+
+                // Atualiza o campo #valor_contrato com o valor total
+                $('#valor_contrato').val(valorTotalContrato.toFixed(2));
+
+
                 },
                 error: function(xhr) {
                     console.error("Erro na requisição:", xhr);
@@ -191,7 +286,6 @@
         }, 500);
     }
 </script>
-
 
 
 <script>
@@ -223,7 +317,7 @@
                             'address_email': '#address_email',
                             'telefone': '#phone',
                             'responsavel': '#responsible',
-                            'zip_code': '#zip_code',
+                            'zip_code_cep': '#zip_code_cep',
                             'cnpj_cpf': '#cnpj_cpf',
                             'endereco': '#address',
                             'complemento': '#complement',
@@ -266,3 +360,6 @@
         buscarContrato($(this).val());
     });
 </script>
+
+
+  
