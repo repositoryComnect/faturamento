@@ -156,3 +156,34 @@
     color: #95a5a6;
     font-style: italic;
 }
+
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a,
+.pagination span {
+    display: inline-block;
+    padding: 6px 12px;
+    margin: 2px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    color: #333;
+    border-radius: 4px;
+}
+
+.pagination .current-page {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+    border: 1px solid #007bff;
+}
+
+.total-registros {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
