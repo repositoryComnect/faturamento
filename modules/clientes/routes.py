@@ -1,12 +1,12 @@
 from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash
-from application.models.models import db, Cliente, Contrato, cliente_contrato
+from application.models.models import db, Cliente, Contrato, cliente_contrato, Revenda, Instalacao
 from sqlalchemy import text
 from datetime import datetime
 import re
 
 cliente_bp = Blueprint('cliente_bp', __name__)
 
-@cliente_bp.route('/clientes/buscar-por-numero/<sequencia>', methods=['GET'])
+'''@cliente_bp.route('/clientes/buscar-por-numero/<sequencia>', methods=['GET'])
 def buscar_cliente_por_contrato(sequencia):
     try:
         sequencia = Cliente.query.filter_by(sequencia=sequencia).first()
@@ -40,18 +40,140 @@ def buscar_cliente_por_contrato(sequencia):
             'endereco': sequencia.endereco or None,
             'complemento': sequencia.complemento or None,
             'bairro' :sequencia.bairro or None,
-            'cidade' : sequencia.cidade or None, 
+            'cidade' : sequencia.cidade or None,
+            'cep_cobranca': sequencia.cep_cobranca or None,
+            'endereco_cobranca': sequencia.endereco_cobranca or None,
+            'cidade_cobranca': sequencia.cidade_cobranca or None,
+            'telefone_cobranca': sequencia.telefone_cobranca or None,
+            'bairro_cobranca': sequencia.bairro_cobranca or None,
+            'uf_cobranca': sequencia.uf_cobranca or None,
             'estado' : sequencia.estado or None,
             'fator_juros': sequencia.fator_juros or None,
             'plano_nome': sequencia.plano_nome or None,
             'observacao': sequencia.observacao or None,
             'data_estado': format_date(sequencia.data_estado) or None,
             'dia_vencimento': sequencia.dia_vencimento or None
+
+            
         }
         return jsonify(data)
 
     except Exception as e:
+        return jsonify({'error': str(e)}), 500'''
+
+
+@cliente_bp.route('/clientes/buscar-por-numero/<sequencia>', methods=['GET'])
+def buscar_cliente_por_contrato(sequencia):
+    try:
+        cliente = Cliente.query.filter_by(sequencia=sequencia).first()
+        if not cliente:
+            return jsonify({'error': f'Cliente {sequencia} não encontrado'}), 404
+
+        # Função auxiliar para formatar datas
+        def format_date(date):
+            return date.strftime('%d/%m/%Y') if date else None
+
+        data = {
+            'sequencia': cliente.sequencia,
+            'cadastramento': format_date(cliente.cadastramento),
+            'atualizacao': format_date(cliente.atualizacao),
+            'razao_social': cliente.razao_social or None,
+            'nome_fantasia': cliente.nome_fantasia or None,
+            'contato': cliente.contato_principal or None,
+            'email': cliente.email or None,
+            'telefone': cliente.telefone or None,
+            'tipo': cliente.tipo or None,
+            'cnpj': cliente.cnpj or None,
+            'im': cliente.im or None,
+            'ie': cliente.ie or None,
+            'revenda_nome': cliente.revenda_nome or None,
+            'vendedor_nome': cliente.vendedor_nome or None,
+            'tipo_servico': cliente.tipo_servico or None,
+            'localidade': cliente.localidade or None,
+            'regiao': cliente.regiao or None,
+            'atividade': cliente.atividade or None,
+            'cep': cliente.cep or None,
+            'endereco': cliente.endereco or None,
+            'complemento': cliente.complemento or None,
+            'bairro': cliente.bairro or None,
+            'cidade': cliente.cidade or None,
+            'cep_cobranca': cliente.cep_cobranca or None,
+            'endereco_cobranca': cliente.endereco_cobranca or None,
+            'cidade_cobranca': cliente.cidade_cobranca or None,
+            'telefone_cobranca': cliente.telefone_cobranca or None,
+            'bairro_cobranca': cliente.bairro_cobranca or None,
+            'uf_cobranca': cliente.uf_cobranca or None,
+            'estado': cliente.estado or None,
+            'fator_juros': float(cliente.fator_juros) if cliente.fator_juros else None,
+            'plano_nome': cliente.plano_nome or None,
+            'observacao': cliente.observacao or None,
+            'data_estado': format_date(cliente.data_estado) or None,
+            'dia_vencimento': cliente.dia_vencimento or None,
+
+            # NOVO: Lista de instalações vinculadas ao cliente
+            'instalacoes': [
+                {
+                    'id': inst.id,
+                    'codigo_instalacao': inst.codigo_instalacao,
+                    'razao_social': inst.razao_social,
+                    'cep': inst.cep,
+                    'endereco': inst.endereco,
+                    'bairro': inst.bairro,
+                    'cidade': inst.cidade,
+                    'uf': inst.uf,
+                    'cadastramento': format_date(inst.cadastramento),
+                    'id_portal': inst.id_portal,
+                    'status': inst.status,
+                    'observacao': inst.observacao or '',
+                    'valor_plano': float(getattr(inst, 'valor_plano', 0.00))  # Proteção caso não exista
+                }
+                for inst in cliente.instalacoes
+            ]
+        }
+        print(data)
+
+        return jsonify(data)
+
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@cliente_bp.route('/desvincular-instalacoes', methods=['POST'])
+def desvincular_instalacoes():
+    cliente_id = request.form.get('cliente_id')
+    instalacao_ids = request.form.getlist('instalacao_ids')
+
+    if not cliente_id or not instalacao_ids:
+        flash('Cliente ou instalações não selecionados.', 'danger')
+        return redirect(request.referrer)
+
+    try:
+        for inst_id in instalacao_ids:
+            instalacao = Instalacao.query.get(inst_id)
+            if instalacao and instalacao.cliente_id == int(cliente_id):
+                instalacao.cliente_id = None
+                db.session.add(instalacao)
+
+        db.session.commit()
+        flash(f'{len(instalacao_ids)} instalação(ões) desvinculada(s) com sucesso.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao desvincular instalações: ' + str(e), 'danger')
+
+    return redirect(request.referrer)
+
+@cliente_bp.route('/get/clientes_com_instalacoes', methods=['GET'])
+def get_clientes_com_instalacoes():
+    clientes = (
+        db.session.query(Cliente)
+        .join(Instalacao)
+        .filter(Instalacao.cliente_id == Cliente.id)
+        .distinct()
+        .all()
+    )
+    return jsonify([
+        {'id': cliente.id, 'sequencia': cliente.sequencia, 'razao_social': cliente.razao_social}
+        for cliente in clientes
+    ])
 
 @cliente_bp.route('/delete/cliente', methods=['POST'])
 def delete_cliente():
@@ -183,10 +305,17 @@ def get_numeros_contrato():
 @cliente_bp.route('/set/cliente', methods=['POST'])
 def set_cliente():
     def parse_date(date_str):
-        try:
-            return datetime.strptime(date_str, '%Y-%m-%d').date()
-        except Exception:
-            return None
+            if not date_str:
+                return None
+            try:
+                for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
+                    try:
+                        return datetime.strptime(date_str, fmt).date()
+                    except ValueError:
+                        continue
+                return None
+            except Exception:
+                return None
 
     try:
         # Iniciar transação (equivalente ao BEGIN TRANSACTION)
@@ -207,8 +336,8 @@ def set_cliente():
             'contato_principal': request.form.get('contact', '').strip(),
             'email': request.form.get('address_email', '').strip(),
             'telefone': request.form.get('phone', '').strip(),
-            'revenda_nome': request.form.get('revenda', '').strip(),
-            'vendedor_nome': request.form.get('vendedor', '').strip(),
+            'revenda_nome': request.form.get('revenda_selecionada_client', '').strip(),
+            'vendedor_nome': request.form.get('vendedor_selecionado_client', '').strip(),
             'tipo_servico': request.form.get('tipo_servico'),
             'localidade': request.form.get('localidade', '').strip(),
             'regiao': request.form.get('regiao', '').strip(),
@@ -218,10 +347,16 @@ def set_cliente():
             'complemento': request.form.get('complement', '').strip(),
             'bairro': request.form.get('neighborhood', '').strip(),
             'cidade': request.form.get('city', '').strip(),
+            'cep_cobranca': request.form.get('cep_cobranca'),
+            'endereco_cobranca': request.form.get('endereco_cobranca'),
+            'cidade_cobranca': request.form.get('cidade_cobranca'),
+            'telefone_cobranca': request.form.get('telefone_cobranca'),
+            'bairro_cobranca': request.form.get('bairro_cobranca'),
+            'uf_cobranca': request.form.get('uf_cobranca'),
             'estado': request.form.get('state'),
             'fator_juros': float(request.form.get('fator_juros', 0)),
-            'estado_atual': request.form.get('estado_atual', 'ATIVO'),
-            'data_estado': parse_date(request.form.get('data_estado')),
+            'estado_atual': request.form.get('estado_atual', 'Ativo'),
+            'data_estado': parse_date(request.form.get('date_estate')),
             'dia_vencimento': int(request.form.get('dia_vencimento', 10)),
             'plano_nome': request.form.get('plano', '').strip(),
             'motivo_estado': request.form.get('motivo_estado', '').strip(),
@@ -459,32 +594,101 @@ def proxima_sequencia_cliente():
 
 @cliente_bp.route('/get/id/cliente', methods=['GET'])
 def get_id_cliente():
-
     search_term = request.args.get('search', '').strip()
-    
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    offset = (page - 1) * per_page
+
     if not search_term:
         return jsonify({'erro': 'Termo de pesquisa não fornecido'}), 400
 
     try:
-        # Consulta SQL usando text() para segurança
-        query = text("""
-            SELECT * FROM clientes
+        # Monta a consulta principal com filtros
+        base_query = """
+            FROM clientes
             WHERE razao_social LIKE :term 
                OR numero_contrato LIKE :term 
                OR nome_fantasia LIKE :term
                OR cnpj LIKE :term
-            """)
-        
-        # Executa a consulta com parâmetros
-        result = db.session.execute(query, {'term': f'%{search_term}%'})
-        
-        # Converte os resultados para dicionário
+        """
+
+        params = {'term': f'%{search_term}%', 'limit': per_page, 'offset': offset}
+
+        # Consulta paginada
+        full_query = f"SELECT * {base_query} ORDER BY razao_social LIMIT :limit OFFSET :offset"
+        result = db.session.execute(text(full_query), params)
         clientes = [dict(row._asdict()) for row in result]
-        
-        return render_template('listar_clientes.html', clientes=clientes)
-        
+
+        # Conta total de resultados para paginação
+        count_query = f"SELECT COUNT(*) {base_query}"
+        total = db.session.execute(text(count_query), {'term': params['term']}).scalar()
+
+        return render_template(
+            'listar_clientes.html',
+            clientes=clientes,
+            total=total,
+            page=page,
+            per_page=per_page,
+            search_term=search_term  # útil para manter o termo no campo de busca
+        )
+
     except Exception as e:
         return jsonify({
             'erro': str(e),
             'sucesso': False
         }), 500
+
+@cliente_bp.route('/revendas_ativas/cliente', methods=['GET'])
+def get_revendas_ativas():
+    revendas = Revenda.query.filter_by(status='Ativo').order_by(Revenda.nome).all()
+    resultado = [r.nome for r in revendas]
+    return jsonify(resultado)
+
+@cliente_bp.route('/insert/instalacoes/cliente', methods=['POST'])
+def insert_instalacoes_cliente():
+    form_data = request.form.to_dict()
+
+    def parse_date(date_str):
+        if not date_str:
+            return None
+        for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
+            try:
+                return datetime.strptime(date_str, fmt).date()
+            except ValueError:
+                continue
+        return None
+
+    cliente_id = form_data.get('cliente_selecionado')
+    if not cliente_id:
+        return jsonify({
+            'success': False,
+            'message': 'Cliente é obrigatório para vincular à instalação.'
+        }), 400
+
+    instalacao_data = {
+        'codigo_instalacao': form_data.get('codigo_instalacao'),
+        'razao_social': form_data.get('company'),
+        'id_portal': form_data.get('id_portal'),
+        'cadastramento': parse_date(form_data.get('registry')),
+        'status': form_data.get('status'),
+        'cep': form_data.get('cep'),
+        'cidade': form_data.get('cidade'),
+        'endereco': form_data.get('endereco'),
+        'bairro': form_data.get('bairro'),
+        'uf': form_data.get('uf'),
+        'observacao': form_data.get('observacao'),
+        'cliente_id': int(cliente_id)
+    }
+
+    # Verifica se instalação já existe
+    if Instalacao.query.filter_by(codigo_instalacao=instalacao_data['codigo_instalacao']).first():
+        return jsonify({
+            'success': False,
+            'message': 'Já existe uma instalação com este código.'
+        }), 400
+
+    nova_instalacao = Instalacao(**instalacao_data)
+    db.session.add(nova_instalacao)
+    db.session.commit()
+
+    return redirect(url_for('home_bp.render_clientes'))

@@ -1,11 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, request
-from application.models.models import Contrato, db, Cliente, Produto, Plano
+from application.models.models import Contrato, db, Cliente, Produto, Plano, ContratoProduto, Revenda, cliente_contrato
 from datetime import datetime
 from sqlalchemy import text
 import re
 
 contratos_bp = Blueprint('contratos_bp', __name__)
-
 
 @contratos_bp.route('/proximo_numero_contrato', methods=['GET'])
 def proximo_numero_contrato():
@@ -36,21 +35,6 @@ def planos_ativos():
     resultado = [{'id': p.id, 'nome': p.nome, 'valor': str(p.valor)} for p in planos]
     return jsonify(resultado)
 
-'''@contratos_bp.route('/api/contrato/<int:contrato_id>', methods=['GET'])
-def contrato_detalhes_api(contrato_id):
-    # Buscando o contrato com o plano associado
-    contrato = db.session.query(Contrato, Plano).join(Plano, Contrato.plano_id == Plano.id).filter(Contrato.id == contrato_id).first()
-
-    if contrato:
-        contrato_data = {
-            'plano_nome': contrato[1].nome,
-            'valor_plano': str(contrato[1].valor),
-            'valor_contrato': str(contrato[0].fator_juros)  # Exemplo de valor, ajuste conforme necessário
-        }
-        return jsonify(contrato_data)
-    else:
-        return jsonify({'error': 'Contrato não encontrado'}), 404'''
-
 @contratos_bp.route('/contratos/delete', methods=['POST'])
 def delete_contrato():
     numero = request.form.get('numero')
@@ -76,18 +60,28 @@ def delete_contrato():
                 'contrato': {
                     'id': contrato_id,
                     'numero': contrato[1],
-                    'sequencia': contrato_id  # se quiser exibir algo como sequência
+                    'sequencia': contrato_id
                 }
             })
 
         elif action == 'unlink':
+            # Excluindo dependências primeiro
             db.session.execute(text("DELETE FROM cliente_contrato WHERE contrato_id = :id"), {'id': contrato_id})
+            db.session.execute(text("DELETE FROM contrato_plano WHERE contrato_id = :id"), {'id': contrato_id})
+            db.session.execute(text("DELETE FROM contratos_produtos WHERE contrato_id = :id"), {'id': contrato_id})
             db.session.commit()
             return jsonify({'success': True, 'message': f'Contrato {numero} desvinculado com sucesso'})
 
         elif action == 'delete':
+            # Excluindo dependências primeiro
+            db.session.execute(text("DELETE FROM cliente_contrato WHERE contrato_id = :id"), {'id': contrato_id})
+            db.session.execute(text("DELETE FROM contrato_plano WHERE contrato_id = :id"), {'id': contrato_id})
+            db.session.execute(text("DELETE FROM contratos_produtos WHERE contrato_id = :id"), {'id': contrato_id})
+
+            # Agora, excluindo o contrato
             db.session.execute(text("DELETE FROM contratos WHERE id = :id"), {'id': contrato_id})
             db.session.commit()
+
             return jsonify({'success': True, 'message': f'Contrato {numero} excluído com sucesso'})
 
         return jsonify({'error': True, 'message': 'Ação inválida'}), 400
@@ -130,7 +124,7 @@ def buscar_contrato():
                 'tipo': contrato.tipo or None,
                 'id_matriz_portal': contrato.id_matriz_portal or None,
                 'responsavel': contrato.responsavel or None,
-                'zip_code': contrato.cep or None,
+                'zip_code_cep': contrato.cep or None,
                 'cnpj_cpf': contrato.cnpj or None,
                 'endereco': contrato.endereco or None,
                 'complemento': contrato.complemento or None,
@@ -152,10 +146,21 @@ def buscar_contrato():
 
 @contratos_bp.route('/contratos/alterar', methods=['POST'])
 def alterar_contrato():
+    # Converter datas para o formato do MySQL
+    def parse_date(date_str):
+        if not date_str:
+            return None
+        try:
+            day, month, year = map(int, date_str.split('/'))
+            return f"{year}-{month:02d}-{day:02d}"
+        except:
+            return None
+        
     try:
         numero = request.form.get('contract_number')
         razao_social = request.form.get('company_name')
         nome_fantasia = request.form.get('trade_name')
+        atualizacao = parse_date(request.form.get('update_datetime_edit'))
         tipo = request.form.get('type')
         responsavel = request.form.get('responsible')
         contato = request.form.get('contact')
@@ -185,6 +190,7 @@ def alterar_contrato():
                     razao_social = :razao_social,
                     nome_fantasia = :nome_fantasia,
                     tipo = :tipo,
+                    atualizacao = :atualizacao,
                     responsavel = :responsavel,
                     contato = :contato,
                     email = :email,
@@ -210,6 +216,7 @@ def alterar_contrato():
                 'razao_social': razao_social,
                 'nome_fantasia': nome_fantasia,
                 'tipo': tipo,
+                'atualizacao': atualizacao,
                 'responsavel': responsavel,
                 'contato': contato,
                 'email': email,
@@ -255,17 +262,21 @@ def listar_contratos():
         
         contratos = [dict(row._mapping) for row in resultado]
         total = db.session.execute(text("SELECT COUNT(*) FROM contratos")).scalar()
+
+        # Para depuração: print os dados de contratos e total
+        print("Contratos:", contratos)
+        print("Total:", total)
         
         return render_template('listar_contratos.html', 
-                            contratos=contratos,
-                            page=page,
-                            per_page=per_page,
-                            total=total)
+                               contratos=contratos,
+                               page=page,
+                               per_page=per_page,
+                               total=total)
         
     except Exception as e:
-        print(f"Erro ao listar clientes: {str(e)}")
+        print(f"Erro ao listar contratos: {str(e)}")
         return render_template('listar_contratos.html', 
-                            error="Não foi possível carregar os clientes")
+                               error=f"Não foi possível carregar os contratos: {str(e)}")
 
 @contratos_bp.route('/contratos/buscar-por-numero/<numero>', methods=['GET'])
 def buscar_contrato_por_numero(numero):
@@ -293,6 +304,8 @@ def buscar_contrato_por_numero(numero):
             'responsavel': contrato.responsavel or None,
             'cep': contrato.cep or None,
             'cnpj': contrato.cnpj or None,
+            'revenda': contrato.revenda or None,
+            'vendedor': contrato.vendedor or None,
             'endereco': contrato.endereco or None,
             'complemento': contrato.complemento or None,
             'bairro': contrato.bairro or None,
@@ -311,9 +324,9 @@ def buscar_contrato_por_numero(numero):
         data['clientes'] = [{
             'nome_fantasia': c.nome_fantasia or None,
             'razao_social': c.razao_social or None,
-            'localidade': c.localidade or None,
+            'cnpj': c.cnpj or None,
             'atividade': c.atividade or None,
-            'regiao': c.regiao or None,
+            'cidade': c.cidade or None,
             'estado_atual': c.estado_atual or None,
             'numero_contrato_cadastrado': c.numero_contrato
         } for c in contrato.clientes] if contrato.clientes else []
@@ -327,6 +340,20 @@ def buscar_contrato_por_numero(numero):
             'status': 'Ativo'  # Pode ser ajustado conforme sua regra
         } for p in contrato.planos] if contrato.planos else []
 
+        # 5. Produtos associados via tabela intermediária
+        associacoes = ContratoProduto.query.filter_by(contrato_id=contrato.id).all()
+        data['produtos'] = []
+        for assoc in associacoes:
+            produto = Produto.query.get(assoc.produto_id)  # Query para cada produto
+            data['produtos'].append({
+                'id': produto.id,
+                'nome': produto.nome,
+                'quantidade': assoc.quantidade,
+                'descricao' : produto.descricao,
+                'valor_unitario': float(produto.preco_base) if produto.preco_base else 0.00
+                # ... outros campos ...
+            })
+
         return jsonify(data)
     
     except Exception as e:
@@ -338,44 +365,46 @@ def set_contrato():
     try:
         db.session.rollback()
         form_data = request.form.to_dict()
-        
+
         def parse_date(date_str):
             if not date_str:
                 return None
-            try:
-                for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
-                    try:
-                        return datetime.strptime(date_str, fmt).date()
-                    except ValueError:
-                        continue
-                return None
-            except Exception:
-                return None
-        
+            for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
+                try:
+                    return datetime.strptime(date_str, fmt).date()
+                except ValueError:
+                    continue
+            return None
+
         def parse_int(value):
             try:
                 return int(value) if value else None
             except (ValueError, TypeError):
                 return None
-        
+
         def parse_float(value):
             try:
                 return float(value) if value else None
             except (ValueError, TypeError):
                 return None
-        
+
         def parse_bool(value):
             if isinstance(value, str):
                 return value.lower() in ('true', '1', 'yes', 'y', 't')
             return bool(value)
-        
+
+        # Dados principais do contrato
         contrato_data = {
             'numero': form_data.get('numero_contrato'),
-            'cadastramento': parse_date(form_data.get('cadastramento')),
-            'atualizacao': parse_date(form_data.get('atualizacao')),
+            'cadastramento': parse_date(form_data.get('current_datetime')),
+            'atualizacao': parse_date(form_data.get('update_datetime')),
             'tipo': form_data.get('tipo_contrato'),
             'id_matriz_portal': form_data.get('portal_id'),
             'responsavel': form_data.get('responsavel'),
+            'cnpj': form_data.get('cnpj'),
+            'tipo_pessoa': form_data.get('people_type'),
+            'revenda': form_data.get('revenda_selecionada'),
+            'vendedor': form_data.get('vendedor_selecionado'),
             'razao_social': form_data.get('razao_social'),
             'nome_fantasia': form_data.get('nome_fantasia'),
             'contato': form_data.get('contato'),
@@ -391,34 +420,74 @@ def set_contrato():
             'fator_juros': parse_float(form_data.get('fator_juros')),
             'contrato_revenda': parse_bool(form_data.get('contrato_revenda')),
             'faturamento_contrato': parse_bool(form_data.get('faturamento_contrato')),
-            'estado_produto': form_data.get('produto'),
+            #'estado_produto': form_data.get('produto'),
             'estado_contrato': form_data.get('estado_contrato'),
             'data_estado': parse_date(form_data.get('data_estado')),
             'motivo_estado': form_data.get('motivo_estado'),
-            
         }
-        
+
+        # Verifica se contrato já existe
         if Contrato.query.filter_by(numero=contrato_data['numero']).first():
             return jsonify({
                 'success': False,
                 'message': 'Já existe um contrato com este número'
             }), 400
-        
+
+        # Cria contrato
         novo_contrato = Contrato(**contrato_data)
         db.session.add(novo_contrato)
         db.session.commit()
-        
+
+        # Associa produto
+        produto_id = form_data.get('produto_id')
+        if produto_id:
+            produto = Produto.query.get(produto_id)
+            if produto:
+                contrato_produto = ContratoProduto(
+                    contrato_id=novo_contrato.id,
+                    produto_id=produto.id,
+                    quantidade=1,
+                    valor_unitario=produto.preco_base
+                )
+                db.session.add(contrato_produto)
+                db.session.commit()
+
+        # Associa plano
+        plano_id = form_data.get('plano_id')
+        if plano_id:
+            plano = Plano.query.get(int(plano_id))
+            if plano:
+                novo_contrato.planos.append(plano)
+                db.session.commit()
+
+            cliente_id = request.form.get('cliente_selecionado')
+
+        # Se um cliente foi selecionado, associar
+        if cliente_id:
+            try:
+                cliente_id_int = int(cliente_id)
+                stmt = cliente_contrato.insert().values(
+                    cliente_id=cliente_id_int,
+                    contrato_id=novo_contrato.id
+                )
+                db.session.execute(stmt)
+                db.session.commit()
+            except ValueError:
+                # Cliente ID inválido (ex: string não numérica)
+                print(f"ID de cliente inválido: {cliente_id}")
+
+        # Ajusta auto_increment (opcional)
         try:
             db.session.execute(
-                "ALTER TABLE contratos AUTO_INCREMENT = : id",
+                text("ALTER TABLE contratos AUTO_INCREMENT = :id"),
                 {'id': novo_contrato.id + 1}
             )
             db.session.commit()
         except Exception as e:
             print(f"Alerta: Não foi possível realizar o autoincremento: {str(e)}")
-        
-        return redirect(url_for(('home_bp.render_contratos')))
-        
+
+        return redirect(url_for('home_bp.render_contratos'))
+
     except Exception as e:
         db.session.rollback()
         return jsonify({
@@ -426,7 +495,25 @@ def set_contrato():
             'message': f'Erro ao criar contrato: {str(e)}',
             'error_details': str(e)
         }), 500
+
+@contratos_bp.route('/api/contrato/<int:contract_id>/produtos', methods=['GET'])
+def get_contract_products(contract_id):
+    associações = ContratoProduto.query.filter_by(contrato_id=contract_id).all()
     
+    produtos = []
+    for assoc in associações:
+        produto = Produto.query.get(assoc.produto_id)
+        produtos.append({
+            'id': produto.id,
+            'nome': produto.nome,
+            'descricao': produto.descricao,
+            'quantidade': assoc.quantidade,
+            'preco_unitario': float(assoc.valor_unitario or 0),
+            'status': produto.status  # Assumindo que Produto tem esse campo
+        })
+    
+    return jsonify({'status': 'success', 'produtos': produtos})
+
 @contratos_bp.route('/get/id/contatos', methods=['GET'])
 def get_id_contratos():
     search_term = request.args.get('search', '').strip()
@@ -445,11 +532,273 @@ def get_id_contratos():
 
         result = db.session.execute(query, {'term': f'%{search_term}%'})
         contratos = [dict(row._asdict()) for row in result]
-        
-        return render_template('listar_contratos.html', contratos=contratos)
+
+        # Acrescentando total, página e itens por página
+        total = len(contratos)
+        page = 1
+        per_page = total  # ou defina um valor fixo, ex: 10
+
+        return render_template(
+            'listar_contratos.html',
+            contratos=contratos,
+            total=total,
+            page=page,
+            per_page=per_page
+        )
         
     except Exception as e:
         return jsonify({
             'erro': str(e),
             'sucesso': False
         }), 500
+
+@contratos_bp.route('/revendas_ativas', methods=['GET'])
+def get_revendas_ativas():
+    revendas = Revenda.query.filter_by(status='Ativo').order_by(Revenda.nome).all()
+    resultado = [r.nome for r in revendas]
+    return jsonify(resultado)
+
+@contratos_bp.route('/get/list/clientes', methods=['GET'])
+def get_list_clientes():
+    clientes = Cliente.query.filter_by(estado_atual='Ativo').order_by(Cliente.razao_social).all()
+    resultado = [{'id': c.id, 'razao_social': c.razao_social} for c in clientes]
+    return jsonify(resultado)
+
+@contratos_bp.route('/vincular-clientes', methods=['POST'])
+def vincular_clientes():
+    try:
+        db.session.begin()
+
+        # 1. Obter o contrato pelo número ou ID
+        contrato_id = request.form.get('selecione_contrato')
+        contrato = Contrato.query.get(contrato_id)
+
+        if not contrato:
+            raise ValueError("Contrato não encontrado.")
+
+        # 2. Obter lista de IDs dos clientes a serem associados
+        cliente_ids = request.form.getlist('cliente_ids')
+        clientes_nao_encontrados = []
+
+        for cliente_id in cliente_ids:
+            cliente = Cliente.query.get(cliente_id)
+            if cliente:
+                # Verifica se já está associado
+                if cliente not in contrato.clientes:
+                    contrato.clientes.append(cliente)
+            else:
+                clientes_nao_encontrados.append(cliente_id)
+
+        if clientes_nao_encontrados:
+            raise ValueError(f"Clientes não encontrados: {', '.join(map(str, clientes_nao_encontrados))}")
+
+        db.session.commit()
+        flash('Clientes associados com sucesso.', 'success')
+        return redirect(url_for('home_bp.render_contratos'))
+
+    except ValueError as ve:
+        db.session.rollback()
+        flash(str(ve), 'danger')
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao associar clientes ao contrato.', 'danger')
+        print(f"Erro: {e}")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+@contratos_bp.route('/get/clientes_por_contrato/<int:contrato_id>', methods=['GET'])
+def clientes_por_contrato(contrato_id):
+    contrato = Contrato.query.get(contrato_id)
+    if not contrato:
+        return jsonify([]), 404
+
+    clientes = contrato.clientes
+    return jsonify([{'id': c.id, 'razao_social': c.razao_social} for c in clientes])
+
+@contratos_bp.route('/desvincular-clientes', methods=['POST'])
+def desvincular_clientes():
+    try:
+        contrato_id = request.form.get('contrato_id')
+        cliente_ids = request.form.getlist('cliente_ids')
+
+        contrato = Contrato.query.get(contrato_id)
+        if not contrato:
+            raise ValueError("Contrato não encontrado.")
+
+        for cliente_id in cliente_ids:
+            cliente = Cliente.query.get(cliente_id)
+            if cliente and cliente in contrato.clientes:
+                contrato.clientes.remove(cliente)
+
+        db.session.commit()
+        flash("Clientes desvinculados com sucesso.", "success")
+        return redirect(url_for('home_bp.render_contratos'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash("Erro ao desvincular clientes do contrato.", "danger")
+        print(f"Erro ao desvincular: {e}")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+@contratos_bp.route('/vincular-planos', methods=['POST'])
+def vincular_planos():
+    try:
+        db.session.begin()
+
+        # 1. Obter o contrato pelo ID
+        contrato_id = request.form.get('contrato_id')
+        contrato = Contrato.query.get(contrato_id)
+
+        if not contrato:
+            raise ValueError("Contrato não encontrado.")
+
+        # 2. Obter lista de IDs dos planos a serem associados
+        plano_ids = request.form.getlist('plano_ids')
+        planos_nao_encontrados = []
+
+        for plano_id in plano_ids:
+            plano = Plano.query.get(plano_id)
+            if plano:
+                # Verifica se já está associado
+                if plano not in contrato.planos:
+                    contrato.planos.append(plano)
+            else:
+                planos_nao_encontrados.append(plano_id)
+
+        if planos_nao_encontrados:
+            raise ValueError(f"Planos não encontrados: {', '.join(map(str, planos_nao_encontrados))}")
+
+        db.session.commit()
+        flash('Planos associados com sucesso.', 'success')
+        return redirect(url_for('home_bp.render_contratos'))
+
+    except ValueError as ve:
+        db.session.rollback()
+        flash(str(ve), 'danger')
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao associar planos ao contrato.', 'danger')
+        print(f"Erro: {e}")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+@contratos_bp.route('/desvincular-planos', methods=['POST'])
+def desvincular_planos():
+    try:
+        db.session.begin()
+
+        contrato_id = request.form.get('contrato_id')
+        plano_ids = request.form.getlist('planos_ids')  # nome do campo no formulário HTML
+
+        contrato = Contrato.query.get(contrato_id)
+        if not contrato:
+            raise ValueError("Contrato não encontrado.")
+
+        if not plano_ids:
+            raise ValueError("Nenhum plano selecionado para desvincular.")
+
+        planos_removidos = []
+        for plano_id in plano_ids:
+            plano = Plano.query.get(plano_id)
+            if plano and plano in contrato.planos:
+                contrato.planos.remove(plano)
+                planos_removidos.append(plano.nome)
+
+        db.session.commit()
+
+        flash(f"Planos desvinculados com sucesso: {', '.join(planos_removidos)}", "success")
+        return redirect(url_for('home_bp.render_contratos'))
+
+    except ValueError as ve:
+        db.session.rollback()
+        flash(str(ve), "danger")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao desvincular planos: {e}")
+        flash("Erro ao desvincular planos do contrato.", "danger")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+@contratos_bp.route('/get/planos_por_contrato/<int:contrato_id>', methods=['GET'])
+def planos_por_contrato(contrato_id):
+    contrato = Contrato.query.get(contrato_id)
+    if not contrato:
+        return jsonify([]), 404
+
+    planos = contrato.planos
+    return jsonify([
+        {
+            'id': plano.id,
+            'nome': plano.nome,
+            'valor': str(plano.valor)
+        } for plano in planos
+    ])
+
+@contratos_bp.route('/vincular-produtos', methods=['POST'])
+def vincular_produtos():
+    try:
+        contrato_id = request.form.get('contrato_id')
+        produto_ids = request.form.getlist('produto_ids')
+
+        contrato = Contrato.query.get(contrato_id)
+        if not contrato:
+            flash("Contrato não encontrado.", "danger")
+            return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+        for produto_id in produto_ids:
+            produto = Produto.query.get(produto_id)
+            if produto:
+                if produto not in contrato.produtos:
+                    contrato.produtos.append(produto)
+
+        db.session.commit()
+        flash("Produtos vinculados com sucesso!", "success")
+        return redirect(url_for('home_bp.render_contratos'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f"Erro ao vincular produtos: {str(e)}", "danger")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+@contratos_bp.route('/get/produtos_por_contrato/<int:contrato_id>', methods=['GET'])
+def produtos_por_contrato(contrato_id):
+    contrato = Contrato.query.get(contrato_id)
+    if not contrato:
+        return jsonify([]), 404
+
+    produtos = contrato.produtos
+    return jsonify([
+        {
+            'id': produto.id,
+            'nome': produto.nome,
+        } for produto in produtos
+    ])
+
+@contratos_bp.route('/desvincular-produtos', methods=['POST'])
+def desvincular_produtos():
+    try:
+        contrato_id = request.form.get('contrato_id')
+        produto_ids = request.form.getlist('produto_ids')
+
+        contrato = Contrato.query.get(contrato_id)
+        if not contrato:
+            flash("Contrato não encontrado.", "danger")
+            return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+        for produto_id in produto_ids:
+            produto = Produto.query.get(produto_id)
+            if produto in contrato.produtos:
+                contrato.produtos.remove(produto)
+
+        db.session.commit()
+        #flash("Produtos desvinculados com sucesso!", "success")
+        return redirect(url_for('home_bp.render_contratos'))
+
+    except Exception as e:
+        db.session.rollback()
+        #flash(f"Erro ao desvincular produtos: {str(e)}", "danger")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+

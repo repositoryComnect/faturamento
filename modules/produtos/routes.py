@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, jsonify,
 from application.models.models import Produto, db
 from datetime import datetime
 from sqlalchemy import text
+import re
 
 produtos_bp = Blueprint('produtos_bp', __name__)
 
@@ -45,9 +46,6 @@ def set_produtos():
             'error_details': str(e)
         }), 500
     
-
-
-    
 @produtos_bp.route('/delete/produto', methods=['POST'])
 def delete_produtos():
     codigo = request.form.get('codigo')
@@ -62,4 +60,19 @@ def delete_produtos():
     
     return redirect(url_for(('home_bp.render_produtos')))
 
+@produtos_bp.route('/proximo_codigo_produto', methods=['GET'])
+def proximo_codigo_produto():
+    # Busca todos os produtos cadastrados
+    produtos = Produto.query.all()
     
+    numeros = []
+    for produto in produtos:
+        # Extrai número do código do produto, assumindo padrão como "P0001", "P0010", etc.
+        match = re.search(r'\d+', produto.codigo or '')
+        if match:
+            numeros.append(int(match.group()))
+    
+    proximo = max(numeros) + 1 if numeros else 1
+    codigo_formatado = f"P{proximo:04d}"  # ex: P0001, P0002, etc.
+    
+    return jsonify({'proximo_codigo_produto': codigo_formatado})    
