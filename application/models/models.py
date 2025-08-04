@@ -149,7 +149,7 @@ class Produto(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text)
     preco_base = db.Column(db.Numeric(10, 2))
-    ativo = db.Column(db.Boolean, default=True)
+    ativo = db.Column(db.String(20))
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
     
     # Relacionamento com Contrato através da tabela de junção
@@ -169,7 +169,7 @@ class Contrato(db.Model):
     tipo = db.Column(db.String(50))
     id_matriz_portal = db.Column(db.String(50))
     responsavel = db.Column(db.String(100))
-    cnpj = db.Column(db.String(15))
+    cnpj_cpf = db.Column(db.String(15))
     tipo_pessoa = db.Column(db.String(40))
     revenda = db.Column(db.String(50))
     vendedor = db.Column(db.String(50))
@@ -311,55 +311,18 @@ class Plano(db.Model):
     nome = db.Column(db.String(200), nullable=False)  # name="nome"
     valor = db.Column(db.Numeric(10, 2), nullable=False)  # name="valor"
     id_portal = db.Column(db.Integer)  # name="id_produto"
+    produto = db.Column(db.String(20))
+    qtd_produto = db.Column(db.Integer)
+    valor_base_produto = db.Column(db.Numeric(10, 2))
 
     # ===== SEÇÃO LICENÇA =====
     desc_boleto_licenca = db.Column(db.String(200))  # name="desc_boleto_licenca"
     licenca_valor = db.Column(db.Numeric(10, 2))  # (já existia)
     aliquota_sp_licenca = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_licenca"
     cod_servico_sp_licenca = db.Column(db.String(20))  # name="cod_servico_sp_licenca"
-    aliquota_barueri_licenca = db.Column(db.Numeric(5, 2))  # name="aliquota_barueri_licenca" (novo)
-    cod_servico_barueri_licenca = db.Column(db.String(20))  # name="cod_servico_barueri_licenca" (novo)
     desc_nf_licenca = db.Column(db.String(200))  # name="desc_nf_licenca" (novo)
 
-    # ===== SEÇÃO SUPORTE =====
-    desc_boleto_suporte = db.Column(db.String(200))  # name="desc_boleto_suporte" (novo)
-    aliquota_sp_suporte = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_suporte" (novo)
-    cod_servico_sp_suporte = db.Column(db.String(20))  # name="cod_servico_sp_suporte" (novo)
-    aliquota_barueri_suporte = db.Column(db.Numeric(5, 2))  # name="aliquota_barueri_suporte" (novo)
-    cod_servico_barueri_suporte = db.Column(db.String(20))  # name="cod_servico_barueri_suporte" (novo)
-    desc_nf_suporte = db.Column(db.String(200))  # name="desc_nf_suporte" (novo)
-
-    # ===== SEÇÃO GERENCIAMENTO =====
-    desc_boleto_gerenciamento = db.Column(db.String(200))  # name="desc_boleto_gerenciamento" (novo)
-    aliquota_sp_gerenciamento = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_gerenciamento" (novo)
-    cod_servico_sp_gerenciamento = db.Column(db.String(20))  # name="cod_servico_sp_gerenciamento" (novo)
-    aliquota_barueri_gerenciamento = db.Column(db.Numeric(5, 2))  # name="aliquota_barueri_gerenciamento" (novo)
-    cod_servico_barueri_gerenciamento = db.Column(db.String(20))  # name="cod_servico_barueri_gerenciamento" (novo)
-    desc_nf_gerenciamento = db.Column(db.String(200))  # name="desc_nf_gerenciamento" (novo)
-
-    # ===== SEÇÃO HOSPEDAGEM =====
-    desc_boleto_hospedagem = db.Column(db.String(200))  # name="desc_boleto_hospedagem" (novo)
-    aliquota_sp_hospedagem = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_hospedagem" (novo)
-    cod_servico_sp_hospedagem = db.Column(db.String(20))  # name="cod_servico_sp_hospedagem" (novo)
-    aliquota_barueri_hospedagem = db.Column(db.Numeric(5, 2))  # name="aliquota_barueri_hospedagem" (novo)
-    cod_servico_barueri_hospedagem = db.Column(db.String(20))  # name="cod_servico_barueri_hospedagem" (novo)
-    desc_nf_hospedagem = db.Column(db.String(200))  # name="desc_nf_hospedagem" (novo)
-
-    # ===== SEÇÃO MANUTENÇÃO =====
-    desc_boleto_manutencao = db.Column(db.String(200))  # name="desc_boleto_manutencao" (novo)
-    aliquota_sp_manutencao = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_manutencao" (novo)
-    cod_servico_sp_manutencao = db.Column(db.String(20))  # name="cod_servico_sp_manutencao" (novo)
-    aliquota_barueri_manutencao = db.Column(db.Numeric(5, 2))  # name="aliquota_barueri_manutencao" (novo)
-    cod_servico_barueri_manutencao = db.Column(db.String(20))  # name="cod_servico_barueri_manutencao" (novo)
-    desc_nf_manutencao = db.Column(db.String(200))  # name="desc_nf_manutencao" (novo)
-
-    # ===== SEÇÃO MONITORAMENTO =====
-    desc_boleto_monitoramento = db.Column(db.String(200))  # name="desc_boleto_monitoramento" (novo)
-    aliquota_sp_monitoramento = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_monitoramento" (novo)
-    cod_servico_sp_monitoramento = db.Column(db.String(20))  # name="cod_servico_sp_monitoramento" (novo)
-    aliquota_barueri_monitoramento = db.Column(db.Numeric(5, 2))  # name="aliquota_barueri_monitoramento" (novo)
-    cod_servico_barueri_monitoramento = db.Column(db.String(20))  # name="cod_servico_barueri_monitoramento" (novo)
-    desc_nf_monitoramento = db.Column(db.String(200))  # name="desc_nf_monitoramento" (novo)
+    
 
     # Datas
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)

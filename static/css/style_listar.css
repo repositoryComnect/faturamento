@@ -117,8 +117,17 @@
     border: none;
     cursor: pointer;
     font-size: 0.95rem;
-    margin-right: 10px;
+    margin-right: 5px;
 }
+
+.btn-warning{
+    margin-right: 5px;
+}
+
+.btn-voltar {
+    margin-left: 20px; /* ou qualquer valor que você preferir */
+}
+
 
 .btn-primary:last-child {
     margin-right: 0;

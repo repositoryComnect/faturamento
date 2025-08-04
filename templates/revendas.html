@@ -6,9 +6,9 @@
 
 {% block content %}
 
-<div class="container mt-5 mb-4">
-    <!-- Cabeçalho com botões -->
-    <div class="d-flex justify-content-between align-items-center">
+<div class="container mt-7 mb-1">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
         <h2>Revendas</h2>
         <div class="d-flex gap-2">
             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRevendaModal">
@@ -137,15 +137,15 @@
         <div class="card-header section-header d-flex justify-content-between align-items-center" 
              data-bs-toggle="collapse" data-bs-target="#vendedoresCollapse" 
              aria-expanded="true" aria-controls="vendedoresCollapse">
-            <h5 class="mb-0">Vendedores</h5>
+            <h5 class="mb-0">Distribuidores</h5>
         </div>
         <div class="collapse show" id="vendedoresCollapse">
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label for="vendedor_selecionado">Selecionar Vendedor</label>
+                        <label for="vendedor_selecionado">Selecionar Distribuidor</label>
                         <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
-                            <option value="">-- Selecione um vendedor --</option>
+                            <option value="">-- Selecione um distribuidor --</option>
                             {% for vendedor in vendedores %}
                                 <option value="{{ vendedor.id }}">{{ vendedor.nome }}</option>
                             {% endfor %}

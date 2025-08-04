@@ -1,6 +1,11 @@
 {% include "model-header.html" %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
 
+<div class="voltar-wrapper">
+    <a href="{{ url_for('home_bp.render_revendas') }}" class="btn btn-primary btn-voltar">Voltar</a>       
+</div>
+
+
 <div class="clientes-container">
     <h2 class="clientes-title">Lista de Revendas</h2>
     <p class="total-registros">Total de Revendas: {{ total }}</p>

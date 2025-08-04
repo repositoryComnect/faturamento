@@ -1,0 +1,78 @@
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup_clientes.css')}}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+<body>
+    <div class="modal fade" id="editProdutoModal" tabindex="-1" aria-labelledby="editProdutoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="editProdutoModalLabel">Editar Produto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm" action="{{ url_for('produtos_bp.set_produtos') }}" method="POST">
+                        <div class="modal-section-header">Informações Básicas</div>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-2">
+                                <label class="form-label">Código</label>
+                                <input type="text" class="form-control" id="codigo" name="codigo" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Nome Produto</label>
+                                <input type="text" class="form-control" id="nome" name="nome">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Descrição</label>
+                                <input type="text" class="form-control" id="descricao" name="descricao">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Preço</label>
+                                <input type="number" class="form-control" id="preco_base" name="preco_base">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Status</label>
+                                <select class="form-control" id="status" name="status">
+                                    <option value="Ativo">Ativo</option>
+                                    <option value="Inativo">Inativo</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="saveProductBtn">
+                                Editar Produto
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Quando o modal for aberto, busca o próximo código
+        const produtoModal = document.getElementById('createProdutoModal');
+        produtoModal.addEventListener('show.bs.modal', function () {
+            fetch('/proximo_codigo_produto')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.proximo_codigo_produto) {
+                        document.getElementById('codigo').value = data.proximo_codigo_produto;
+                    } else {
+                        console.warn("Código não retornado pela API.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao buscar código do produto:", error);
+                });
+        });
+    </script>
+    
+</body>
+</html>

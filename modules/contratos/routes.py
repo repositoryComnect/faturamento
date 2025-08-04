@@ -125,7 +125,7 @@ def buscar_contrato():
                 'id_matriz_portal': contrato.id_matriz_portal or None,
                 'responsavel': contrato.responsavel or None,
                 'zip_code_cep': contrato.cep or None,
-                'cnpj_cpf': contrato.cnpj or None,
+                'cnpj_cpf': contrato.cnpj_cpf or None,
                 'endereco': contrato.endereco or None,
                 'complemento': contrato.complemento or None,
                 'bairro': contrato.bairro or None,
@@ -146,7 +146,6 @@ def buscar_contrato():
 
 @contratos_bp.route('/contratos/alterar', methods=['POST'])
 def alterar_contrato():
-    # Converter datas para o formato do MySQL
     def parse_date(date_str):
         if not date_str:
             return None
@@ -155,7 +154,7 @@ def alterar_contrato():
             return f"{year}-{month:02d}-{day:02d}"
         except:
             return None
-        
+
     try:
         numero = request.form.get('contract_number')
         razao_social = request.form.get('company_name')
@@ -174,9 +173,15 @@ def alterar_contrato():
         estado = request.form.get('state')
         dia_vencimento = request.form.get('last_day')
         fator_juros = request.form.get('interest_rate_factor')
-        contrato_revenda = request.form.get('id_matriz_portal')
-        faturamento_contrato = request.form.get('contract_value')
-        faturamento_contrato = int(faturamento_contrato) if faturamento_contrato.strip() else None
+        id_matriz_portal  = request.form.get('id_matriz_portal')
+        contrato_revenda = request.form.get('revenda_selecionada')
+
+        # Tratamento seguro do campo
+        faturamento_contrato_raw = request.form.get('contract_value')
+        faturamento_contrato = (
+            int(faturamento_contrato_raw) if faturamento_contrato_raw and faturamento_contrato_raw.strip() else None
+        )
+
         estado_contrato = request.form.get('current_state')
         data_estado = request.form.get('state_date')
         motivo_estado = request.form.get('reason')
@@ -233,12 +238,13 @@ def alterar_contrato():
                 'faturamento_contrato': faturamento_contrato,
                 'estado_contrato': estado_contrato,
                 'data_estado': data_estado,
-                'motivo_estado': motivo_estado
+                'motivo_estado': motivo_estado, 
+                'id_matriz_portal': id_matriz_portal,
             }
         )
         db.session.commit()
 
-        return redirect(url_for(('home_bp.render_contratos')))
+        return redirect(url_for('home_bp.render_contratos'))
 
     except Exception as e:
         db.session.rollback()
@@ -303,7 +309,7 @@ def buscar_contrato_por_numero(numero):
             'telefone': contrato.telefone or None,
             'responsavel': contrato.responsavel or None,
             'cep': contrato.cep or None,
-            'cnpj': contrato.cnpj or None,
+            'cnpj_cpf': contrato.cnpj_cpf or None,
             'revenda': contrato.revenda or None,
             'vendedor': contrato.vendedor or None,
             'endereco': contrato.endereco or None,
@@ -401,7 +407,7 @@ def set_contrato():
             'tipo': form_data.get('tipo_contrato'),
             'id_matriz_portal': form_data.get('portal_id'),
             'responsavel': form_data.get('responsavel'),
-            'cnpj': form_data.get('cnpj'),
+            'cnpj_cpf': form_data.get('cnpj'),
             'tipo_pessoa': form_data.get('people_type'),
             'revenda': form_data.get('revenda_selecionada'),
             'vendedor': form_data.get('vendedor_selecionado'),

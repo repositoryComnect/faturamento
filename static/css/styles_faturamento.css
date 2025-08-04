@@ -1,0 +1,165 @@
+
+/* Botões */
+button.btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease-in-out;
+    border: none;
+}
+
+button.btn i {
+    margin-right: 4px;
+}
+
+button.btn-primary {
+    background-color: #2359eb;
+    color: #fff;
+}
+
+button.btn-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+button.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Tabela responsiva */
+.table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+}
+
+/* Estilo da tabela */
+.clientes-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+    font-size: 0.95rem;
+}
+
+.clientes-table thead th {
+    background-color: #2359eb;
+    color: #fff;
+    text-align: center;
+    padding: 12px 14px;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.clientes-table tbody td {
+    text-align: center;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e6e6e6;
+    vertical-align: middle;
+}
+
+.clientes-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.clientes-table tbody tr:hover {
+    background-color: #eef5ff;
+    transition: 0.2s;
+}
+
+/* Checkbox centralizado */
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #2359eb;
+}
+
+/* Status (badge) */
+.badge {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+    min-width: 80px;
+    display: inline-block;
+}
+
+.bg-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.bg-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Paginação */
+.pagination {
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.pagination .page-link {
+    color: #2359eb;
+    border: 1px solid #ddd;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin: 2px;
+    transition: 0.2s;
+}
+
+.pagination .page-link:hover {
+    background-color: #2359eb;
+    color: #fff;
+    border-color: #2359eb;
+}
+
+.pagination .active .page-link {
+    background-color: #2359eb;
+    color: white;
+    font-weight: bold;
+    border-color: #2359eb;
+}
+
+.pagination .disabled .page-link {
+    color: #ccc;
+}
+
+/* Responsivo para dispositivos menores */
+@media (max-width: 768px) {
+    .clientes-table thead {
+        display: none;
+    }
+
+    .clientes-table, 
+    .clientes-table tbody, 
+    .clientes-table tr, 
+    .clientes-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .clientes-table tr {
+        margin-bottom: 15px;
+        border-bottom: 2px solid #eee;
+    }
+
+    .clientes-table td {
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+    }
+
+    .clientes-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: 600;
+        text-align: left;
+    }
+}

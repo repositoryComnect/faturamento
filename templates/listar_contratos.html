@@ -3,6 +3,12 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
 
 {% block content %}
+
+<div class="voltar-wrapper">
+    <a href="{{ url_for('home_bp.render_contratos') }}" class="btn btn-primary btn-voltar">Voltar</a>       
+</div>
+
+
 <div class="clientes-container">
     <h2 class="clientes-title">Lista de Contratos</h2>
     <p class="total-registros">Total de Contratos: {{ total }}</p>
@@ -27,7 +33,7 @@
                         <th>Endereço</th>
                         <th>Cidade</th>
                         <th>Status</th>
-                        <th>Plano</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
@@ -49,7 +55,6 @@
                                 {{ contrato.estado_contrato or 'N/A' }}
                             </span>
                         </td>
-                        <td>{{ contrato.plano_nome or 'N/A' }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

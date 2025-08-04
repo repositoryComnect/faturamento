@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
-from application.models.models import db, Plano, Contrato
+from application.models.models import db, Plano, Contrato, Produto
 from sqlalchemy import text
 from datetime import datetime
 import re
@@ -35,68 +35,48 @@ def insert_planos():
             except (ValueError, TypeError):
                 return 0.0
 
-        desc_nf_licenca = True if form_data.get('desc_nf_licenca') == 'on' else False
-
-        # Valores base
+        # Pega dados do formulário
+        codigo = form_data.get('codigo')
+        nome = form_data.get('nome')
         valor_base = parse_float(form_data.get('valor', 0))
+        id_produto = form_data.get('id_produto')
+        produto_id = form_data.get('produto_id')
+        qtd_produto = int(form_data.get('qtd_produto') or 0)
+        contrato_id = form_data.get('contrato_id')
+
+        # Cálculo do valor com base na quantidade e produto vinculado (se preço já não foi calculado no front)
+        produto = None  # ✅ inicializa
+        base_valor_produto = None
+
+        if produto_id:
+            produto = Produto.query.get(int(produto_id))
+            base_valor_produto = produto.preco_base
+            if produto and produto.preco_base and qtd_produto > 0:
+                valor_base = float(produto.preco_base) * qtd_produto
+
+        # Aliquota
         aliquota_sp = parse_float(form_data.get('aliquota_sp_licenca'))
-        aliquota_barueri = parse_float(form_data.get('aliquota_barueri_licenca'))
+        cod_servico_sp = form_data.get('cod_servico_sp_licenca')
+        desc_nf_licenca = form_data.get('desc_nf_licenca')
+        desc_boleto_licenca = form_data.get('desc_boleto_licenca')
 
-        # Só calcula o valor com alíquota se pelo menos uma for > 0
-        if aliquota_sp > 0 or aliquota_barueri > 0:
-            percentual_total = aliquota_sp + aliquota_barueri
-            valor_com_imposto = valor_base + (valor_base * percentual_total / 100)
-        else:
-            valor_com_imposto = valor_base  # permanece o mesmo
+        # Cálculo de imposto (caso deseje expandir futuramente com outras alíquotas)
+        valor_com_imposto = valor_base + (valor_base * aliquota_sp / 100) if aliquota_sp > 0 else valor_base
 
+        # Criação do plano
         plano_data = {
-            'codigo': form_data.get('codigo'),
-            'nome': form_data.get('nome'),
+            'codigo': codigo,
+            'nome': nome,
             'valor': round(valor_com_imposto, 2),
-            'licenca_valor': valor_base,
-            'id_portal': form_data.get('id_produto'),
-            'desc_boleto_licenca': form_data.get('desc_boleto_licenca'),
+            'licenca_valor': round(valor_base, 2),
+            'id_portal': id_produto,
+            'desc_boleto_licenca': desc_boleto_licenca,
             'aliquota_sp_licenca': aliquota_sp,
-            'cod_servico_sp_licenca': form_data.get('cod_servico_sp_licenca'),
-            'aliquota_barueri_licenca': aliquota_barueri,
-            'cod_servico_barueri_licenca': form_data.get('cod_servico_barueri_licenca'),
+            'cod_servico_sp_licenca': cod_servico_sp,
+            'produto': produto.nome if produto else None,
+            'valor_base_produto' : base_valor_produto,
+            'qtd_produto' : qtd_produto,
             'desc_nf_licenca': desc_nf_licenca,
-
-            'desc_boleto_suporte': form_data.get('desc_boleto_suporte'),
-            'aliquota_sp_suporte': parse_float(form_data.get('aliquota_sp_suporte')),
-            'cod_servico_sp_suporte': form_data.get('cod_servico_sp_suporte'),
-            'aliquota_barueri_suporte': parse_float(form_data.get('aliquota_barueri_suporte')),
-            'cod_servico_barueri_suporte': form_data.get('cod_servico_barueri_suporte'),
-            'desc_nf_suporte': form_data.get('desc_nf_suporte'),
-
-            'desc_boleto_gerenciamento': form_data.get('desc_boleto_gerenciamento'),
-            'aliquota_sp_gerenciamento': parse_float(form_data.get('aliquota_sp_gerenciamento')),
-            'cod_servico_sp_gerenciamento': form_data.get('cod_servico_sp_gerenciamento'),
-            'aliquota_barueri_gerenciamento': parse_float(form_data.get('aliquota_barueri_gerenciamento')),
-            'cod_servico_barueri_gerenciamento': form_data.get('cod_servico_barueri_gerenciamento'),
-            'desc_nf_gerenciamento': form_data.get('desc_nf_gerenciamento'),
-
-            'desc_boleto_hospedagem': form_data.get('desc_boleto_hospedagem'),
-            'aliquota_sp_hospedagem': parse_float(form_data.get('aliquota_sp_hospedagem')),
-            'cod_servico_sp_hospedagem': form_data.get('cod_servico_sp_hospedagem'),
-            'aliquota_barueri_hospedagem': parse_float(form_data.get('aliquota_barueri_hospedagem')),
-            'cod_servico_barueri_hospedagem': form_data.get('cod_servico_barueri_hospedagem'),
-            'desc_nf_hospedagem': form_data.get('desc_nf_hospedagem'),
-
-            'desc_boleto_manutencao': form_data.get('desc_boleto_manutencao'),
-            'aliquota_sp_manutencao': parse_float(form_data.get('aliquota_sp_manutencao')),
-            'cod_servico_sp_manutencao': form_data.get('cod_servico_sp_manutencao'),
-            'aliquota_barueri_manutencao': parse_float(form_data.get('aliquota_barueri_manutencao')),
-            'cod_servico_barueri_manutencao': form_data.get('cod_servico_barueri_manutencao'),
-            'desc_nf_manutencao': form_data.get('desc_nf_manutencao'),
-
-            'desc_boleto_monitoramento': form_data.get('desc_boleto_monitoramento'),
-            'aliquota_sp_monitoramento': parse_float(form_data.get('aliquota_sp_monitoramento')),
-            'cod_servico_sp_monitoramento': form_data.get('cod_servico_sp_monitoramento'),
-            'aliquota_barueri_monitoramento': parse_float(form_data.get('aliquota_barueri_monitoramento')),
-            'cod_servico_barueri_monitoramento': form_data.get('cod_servico_barueri_monitoramento'),
-            'desc_nf_monitoramento': form_data.get('desc_nf_monitoramento'),
-
             'data_criacao': datetime.now(),
             'data_atualizacao': datetime.now()
         }
@@ -105,11 +85,12 @@ def insert_planos():
         db.session.add(novo_plano)
         db.session.commit()
 
-        contrato_id = form_data.get('contrato_id')
+        # Vincular contrato (muitos-para-muitos)
         if contrato_id:
             contrato = Contrato.query.get(int(contrato_id))
-            contrato.planos.append(novo_plano)
-            db.session.commit()
+            if contrato:
+                contrato.planos.append(novo_plano)
+                db.session.commit()
 
         return redirect(url_for('home_bp.render_planos'))
 
@@ -119,6 +100,7 @@ def insert_planos():
             'success': False,
             'message': f'Erro ao criar plano: {str(e)}'
         }), 500
+
 
 @planos_bp.route('/contratos_ativos', methods=['GET'])
 def contratos_ativos():
@@ -217,7 +199,11 @@ def proximo_codigo_plano():
     
     return jsonify({'proximo_codigo': numero_formatado})
 
-
+@planos_bp.route('/planos/get_produtos', methods=['POST'])
+def get_produtos():
+    produtos = Produto.query.order_by(Produto.codigo).all()
+    resultado = [{'id': p.id, 'codigo': p.codigo, 'nome': p.nome, 'preco_base': p.preco_base} for p in produtos]
+    return jsonify(resultado) 
 
 
 

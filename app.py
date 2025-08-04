@@ -10,6 +10,7 @@ from modules.dashboard.routes import dashboard_bp
 from modules.revendas.routes import revendas_bp
 from modules.vendedores.routes import vendedores_bp
 from modules.instalacoes.routes import instalacoes_bp
+from modules.faturamento.routes import faturamento_bp
 from flask_migrate import Migrate
 from modules.planos.routes import planos_bp
 from application.models.models import db, User
@@ -29,6 +30,7 @@ app.register_blueprint(produtos_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(revendas_bp)
 app.register_blueprint(vendedores_bp)
+app.register_blueprint(faturamento_bp)
 app.register_blueprint(instalacoes_bp)
 
 

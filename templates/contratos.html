@@ -117,12 +117,12 @@
                                 <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa" value="{{ contrato.tipo_pessoa }}" readonly>
                             </div>
                             
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label class="form-label">Revenda:</label>
                                 <input type="text" class="form-control" id="revenda" name="revenda" value="{{ contrato.revenda_contrato }}" readonly>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Vendedor:</label>
+                                <label class="form-label">Distribuidor:</label>
                                 <input type="text" class="form-control" id="vendedor" name="vendedor" value="{{ contrato.vendedor_contrato }}" readonly>
                             </div>
                         </div>
@@ -141,11 +141,11 @@
                                 <label class="form-label">CEP:</label>
                                 <input type="text" class="form-control" name="code_residence"  id="code_residence" value="{{ contrato.cep }}" readonly>
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-3">
                                 <label class="form-label">Endereço:</label>
                                 <input type="text" class="form-control" name="endereco" id="endereco" value="{{ contrato.endereco }}" readonly>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Complemento:</label>
                                 <input type="text" class="form-control" id="complemento" name="complemento" value="{{ contrato.complemento }}" readonly>
                             </div>
@@ -247,8 +247,8 @@
                                 <label class="form-label">Dia Vencimento:</label>
                                 <input type="text" class="form-control" id="dia_vencimento" value="{{ contrato.dia_vencimento }}" readonly>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Fator Moderador da Taxa de Juros:</label>
+                            <div class="col-md-2">
+                                <label class="form-label">Fator Taxa de Juros:</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="fator_juros" value="{{ contrato.fator_juros }}" readonly>
                                     <span class="input-group-text">%</span>
@@ -416,7 +416,9 @@
                         </div>
                     </div>
                 </div>
+                
         </div>
+        
         
         
         {% endif %}
@@ -424,6 +426,7 @@
         
         
     </div>
+    
        
     
     <br><br><br><br><br><br><br><br><br>

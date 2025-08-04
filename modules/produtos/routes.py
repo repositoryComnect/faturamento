@@ -14,7 +14,7 @@ def set_produtos():
             'nome': request.form.get('nome'),
             'descricao': request.form.get('descricao'),
             'preco_base': request.form.get('preco_base'),
-            'ativo': request.form.get('ativo'),    
+            'ativo': request.form.get('status'),    
             }
         
         if Produto.query.filter_by(codigo=produto_data['codigo']).first():

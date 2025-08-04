@@ -52,23 +52,23 @@
                             </div>
                             <div class="col-md-1">
                                 <label class="form-label">Id Portal:</label>
-                                <input type="text" class="form-control" id="portal_id" name="portal_id">
+                                <input type="text" class="form-control" id="portal_id" name="portal_id" required>
                             </div>
                             
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">E-mail:</label>
                                 <input type="email" class="form-control" id="email" name="email" required>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Telefone:</label>
                                 <input type="tel" class="form-control" id="telefone" name="telefone" required>
                             </div>
-                            <div class="col-md-3">
+                            <!--<div class="col-md-2">
                                 <label class="form-label">Responsável:</label>
                                 <input type="text" class="form-control" id="responsavel" name="responsavel">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">CNPJ:</label>
+                            </div>-->
+                            <div class="col-md-2">
+                                <label class="form-label">CNPJ/CPF:</label>
                                 <input type="text" class="form-control" id="cnpj" name="cnpj">
                             </div>
                             <div class="col-md-2">
@@ -78,7 +78,7 @@
                                     <option value="Pessoa Jurídica">Pessoa Jurídica</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">Revenda:</label>
                                 <select class="form-select" name="revenda_selecionada" id="revenda_selecionada">
                                     <option value="">Selecione uma revenda</option>
@@ -87,10 +87,10 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label" for="vendedor_selecionado">Vendedor:</label>
+                            <div class="col-md-3">
+                                <label class="form-label" for="vendedor_selecionado">Distribuidor:</label>
                                     <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
-                                    <option value="">Selecione um vendedor</option>
+                                    <option value="">Selecione um distribuidor</option>
                                         {% for vendedor in vendedores %}
                                     <option value="{{ vendedor.nome }}">{{ vendedor.nome }}</option>
                                         {% endfor %}
@@ -112,7 +112,7 @@
                                 <label class="form-label">CEP:</label>
                                 <input type="text" class="form-control" id="cep" name="cep" required>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">Endereço:</label>
                                 <input type="text" class="form-control" id="endereco" name="endereco" required>
                             </div>
@@ -168,12 +168,12 @@
                                     <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <!--<div class="col-md-2">
                                 <label class="form-label">Produto:</label>
                                 <select class="form-select" name="produto_id" id="produto">
                                     <option value="">Carregando...</option>
                                 </select>
-                            </div>
+                            </div>-->
                             <div class="col-md-2">
                                 <label class="form-label">Estado:</label>
                                 <select class="form-select" name="estado_contrato" id="estado_contrato">
@@ -194,7 +194,7 @@
                         
                         <div class="modal-section-header">Relação de Planos</div>
                         <div class="row g-3 mb-4">
-                            <div class="col-md-4">
+                            <div class="col-md-8">
                                 <label class="form-label">Plano:</label>
                                 <select class="form-select" name="plano_id" id="plano">
                                     <option value="">Carregando planos...</option>
