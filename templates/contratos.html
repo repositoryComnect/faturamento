@@ -1,11 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    {% include 'model-header.html' %}
-    {% include 'links.html' %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_contratos.css' )}}">
-</head>
-<body>
+{% extends "base_template.html" %}
+
+{% block title %}Contratos{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles_contratos.css') }}">
+{% endblock %}
+
+{% block content %}
     <!-- Mensagens Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -425,12 +426,11 @@
 
         
         
-    </div>
-    
-       
-    
-    <br><br><br><br><br><br><br><br><br>
-    {% include 'js/contratos_js.html' %}
+    </div>  
+{% endblock %}
+
+{% block scripts %}
+{% include 'js/contratos_js.html' %}
     {% include 'popup/contratos/popup_vincular_produto.html' %}
     {% include 'popup/contratos/popup_vincular_plano.html' %}
     {% include 'popup/contratos/popup_vincular_cliente.html' %}
@@ -440,8 +440,8 @@
     {% include 'popup/contratos/popup_delete_contrato.html' %}
     {% include 'popup/contratos/popup_contratos.html' %}
     {% include 'popup/contratos/popup_editar_contrato.html' %}
+{% endblock %}
+
+    
 
    
-
-</body>
-</html>

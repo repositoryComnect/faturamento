@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    {% include 'model-header.html' %}
-    {% include 'links.html' %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_faturamento.css') }}">
-</head>
-<body>
+{% extends "base_template.html" %}
 
+{% block title %}Faturamento{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_faturamento.css') }}">
+{% endblock %}
+
+{% block content %}
 <div class="container mt-5 mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Faturamento</h2>
@@ -92,5 +92,7 @@
     </form>
 </div>
 
-</body>
-</html>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

@@ -1,6 +1,12 @@
-{% include "model-header.html" %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+{% extends "base_template.html" %}
 
+{% block title %} Listar Vendedores{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+{% endblock %}
+
+{% block content %}
 <div class="clientes-container">
     <h2 class="clientes-title">Lista de Distribuidores</h2>
     <p class="total-registros">Total de Distribuidores: {{ total }}</p>
@@ -68,3 +74,9 @@
         {% endif %}
     </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}

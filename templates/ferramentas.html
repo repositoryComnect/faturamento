@@ -1,4 +1,11 @@
-{% include 'model-header.html' %}
+{% extends "base_template.html" %}
+
+{% block title %}Contratos{% endblock %}
+
+{% block styles %}
+{% endblock %}
+
+{% block content %}
 <!-- Centraliza o conteúdo da página -->
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 10vh;">
     <!-- Moldura da janela -->
@@ -35,5 +42,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block scripts %}
 {% include 'js/ferramentas_js.html' %}
+{% endblock %}
+

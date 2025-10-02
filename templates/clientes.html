@@ -1,10 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    {% include "model-header.html" %}
-    {% include "links.html" %}
-</head>
-<body>
+{% extends "base_template.html" %}
+
+{% block title %}Clientes{% endblock %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block content %}
     <!-- Mensagens Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -293,16 +295,14 @@
             </div>
         </div>
         {% endif %}
+
+{% endblock %}
     
+{% block scripts %}
     {% include 'popup/clientes/popup_cliente.html' %}
     {% include 'popup/clientes/popup_vincular_instalacao.html' %}
     {% include 'popup/clientes/popup_desvincular_instalacoes.html' %}
     {% include 'popup/clientes/popup_delete_cliente.html' %}
     {% include 'popup/clientes/popup_editar_cliente.html' %}
     {% include 'js/clientes_js.html' %}
-    
-
-    </div><br><br><br><br><br>
-
-</body>
-</html>
+{% endblock %}

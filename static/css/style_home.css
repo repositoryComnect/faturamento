@@ -1,3 +1,11 @@
+/* Reset e corpo */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff; /* fundo claro padrão para todas as telas */
+    color: #212529; /* texto padrão escuro */
+}
+
 /* Sidebar recolhível */
 #sidebar {
     height: 100%;
@@ -5,11 +13,10 @@
     top: 0;
     left: 0;
     width: 250px;
-    background-color: #343a40;
+    background-color: #343a40; /* sidebar escura */
     padding-top: 20px;
     color: white;
     z-index: 5;
-    padding-left: 0;
     transition: all 0.3s ease;
     overflow-x: hidden;
 }
@@ -32,6 +39,7 @@
     font-size: 1.2rem;
 }
 
+/* Botão toggle */
 .sidebar-toggle {
     position: fixed;
     left: 10px;
@@ -58,17 +66,11 @@
 
 /* Quando o sidebar está expandido */
 #sidebar:not(.collapsed) .sidebar-toggle {
-    left: 215px; /* 250px (largura sidebar) - 35px (ajuste posição) */
+    left: 215px; /* 250px - ajuste */
     background: #529dff;
 }
 
-/* Esconde o botão em telas muito pequenas onde o sidebar fica sempre recolhido */
-@media (max-width: 768px) {
-    .sidebar-toggle {
-        display: none;
-    }
-}
-
+/* Menu interno do sidebar */
 #sidebar nav ul {
     list-style: none;
     padding: 0;
@@ -100,6 +102,8 @@
     margin-left: 250px;
     padding: 20px;
     transition: all 0.3s ease;
+    background-color: #f8f9fa; /* fundo claro do conteúdo */
+    min-height: 100vh;
 }
 
 #content.expanded {
@@ -117,8 +121,8 @@
     }
     
     #sidebar nav ul li a {
-        padding: 10px 15px;
         text-align: center;
+        padding: 10px 15px;
     }
     
     #sidebar nav ul li a i {
@@ -135,77 +139,39 @@
     }
 }
 
-/* Resto do seu CSS existente permanece o mesmo */
-.container-fluid.container-xl {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 30px;
-    margin: 0;
-    width: 100%;
-    max-width: 100%;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1), 
-                0px 1px 3px rgba(0, 0, 0, 0.05);
-    position: relative;
+/* Navbar limpa */
+.navbar {
+    background-color: #343a40; /* navbar escura */
 }
 
-.logo {
-    position: relative;
-    z-index: 10;
+.navbar a,
+.navbar .navbar-brand {
+    color: white;
 }
 
-.logo img {
-    max-height: 50px;
-    cursor: pointer;
-    margin-left: auto;
-    margin-right: 20px;
-}
-
-.navmenu {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.navmenu ul {
-    display: flex;
-    list-style: none;
-    padding-left: 0;
-}
-
-.navmenu li {
-    position: relative;
-    margin-right: 30px;
-}
-
-.navmenu a {
-    text-decoration: none;
-    color: #333;
-    font-size: 16px;
-    font-weight: 600;
-    transition: color 0.3s, transform 0.3s;
-}
-
-.navmenu a.active {
+.navbar a:hover {
     color: #529dff;
 }
 
-.navmenu a:hover {
-    color: #529dff;
-    transform: translateY(-3px);
+
+.navbar .dropdown-menu {
+    background-color: #343a40; /* mesmo fundo do navbar */
+    color: #ffffff;            /* texto branco */
+    border: 1px solid #525252; /* borda sutil */
 }
 
-.navmenu li strong {
-    font-weight: 800;
-    font-size: 16px;
-    color: rgb(82, 157, 255);
+.navbar .dropdown-menu .dropdown-item {
+    color: #ffffff;
 }
 
-.buttonsHeader {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 100%;
-    padding: 10px;
-    box-sizing: border-box;
+.navbar .dropdown-menu .dropdown-item:hover {
+    background-color: #529dff; /* hover azul */
+    color: #ffffff;
+}
+
+/* Estilo para inputs readonly */
+input[readonly],
+textarea[readonly] {
+    background-color: #e9ecef; /* cinza claro */
+    opacity: 1;                /* garante que a cor apareça */
 }

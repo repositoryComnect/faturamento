@@ -1,0 +1,99 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <!-- Logo -->
+        <a class="navbar-brand" href="/">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" height="50">
+        </a>
+
+        <!-- Botão mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTopo"
+            aria-controls="navbarTopo" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menu -->
+        <div class="collapse navbar-collapse" id="navbarTopo">
+            <ul class="navbar-nav mx-auto">
+
+                <!-- Contratos -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="contratosDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Gerenciamento de Contratos
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="contratosDropdown">
+                        <li><a class="dropdown-item" href="/contratos">Contratos</a></li>
+                        <li><a class="dropdown-item" href="/revendas">Revendas</a></li>
+                        <li><a class="dropdown-item" href="/vendedores">Distribuidores</a></li>
+                    </ul>
+                </li>
+
+                <!-- Clientes -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="clientesDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Gerenciamento de Clientes
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="clientesDropdown">
+                        <li><a class="dropdown-item" href="/clientes">Clientes</a></li>
+                        <li><a class="dropdown-item" href="/instalacoes">Instalações</a></li>
+                    </ul>
+                </li>
+
+                <!-- Produtos -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="produtosDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Gerenciamento de Produtos
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="produtosDropdown">
+                        <li><a class="dropdown-item" href="/planos">Planos</a></li>
+                        <li><a class="dropdown-item" href="/produtos">Produtos</a></li>
+                    </ul>
+                </li>
+
+                <!-- Links diretos -->
+                <li class="nav-item"><a class="nav-link" href="/faturamento">Faturamento</a></li>
+                <li class="nav-item"><a class="nav-link" href="/notas">Notas Fiscais</a></li>
+                <li class="nav-item"><a class="nav-link" href="/relatorios">Relatórios</a></li>
+
+                <!-- Ferramentas -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="ferramentasDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Ferramentas
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="ferramentasDropdown">
+                        <li><a class="dropdown-item" href="/ferramentas">Localizar CEP</a></li>
+                    </ul>
+                </li>
+
+                <!-- Dashboard -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dashboardDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Dashboard
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
+                        <li><a class="dropdown-item" href="/dashboard_contratos">Contratos</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Usuário logado e logout -->
+            <div class="d-flex align-items-center">
+                {% if session.get('username') %}
+                    <span class="navbar-text text-info me-3">
+                        <strong>{{ session['username'] }}</strong>
+                    </span>
+                {% endif %}
+                <form action="/logout" method="POST">
+                    <button type="submit" class="btn btn-outline-danger">Sair</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+<br>
+<br>
+<br><br>

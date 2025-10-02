@@ -1,7 +1,12 @@
-{% include "model-header.html" %}
+{% extends "base_template.html" %}
+
+{% block title %}Produtos{% endblock %}
+
+{% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+{% endblock %}
 
-
+{% block content %}
 <div class="container mt-4 mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="clientes-title m-0">Produtos</h2>
@@ -50,6 +55,11 @@
     </div>
 </div>
 
+       
+{% endblock %}
+
+{% block scripts %}
 {% include 'popup/produto/popup_editar_produto.html' %}
 {% include 'popup/produto/popup_produto.html' %}
 {% include 'popup/produto/popup_delete_produto.html' %}
+{% endblock %}

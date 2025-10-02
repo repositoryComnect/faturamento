@@ -1,11 +1,13 @@
-{% include 'model-header.html' %}
-{% include 'links.html' %}
+{% extends "base_template.html" %}
 
+{% block title %}Revendas{% endblock %}
+
+{% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_revendas.css') }}">
+{% endblock %}
 
 {% block content %}
-
 <div class="container mt-7 mb-1">
     <div class="d-flex justify-content-between align-items-center mb-4">
 
@@ -183,7 +185,9 @@
 </script>
 
 
-<br><br><br><br><br><br>
+{% endblock %}
+
+{% block scripts %}
 {% include 'js/revendas/revendas_js.html' %}
 {% include 'popup/revenda/popup_delete_revenda.html' %}
 {% endblock %}

@@ -1,6 +1,12 @@
-{% include "model-header.html" %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+{% extends "base_template.html" %}
 
+{% block title %}Contratos{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+{% endblock %}
+
+{% block content %}
 <div class="voltar-wrapper">
     <a href="{{ url_for('home_bp.render_revendas') }}" class="btn btn-primary btn-voltar">Voltar</a>       
 </div>
@@ -83,3 +89,9 @@
         {% endif %}
     </div>
 </div>
+
+{% endblock %}
+
+{% block scripts %}
+
+{% endblock %}

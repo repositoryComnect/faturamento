@@ -1,7 +1,11 @@
-{% include 'model-header.html' %}
-{% include 'links.html' %}
+{% extends "base_template.html" %}
+
+{% block title %}Planos{% endblock %}
+
+{% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css' )}}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_planos.css' )}}">
+{% endblock %}
 
 {% block content %}
 <div class="container mt-4 mb-3">
@@ -163,7 +167,9 @@
     {% include 'popup/planos/popup_delete_planos.html' %}
 </div>
 
+{% endblock %}
 
+{% block scripts %}
 {% include 'js/planos/planos_js.html' %}
 {% endblock %}
 <br><br><br><br><br><br>

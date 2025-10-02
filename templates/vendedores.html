@@ -1,8 +1,11 @@
-{% include 'model-header.html' %}
-{% include 'links.html' %}
+{% extends "base_template.html" %}
 
+{% block title %}Vendedores{% endblock %}
+
+{% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_revendas.css') }}">
+{% endblock %}
 
 {% block content %}
 
@@ -77,11 +80,10 @@
     </div>
     </form>
 </div>
+       
+{% endblock %}
 
-
-
-
-<br><br><br><br><br><br>
+{% block scripts %}
 {% include 'js/vendedores/vendedores_js.html' %}
 {% include 'popup/vendedores/popup_delete_vendedores.html' %}
 {% endblock %}

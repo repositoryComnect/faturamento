@@ -1,10 +1,12 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    {% include "model-header.html" %}
-    {% include "links.html" %}
-</head>
-<body>
+{% extends "base_template.html" %}
+
+{% block title %}Notas{% endblock %}
+
+{% block styles %}
+
+{% endblock %}
+
+{% block content %}
     <!-- Mensagens Flash -->
     {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
@@ -295,12 +297,11 @@
             </div>
         </div>
     
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+{% endblock %}
+
+{% block scripts %}
     {% include 'popup/notas/popup_notas.html' %}
     {% include 'popup/notas/popup_delete_notas.html' %}
+{% endblock %}
 
-    </div><br><br><br><br><br>
-
-</body>
-</html>
