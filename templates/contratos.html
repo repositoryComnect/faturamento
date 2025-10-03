@@ -60,7 +60,9 @@
                             <div class="col-md-2">
                                 <label class="form-label">Nº Contrato:</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="numeroContrato" value="{{ contrato.numero if contrato else '' }}" onchange="buscarDadosContrato(this.value)">
+                                    <input type="text" class="form-control" id="numeroContrato" 
+       value="{{ contrato.numero if contrato else '' }}" 
+       onchange="buscarDadosContrato(this.value)">
                                     <div id="loadingContrato" class="input-group-text d-none">
                                         <div class="spinner-border spinner-border-sm" role="status"></div>
                                     </div>

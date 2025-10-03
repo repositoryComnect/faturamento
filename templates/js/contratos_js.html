@@ -1,10 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<!-- CSS Bootstrap -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- JS Bootstrap Bundle (com Popper incluído) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
     let timeoutBuscarContratoId;
     let clientesData = []; // Armazena os clientes para paginação
@@ -251,28 +244,26 @@
                             </tr>
                         `);
                     }
-                // ======= SOMA DOS VALORES DE PLANOS E PRODUTOS =======
 
-                let totalPlanos = 0;
-                if (data.planos && Array.isArray(data.planos)) {
-                    totalPlanos = data.planos.reduce((acc, plano) => acc + (plano.valor || 0), 0);
-                }
+                    // ======= SOMA DOS VALORES DE PLANOS E PRODUTOS =======
+                    let totalPlanos = 0;
+                    if (data.planos && Array.isArray(data.planos)) {
+                        totalPlanos = data.planos.reduce((acc, plano) => acc + (plano.valor || 0), 0);
+                    }
 
-                let totalProdutos = 0;
-                if (data.produtos && Array.isArray(data.produtos)) {
-                    totalProdutos = data.produtos.reduce((acc, produto) => {
-                        const quantidade = produto.quantidade || 0;
-                        const valorUnitario = produto.valor_unitario || 0;
-                        return acc + (quantidade * valorUnitario);
-                    }, 0);
-                }
+                    let totalProdutos = 0;
+                    if (data.produtos && Array.isArray(data.produtos)) {
+                        totalProdutos = data.produtos.reduce((acc, produto) => {
+                            const quantidade = produto.quantidade || 0;
+                            const valorUnitario = produto.valor_unitario || 0;
+                            return acc + (quantidade * valorUnitario);
+                        }, 0);
+                    }
 
-                const valorTotalContrato = totalPlanos + totalProdutos;
+                    const valorTotalContrato = totalPlanos + totalProdutos;
 
-                // Atualiza o campo #valor_contrato com o valor total
-                $('#valor_contrato').val(valorTotalContrato.toFixed(2));
-
-
+                    // Atualiza o campo #valor_contrato com o valor total
+                    $('#valor_contrato').val(valorTotalContrato.toFixed(2));
                 },
                 error: function(xhr) {
                     console.error("Erro na requisição:", xhr);
@@ -285,7 +276,27 @@
             });
         }, 500);
     }
+
+    // -------- CAPTURA DO ENTER OU BLUR NO CAMPO --------
+    document.addEventListener("DOMContentLoaded", function () {
+        const numeroContratoInput = document.getElementById("numeroContrato");
+        if (numeroContratoInput) {
+            // Enter
+            numeroContratoInput.addEventListener("keydown", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault(); // impede submit do form
+                    buscarDadosContrato(this.value);
+                }
+            });
+
+            // Blur (quando perde o foco)
+            numeroContratoInput.addEventListener("change", function () {
+                buscarDadosContrato(this.value);
+            });
+        }
+    });
 </script>
+
 
 
 <script>
