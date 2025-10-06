@@ -8,7 +8,7 @@ body {
 
 /* Corpo da página */
 body.index-page {
-    font-family: Arial, sans-serif;
+    
     background-color: #4e4f5000;
     color: #212020;
     display: flex;

@@ -1,7 +1,6 @@
 /* Reset e corpo */
 body {
     margin: 0;
-    font-family: 'Poppins', sans-serif;
     background-color: #ffffff; /* fundo claro padrão para todas as telas */
     color: #212529; /* texto padrão escuro */
 }

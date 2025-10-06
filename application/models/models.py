@@ -10,22 +10,22 @@ class Company(db.Model):
     __tablename__ = 'company'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    tax_id = db.Column(db.String(18), unique=True)  # cnpj
-    opening_date = db.Column(db.Date)
-    company_name = db.Column(db.String(100))  # nome_empresa
-    trade_name = db.Column(db.String(100))  # nome_fantasia
-    main_activity_code = db.Column(db.JSON)  # cod_desc_principal
-    secondary_activity_codes = db.Column(db.JSON)  # cod_desc_secundaria
-    legal_activity_codes = db.Column(db.JSON)  # cod_desc_juridica
-    street = db.Column(db.String(50))  # logradouro
-    number = db.Column(db.Integer)  # numero
-    complement = db.Column(db.String(50))  # complemento
-    zip_code = db.Column(db.Integer)  # cep
-    district = db.Column(db.String(30))  # bairro
-    city = db.Column(db.String(30))  # municipio
-    state = db.Column(db.String(2))  # uf
+    cnpj = db.Column(db.String(18), unique=True)  # cnpj
+    data_abertura = db.Column(db.Date)
+    nome_empresa = db.Column(db.String(100))  # nome_empresa
+    nome_fantasia = db.Column(db.String(100))  # nome_fantasia
+    cod_desc_principal = db.Column(db.JSON)  # cod_desc_principal
+    cod_desc_secundaria = db.Column(db.JSON)  # cod_desc_secundaria
+    cod_desc_juridica = db.Column(db.JSON)  # cod_desc_juridica
+    logradouro = db.Column(db.String(50))  # logradouro
+    numero = db.Column(db.Integer)  # numero
+    complemento = db.Column(db.String(50))  # complemento
+    cep = db.Column(db.Integer)  # cep
+    bairro = db.Column(db.String(30))  # bairro
+    municipio = db.Column(db.String(30))  # municipio
+    uf = db.Column(db.String(2))  # uf
     email = db.Column(db.String(50))
-    phone = db.Column(db.String(15))  # telefone
+    telefone = db.Column(db.String(15))  # telefone
     status = db.Column(db.String(10))
 
 
