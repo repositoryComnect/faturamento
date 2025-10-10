@@ -1,0 +1,8 @@
+/* CSS com seletores mais específicos */
+.navbar-brand img {
+    height: 70px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    max-width: 200px !important;
+}
+

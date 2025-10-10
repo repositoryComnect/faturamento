@@ -8,26 +8,23 @@
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/icone.png') }}">
     <link rel="icon" href="{{ url_for('static', filename='img/icone_faturamento.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_header.css') }}">
 
     {% include 'extensions/links.html' %}
-
-  
-
-    <!-- DevExtreme JS -->
 
     {% block styles %}{% endblock %}
 </head>
 
-<body class=" {% block body_class %}{% endblock %}">
-    {% block header %}
-        {% include 'header/model-header.html' %}
-    {% endblock %}
+<body class="{% block body_class %}{% endblock %}">
+    {% if session.empresa == '1' %}
+        {% include 'header/model-header-comnect.html' %}
+    {% elif session.empresa == '2' %}
+        {% include 'header/model-header-vyrtos.html' %}
+    {% endif %}
 
     <main class="container-fluid my-4 px-lg-5">
         {% block content %}{% endblock %}
     </main>
-
-    
 
     {% block scripts %}{% endblock %}
 </body>

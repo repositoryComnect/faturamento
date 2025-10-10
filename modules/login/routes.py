@@ -1,7 +1,7 @@
-from flask import Blueprint, request, render_template, redirect, flash, url_for, session
+from flask import Blueprint, request, render_template, redirect, flash, url_for, session, jsonify
 from flask_login import login_user, logout_user, login_required
 from settings.extensions import db
-from application.models.models import User
+from application.models.models import User, Empresa
 import bcrypt
 from werkzeug.security import check_password_hash
 
@@ -37,12 +37,12 @@ def register():
 
     return render_template('register.html')
 
-
 @login_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        empresa = request.form.get('empresa')
 
         print(f"Tentando fazer login com: {username} e senha: {password}")
 
@@ -61,6 +61,9 @@ def login():
 
             # Armazena o nome de usuário na sessão
             session['username'] = user.username
+            session['empresa'] = empresa  # ID da empresa fica armazenado aqui
+
+            print(f"Empresa ID armazenado na session: {empresa}")
 
             # Redireciona para a página inicial (home)
             return redirect(url_for('login.home'))  # Redireciona para a rota 'home'
@@ -70,11 +73,28 @@ def login():
 
     return render_template('login.html')  # Renderiza o template de login
 
-
-
-
-
-
+@login_bp.route('/getEmpresa', methods=['GET'])
+def get_empresa():
+    try:
+        # Busca todas as empresas ativas
+        empresas = Empresa.query.filter_by(status='ativo').all()
+        
+        # Formata os dados para JSON
+        empresas_data = []
+        for empresa in empresas:
+            empresas_data.append({
+                'id': empresa.id,
+                'nome_fantasia': empresa.nome_fantasia,
+                'nome_empresa': empresa.nome_empresa,
+                'cnpj': empresa.cnpj
+            })
+        
+        return jsonify(empresas_data)
+    
+    except Exception as e:
+        print(f"Erro ao buscar empresas: {e}")
+        return jsonify([]), 500
+    
 @login_bp.route('/logout', methods=['POST'])
 @login_required
 def logout():

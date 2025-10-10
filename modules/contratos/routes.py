@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, request
+from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, request, session
 from application.models.models import Contrato, db, Cliente, Produto, Plano, ContratoProduto, Revenda, cliente_contrato
 from datetime import datetime
 from sqlalchemy import text
@@ -257,17 +257,20 @@ def alterar_contrato():
 @contratos_bp.route('/listar/contratos')
 def listar_contratos():
     try:
+        empresa_id = session.get('empresa')
         page = request.args.get('page', 1, type=int)
         per_page = 10  
         
         offset = (page - 1) * per_page
         resultado = db.session.execute(
-            text("SELECT * FROM contratos ORDER BY numero LIMIT :limit OFFSET :offset"),
-            {'limit': per_page, 'offset': offset}
+            text("SELECT * FROM contratos WHERE empresa_id = :empresa_id ORDER BY numero LIMIT :limit OFFSET :offset"),
+            {'empresa_id': empresa_id, 'limit': per_page, 'offset': offset}
         )
         
         contratos = [dict(row._mapping) for row in resultado]
-        total = db.session.execute(text("SELECT COUNT(*) FROM contratos")).scalar()
+        total = db.session.execute(
+            text("SELECT COUNT(*) FROM contratos WHERE empresa_id = :empresa_id"),
+            {'empresa_id': empresa_id}).scalar()
 
         # Para depuração: print os dados de contratos e total
         print("Contratos:", contratos)
@@ -286,8 +289,13 @@ def listar_contratos():
 
 @contratos_bp.route('/contratos/buscar-por-numero/<numero>', methods=['GET'])
 def buscar_contrato_por_numero(numero):
+    empresa_id = session.get('empresa')
+    if not empresa_id:
+        return jsonify({'error': 'Empresa não selecionada'}), 400
+
     try:
-        contrato = Contrato.query.filter_by(numero=numero).first()
+        # Filtra pelo número e pela empresa da session
+        contrato = Contrato.query.filter_by(numero=numero, empresa_id=empresa_id).first()
         
         if not contrato:
             return jsonify({'error': f'Contrato {numero} não encontrado'}), 404
@@ -343,22 +351,22 @@ def buscar_contrato_por_numero(numero):
             'codigo': p.codigo,
             'nome': p.nome,
             'valor': float(p.valor),
-            'status': 'Ativo'  # Pode ser ajustado conforme sua regra
+            'status': 'Ativo'
         } for p in contrato.planos] if contrato.planos else []
 
-        # 5. Produtos associados via tabela intermediária
+        # Produtos associados via tabela intermediária
         associacoes = ContratoProduto.query.filter_by(contrato_id=contrato.id).all()
         data['produtos'] = []
         for assoc in associacoes:
-            produto = Produto.query.get(assoc.produto_id)  # Query para cada produto
-            data['produtos'].append({
-                'id': produto.id,
-                'nome': produto.nome,
-                'quantidade': assoc.quantidade,
-                'descricao' : produto.descricao,
-                'valor_unitario': float(produto.preco_base) if produto.preco_base else 0.00
-                # ... outros campos ...
-            })
+            produto = Produto.query.get(assoc.produto_id)
+            if produto:
+                data['produtos'].append({
+                    'id': produto.id,
+                    'nome': produto.nome,
+                    'quantidade': assoc.quantidade,
+                    'descricao': produto.descricao,
+                    'valor_unitario': float(produto.preco_base) if produto.preco_base else 0.00
+                })
 
         return jsonify(data)
     
@@ -366,8 +374,16 @@ def buscar_contrato_por_numero(numero):
         print(f"ERRO: {str(e)}")
         return jsonify({'error': 'Erro ao processar a requisição'}), 500
 
+
 @contratos_bp.route('/set_contrato', methods=['POST'])
 def set_contrato():
+    empresa_id = session.get('empresa')
+    if not empresa_id:
+        return jsonify({
+            'success': False,
+            'message': 'Empresa não selecionada. Não é possível criar contrato.'
+        }), 400
+
     try:
         db.session.rollback()
         form_data = request.form.to_dict()
@@ -426,10 +442,10 @@ def set_contrato():
             'fator_juros': parse_float(form_data.get('fator_juros')),
             'contrato_revenda': parse_bool(form_data.get('contrato_revenda')),
             'faturamento_contrato': parse_bool(form_data.get('faturamento_contrato')),
-            #'estado_produto': form_data.get('produto'),
             'estado_contrato': form_data.get('estado_contrato'),
-            'data_estado': parse_date(form_data.get('data_estado')),
+            'data_estado': parse_date(form_data.get('date_status')),
             'motivo_estado': form_data.get('motivo_estado'),
+            'empresa_id': session.get('empresa') 
         }
 
         # Verifica se contrato já existe

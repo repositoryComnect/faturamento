@@ -36,7 +36,8 @@ app.register_blueprint(instalacoes_bp)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%40Slink1205@localhost/faturamento'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.urandom(24)
+app.config['SECRET_KEY'] = 'e4f8a1c5d3b7462f9a1e8c7b5d6f4a2e'
+
 
 # Inicializa o db com o app
 db.init_app(app)

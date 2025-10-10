@@ -6,8 +6,8 @@ from datetime import datetime
 db = SQLAlchemy()
 
 
-class Company(db.Model):
-    __tablename__ = 'company'
+class Empresa(db.Model):
+    __tablename__ = 'empresa'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     cnpj = db.Column(db.String(18), unique=True)  # cnpj
@@ -27,9 +27,6 @@ class Company(db.Model):
     email = db.Column(db.String(50))
     telefone = db.Column(db.String(15))  # telefone
     status = db.Column(db.String(10))
-
-
-
 
 # Tabela associativa N:N entre Cliente e Contrato
 cliente_contrato = db.Table(
@@ -72,12 +69,17 @@ class Revenda(db.Model):
     status = db.Column(db.String(10))
     id_conta = db.Column(db.Integer)
     tipo_conta = db.Column(db.String(20))
-    cep = db.Column(db.Integer)
-    bairro = db.Column(db.String(20))
+    cep = db.Column(db.String(20))
+    bairro = db.Column(db.String(100))
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
-    
+
+    # 🔹 Relacionamento com Empresa
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('revendas', lazy=True))
+
+    # 🔹 Relacionamentos internos
     vendedores = db.relationship('Vendedor', backref='revenda_associada', lazy=True)
-    clientes = db.relationship('Cliente', backref='vendedor_associado', lazy=True)
+    clientes = db.relationship('Cliente', backref='revenda_associada', lazy=True)
 
 class Vendedor(db.Model):
     __tablename__ = 'vendedores'
@@ -88,10 +90,18 @@ class Vendedor(db.Model):
     cpf = db.Column(db.String(14), unique=True)
     telefone = db.Column(db.String(20))
     email = db.Column(db.String(100))
+    
+    # 🔹 Relacionamento com Revenda
     revenda_id = db.Column(db.Integer, db.ForeignKey('revendas.id'))
+    
     ativo = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
     
+    # 🔹 Relacionamento com Empresa
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('vendedores', lazy=True))
+    
+    # 🔹 Relacionamento com Cliente
     clientes = db.relationship('Cliente', backref='vendedor', lazy=True)
 
 class Cliente(db.Model):
@@ -133,12 +143,11 @@ class Cliente(db.Model):
 
     # Endereço Cobrança
     cep_cobranca = db.Column(db.String(15))
-    endereco_cobranca = db.Column(db.String(25))
-    cidade_cobranca = db.Column(db.String(40))
-    telefone_cobranca = db.Column(db.String(12))
-    bairro_cobranca = db.Column(db.String(20))
+    endereco_cobranca = db.Column(db.String(255))
+    cidade_cobranca = db.Column(db.String(100))
+    telefone_cobranca = db.Column(db.String(20))
+    bairro_cobranca = db.Column(db.String(100))
     uf_cobranca = db.Column(db.String(2))
-    
     
     # Condições comerciais
     cliente_revenda = db.Column(db.Boolean, default=False)
@@ -156,8 +165,12 @@ class Cliente(db.Model):
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
     
     # Novo campo para número de contrato
-    numero_contrato = db.Column(db.String(255))  # Novo campo
-
+    numero_contrato = db.Column(db.String(255))
+    
+    # Relacionamento com Empresa
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('clientes', lazy=True))
+    
     # Relacionamentos
     contratos = db.relationship(
         'Contrato',
@@ -171,13 +184,17 @@ class Produto(db.Model):
     __tablename__ = 'produtos'
     
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    codigo = db.Column(db.String(50), unique=True)
+    codigo = db.Column(db.String(50), unique=True, nullable=False)
     nome = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text)
-    preco_base = db.Column(db.Numeric(10, 2))
+    preco_base = db.Column(db.Numeric(10, 2), default=0.00)
     ativo = db.Column(db.String(20))
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
-    
+
+    # Relacionamento com Empresa (padronizado)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('produtos', lazy=True))
+
     # Relacionamento com Contrato através da tabela de junção
     contratos = db.relationship(
         'Contrato',
@@ -195,7 +212,7 @@ class Contrato(db.Model):
     tipo = db.Column(db.String(50))
     id_matriz_portal = db.Column(db.String(50))
     responsavel = db.Column(db.String(100))
-    cnpj_cpf = db.Column(db.String(15))
+    cnpj_cpf = db.Column(db.String(20))
     tipo_pessoa = db.Column(db.String(40))
     revenda = db.Column(db.String(50))
     vendedor = db.Column(db.String(50))
@@ -223,6 +240,9 @@ class Contrato(db.Model):
     estado_contrato = db.Column(db.String(30))
     data_estado = db.Column(db.Date)
     motivo_estado = db.Column(db.String(200))
+    # Relacionamento com Empresa
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('contratos', lazy=True))
 
     # Chaves estrangeiras
     produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=True)
@@ -283,12 +303,15 @@ class Instalacao(db.Model):
     observacao = db.Column(db.Text)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
 
-    # Relacionamento com Cliente
+    # 🔹 Relacionamento com Empresa (nome de backref ajustado)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('instalacoes', lazy=True))
+
+    # 🔹 Relacionamento com Cliente
     cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'), nullable=False)
     cliente = db.relationship('Cliente', back_populates='instalacoes')
 
-
-    # Relacionamento com títulos
+    # 🔹 Relacionamento com títulos
     titulos = db.relationship('TituloInstalacao', backref='instalacao', lazy=True)
 
 class NotaFiscal(db.Model):
@@ -304,6 +327,9 @@ class NotaFiscal(db.Model):
     chave_acesso = db.Column(db.String(50))
     xml = db.Column(db.Text)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
+     # 🔹 Relacionamento com Empresa
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('notas_fiscais', lazy=True))
     
     produtos = db.relationship('Produto', secondary='produtos_notas', backref=db.backref('notas_fiscais', lazy=True))
 
@@ -315,6 +341,8 @@ class ProdutoNota(db.Model):
     quantidade = db.Column(db.Integer, default=1)
     valor_unitario = db.Column(db.Numeric(10, 2))
     desconto = db.Column(db.Numeric(5, 2), default=0)
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('produtos_notas', lazy=True))
 
 class TituloInstalacao(db.Model):
     __tablename__ = 'titulos_instalacoes'
@@ -327,6 +355,8 @@ class TituloInstalacao(db.Model):
     data_pagamento = db.Column(db.Date)
     status = db.Column(db.String(20), default='pendente')
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('titulos_instalacoes', lazy=True))
 
 class Plano(db.Model):
     __tablename__ = 'planos'
@@ -347,7 +377,8 @@ class Plano(db.Model):
     aliquota_sp_licenca = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_licenca"
     cod_servico_sp_licenca = db.Column(db.String(20))  # name="cod_servico_sp_licenca"
     desc_nf_licenca = db.Column(db.String(200))  # name="desc_nf_licenca" (novo)
-
+    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
+    empresa = db.relationship('Empresa', backref=db.backref('planos', lazy=True))
     
 
     # Datas
@@ -381,18 +412,21 @@ class FaturamentoGrupo(db.Model):
     descricao = db.Column(db.Text)
     tipo_agrupamento = db.Column(db.Enum(*tipo_agrupamento_enum, name="tipo_agrupamento_enum"), nullable=False)
     data_criacao = db.Column(db.DateTime)
+    empresa = db.Column(db.Integer)
 
 class FaturamentoGrupoClientes(db.Model):
     __tablename__ = 'faturamento_grupo_clientes'
     id = db.Column(db.Integer, primary_key=True)
     grupo_id = db.Column(db.Integer, db.ForeignKey('faturamento_grupo.id'))
     cliente_id = db.Column(db.Integer)
+    empresa = db.Column(db.Integer)
 
 class FaturamentoTipo(db.Model):
     __tablename__ = 'faturamento_tipo'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.Enum(*tipo_faturamento_enum, name="tipo_faturamento_enum"), nullable=False)
     descricao = db.Column(db.Text)
+    empresa = db.Column(db.Integer)
 
 class FaturamentoVolumeRegra(db.Model):
     __tablename__ = 'faturamento_volume_regra'
@@ -403,6 +437,7 @@ class FaturamentoVolumeRegra(db.Model):
     preco_unitario = db.Column(db.Numeric(10, 2))
     desconto_percentual = db.Column(db.Numeric(5, 2))
     pro_rata = db.Column(db.Boolean, default=False)
+    empresa = db.Column(db.Integer)
 
 class FaturamentoTempoRegra(db.Model):
     __tablename__ = 'faturamento_tempo_regra'
@@ -413,6 +448,7 @@ class FaturamentoTempoRegra(db.Model):
     preco = db.Column(db.Numeric(10, 2))
     desconto_por_tempo = db.Column(db.Numeric(5, 2))
     pro_rata = db.Column(db.Boolean, default=False)
+    empresa = db.Column(db.Integer)
 
 class FaturamentoUsoRegra(db.Model):
     __tablename__ = 'faturamento_uso_regra'
@@ -424,18 +460,21 @@ class FaturamentoUsoRegra(db.Model):
     preco_por_unidade = db.Column(db.Numeric(10, 2))
     preco_por_fracao = db.Column(db.Numeric(10, 2))
     desconto = db.Column(db.Numeric(5, 2))
+    empresa = db.Column(db.Integer)
 
 class FormaPagamento(db.Model):
     __tablename__ = 'forma_pagamento'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
     descricao = db.Column(db.Text)
+    empresa = db.Column(db.Integer)
 
 class MetodoPagamento(db.Model):
     __tablename__ = 'metodo_pagamento'
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100))
     detalhes_extras = db.Column(db.Text)
+    empresa = db.Column(db.Integer)
 
 class ContratoPagamentoConfig(db.Model):
     __tablename__ = 'contrato_pagamento_config'
@@ -445,6 +484,7 @@ class ContratoPagamentoConfig(db.Model):
     metodo_pagamento_id = db.Column(db.Integer, db.ForeignKey('metodo_pagamento.id'))
     parcelas = db.Column(db.Integer)
     vencimento_dia = db.Column(db.Integer)
+    empresa = db.Column(db.Integer)
 
 class Fatura(db.Model):
     __tablename__ = 'fatura'
@@ -456,6 +496,7 @@ class Fatura(db.Model):
     data_emissao = db.Column(db.Date)
     valor_total = db.Column(db.Numeric(10, 2))
     status = db.Column(db.Enum(*status_fatura_enum, name="status_fatura_enum"))
+    empresa = db.Column(db.Integer)
 
 class FaturaItem(db.Model):
     __tablename__ = 'fatura_itens'
@@ -466,3 +507,4 @@ class FaturaItem(db.Model):
     quantidade = db.Column(db.Numeric(10, 2))
     valor_unitario = db.Column(db.Numeric(10, 2))
     total = db.Column(db.Numeric(10, 2))
+    empresa = db.Column(db.Integer)

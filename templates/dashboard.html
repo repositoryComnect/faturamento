@@ -1,52 +1,127 @@
-{% include 'header/model-header.html' %}
+{% extends "base_template.html" %}
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css')}}">
+{% block title %}Dashboard{% endblock %}
 
-    <div id="chartContainer" 
-        style="height: 400px; width: 600px; margin: auto;">
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles_dashboard.css') }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="chart-container">
+    <div class="chart-box">
+        <div class="chart-title">Cadastros de Contratos por Mês</div>
+        <div id="barChart" style="height: 400px;"></div>
     </div>
 
-    <script>
-        fetch('/api/chart_data')
-            .then(response => response.json())
-            .then(data => {
-                $('#chartContainer').dxChart({
-                    dataSource: data,
-                    series: [{
-                        argumentField: 'month',
-                        valueField: 'count',
-                        type: 'bar', 
-                        name: 'Cadastros',
-                        color: '#4CAF50'
-                    }],
-                    title: 'Cadastros de Contratos por Mês',
-                    argumentAxis: {
-                        title: 'Mês'
-                    },
-                    valueAxis: {
-                        title: 'Quantidade de Cadastros por Mês'
-                    },
-                    tooltip: {
-                        enabled: true,
-                        customizeTooltip: function (pointInfo) {
-                            return {
-                                text: `${pointInfo.argumentText}: ${pointInfo.valueText} cadastros`
-                            };
-                        }
-                    },
-                    legend: {
-                        visible: false
-                    }
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao carregar dados do gráfico:', error);
-            });
-    </script>
-
+    <div class="chart-box">
+        <div class="chart-title">Status dos Cadastros</div>
+        <div id="pieChart" style="height: 400px;"></div>
+    </div>
 </div>
+{% endblock %}
 
-{% include 'footer/model-footer.html' %}
+{% block scripts %}
+<!-- jQuery (necessário para DevExtreme) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-</body>
-</html>
+<!-- DevExtreme (CSS e JS) -->
+<link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/23.2.3/css/dx.light.css">
+<script src="https://cdn3.devexpress.com/jslib/23.2.3/js/dx.all.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Gráfico de barras
+    fetch('/api/chart_data')
+        .then(response => response.json())
+        .then(data => {
+            $('#barChart').dxChart({
+                dataSource: data,
+                series: [{
+                    argumentField: 'month',
+                    valueField: 'count',
+                    type: 'bar', 
+                    name: 'Cadastros',
+                    color: '#4CAF50'
+                }],
+                title: {
+                    text: 'Cadastros por Mês',
+                    font: { size: 14 }
+                },
+                argumentAxis: {
+                    title: 'Mês',
+                    label: { rotationAngle: -45 }
+                },
+                valueAxis: {
+                    title: 'Quantidade',
+                    allowDecimals: false
+                },
+                tooltip: {
+                    enabled: true,
+                    customizeTooltip: function (pointInfo) {
+                        return {
+                            text: `<strong>${pointInfo.argumentText}</strong><br>${pointInfo.valueText} cadastros`
+                        };
+                    }
+                },
+                legend: { visible: false },
+                export: { enabled: true }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados do gráfico de barras:', error);
+            $('#barChart').html('<div class="alert alert-danger">Erro ao carregar dados do gráfico de barras</div>');
+        });
+
+    // Gráfico de pizza
+    fetch('/api/chart_pie')
+        .then(response => response.json())
+        .then(data => {
+            $('#pieChart').dxPieChart({
+                dataSource: data,
+                palette: 'bright',
+                title: {
+                    text: 'Distribuição por Status',
+                    font: { size: 14 }
+                },
+                series: [{
+                    argumentField: 'status',
+                    valueField: 'count',
+                    type: 'pie',
+                    label: {
+                        visible: true,
+                        format: 'percent',
+                        connector: { visible: true, width: 1 },
+                        customizeText: function(point) {
+                            return `${point.argumentText}: ${point.valueText}`;
+                        }
+                    }
+                }],
+                tooltip: {
+                    enabled: true,
+                    customizeTooltip: function(pointInfo) {
+                        return {
+                            text: `<strong>${pointInfo.argumentText}</strong><br>
+                                   ${pointInfo.valueText} cadastros<br>
+                                   ${pointInfo.percentText} do total`
+                        };
+                    }
+                },
+                legend: {
+                    horizontalAlignment: 'center',
+                    verticalAlignment: 'bottom',
+                    itemTextPosition: 'right'
+                },
+                export: { enabled: true },
+                onPointClick: function(e) {
+                    e.target.isVisible() ? e.target.hide() : e.target.show();
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados do gráfico de pizza:', error);
+            $('#pieChart').html('<div class="alert alert-danger">Erro ao carregar dados do status</div>');
+        });
+});
+</script>
+{% endblock %}

@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand" href="/">
-            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" height="50">
+            <img src="{{ url_for('static', filename='img/logo-vyrtos.png') }}" alt="Logo" >
         </a>
 
         <!-- Botão mobile -->
@@ -49,6 +49,17 @@
                     <ul class="dropdown-menu" aria-labelledby="produtosDropdown">
                         <li><a class="dropdown-item" href="/planos">Planos</a></li>
                         <li><a class="dropdown-item" href="/produtos">Produtos</a></li>
+                    </ul>
+                </li>
+
+                <!-- Usuários -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="usuariosDropdown" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        Gerenciamento de Usuários
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="usuariosDropdown">
+                        <li><a class="dropdown-item" href="/clientes">Usuários</a></li>
                     </ul>
                 </li>
 

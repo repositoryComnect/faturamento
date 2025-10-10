@@ -22,26 +22,30 @@
     <div class="container mt-5 mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <h2>Contratos</h2>
-            <div class="d-flex gap-2">    
-                <button class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createContractModal">
+            <div class="d-flex gap-2"> <!-- Mesma classe gap-2 dos clientes -->
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createContractModal">
                     <i class="bi bi-plus-circle me-2"></i>Criar Novo Contrato
                 </button>
-                <button class="btn btn-warning me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#updateContractModal">
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateContractModal">
                     <i class="bi bi-gear-wide-connected me-2"></i>Editar Contrato
                 </button>
-                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteContractModal">
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteContractModal">
                     <i class="bi bi-trash me-2"></i>Excluir Contrato
                 </button>
-                <button class="btn btn-secondary btn-sm" onclick="window.location.href=this.getAttribute('action')" action="{{ url_for('contratos_bp.listar_contratos') }}">
+                <button class="btn btn-secondary" 
+                    onclick="window.location.href=this.getAttribute('action')" 
+                    action="{{ url_for('contratos_bp.listar_contratos') }}">
                     <i class="bi bi-search me-2"></i>Listar Todos
                 </button>
                 <form class="d-flex" role="search" method="GET" action="{{ url_for('contratos_bp.get_id_contratos') }}">
                     <input class="form-control me-2" 
-                           type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
+                        type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
                     <button class="btn btn-outline-success" type="submit">Localizar</button>
                 </form>
             </div>
-        </div>   
+        </div>
+
+
         
         {% if not contrato %}
             <div class="alert alert-warning">
@@ -61,8 +65,8 @@
                                 <label class="form-label">Nº Contrato:</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="numeroContrato" 
-       value="{{ contrato.numero if contrato else '' }}" 
-       onchange="buscarDadosContrato(this.value)">
+                                        value="{{ contrato.numero if contrato else '' }}" 
+                                        onchange="buscarDadosContrato(this.value)">
                                     <div id="loadingContrato" class="input-group-text d-none">
                                         <div class="spinner-border spinner-border-sm" role="status"></div>
                                     </div>
@@ -112,7 +116,7 @@
                                 <input type="text" class="form-control" id="responsavel" name="responsavel" value="{{ contrato.responsavel }}" readonly>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">CNPJ:</label>
+                                <label class="form-label">CPF/CNPJ:</label>
                                 <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ contrato.cnpj }}" readonly>
                             </div>
                             <div class="col-md-2">

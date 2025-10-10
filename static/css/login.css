@@ -8,14 +8,26 @@
 /* Corpo da página */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f7fc;
+    background-color: #f1f3f7;
     color: #333;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     text-align: center;
     margin: 0;
+    padding: 20px;
+}
+
+/* Container principal para centralização */
+.login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex: 1;
 }
 
 /* Estilo do título */
@@ -30,10 +42,11 @@ h1 {
     background-color: #fff;
     padding: 40px;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-    width: 100%;
+    box-shadow: 
+        0 2px 4px rgba(0, 0, 0, 0.05),
+        0 8px 16px rgba(0, 0, 0, 0.1);    width: 100%;
     max-width: 400px;
-
+    margin: 0 auto;
 }
 
 /* Estilo dos campos de entrada */
@@ -48,20 +61,53 @@ input {
 
 /* Estilo do botão */
 button {
-    padding: 15px;
+    width: 100%;
+    padding: 12px;
     background-color: #007bff;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 1.2em;
     cursor: pointer;
+    margin-top: 10px;
 }
 
 button:hover {
     background-color: #0056b3;
 }
 
-.message-flash{
+.message-flash {
     color: red;
+    margin-bottom: 20px;
 }
+
+.message-flash ul {
+    list-style: none;
+    padding: 0;
+}
+
+
+/* Container do select moderno */
+.select-container {
+    position: relative;
+    width: 100%;
+    margin: 10px 0;
+}
+
+/* Select moderno */
+.modern-select {
+    width: 100%;
+    padding: 15px 45px 15px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1em;
+    background-color: white;
+    appearance: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #333;
+}
+
+
+
 
