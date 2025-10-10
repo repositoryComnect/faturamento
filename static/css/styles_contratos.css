@@ -52,9 +52,9 @@
 
 /* Campos de leitura */
 .form-control[readonly] {
-    background-color: #f9fafc;
-    border-color: #dee2e6;
-    color: #495057;
+    background-color: #e9e8e8;
+    border-color: #edf0f4;
+    color: #6b6b6d;
 }
 
 /* ===== BOTÕES ===== */
