@@ -322,44 +322,7 @@
 
     {% include 'js/clientes_popup_js.html' %}
 
-<!--    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const checkbox = document.getElementById('copiar_endereco');
-            const form = document.getElementById('clientForm');
 
-            function copiarEnderecoClienteParaCobranca() {
-                document.getElementById('cep_cobranca').value = document.getElementById('zip_code_cep').value;
-                document.getElementById('endereco_cobranca').value = document.getElementById('address').value;
-                document.getElementById('bairro_cobranca').value = document.getElementById('neighborhood').value;
-                document.getElementById('cidade_cobranca').value = document.getElementById('city').value;
-                document.getElementById('uf_cobranca').value = document.getElementById('state').value;
-            }
-
-            checkbox.addEventListener('change', function () {
-                if (this.checked) {
-                    copiarEnderecoClienteParaCobranca();
-                } else {
-                    document.getElementById('cep_cobranca').value = '';
-                    document.getElementById('endereco_cobranca').value = '';
-                    document.getElementById('bairro_cobranca').value = '';
-                    document.getElementById('cidade_cobranca').value = '';
-                    document.getElementById('uf_cobranca').value = '';
-                }
-            });
-
-            form.addEventListener('submit', function (event) {
-                if (checkbox.checked) {
-                    event.preventDefault(); // Impede envio imediato
-                    copiarEnderecoClienteParaCobranca();
-
-                    // Aguarda um "tick" do navegador para garantir preenchimento antes do submit
-                    setTimeout(() => {
-                        form.submit(); // Submete o formulário manualmente
-                    }, 50);
-                }
-            });
-        });
-</script> -->
   
 </body>
 </html>

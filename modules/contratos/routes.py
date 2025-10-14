@@ -94,6 +94,7 @@ def delete_contrato():
 def buscar_contrato():
     data = request.get_json()
     termo = data.get('termo', '')
+    empresa_id = session.get('empresa')
 
     if not termo:
         return jsonify({'success': False, 'error': 'Nenhum termo enviado'})
@@ -103,11 +104,12 @@ def buscar_contrato():
 
     # Aqui buscamos pelo número do contrato, razão social, nome fantasia ou ID do contrato
     contrato = Contrato.query.filter(
+        Contrato.empresa_id == empresa_id, (
         (Contrato.numero.ilike(f"%{termo}%")) |
         (Contrato.razao_social.ilike(f"%{termo}%")) |
         (Contrato.nome_fantasia.ilike(f"%{termo}%")) |
         (Contrato.id_matriz_portal.ilike(f"%{termo}%"))
-    ).first()
+    )).first()
 
     if contrato:
         return jsonify({
@@ -142,7 +144,7 @@ def buscar_contrato():
             }
         })
     else:
-        return jsonify({'success': False, 'error': 'Contrato não encontrado'})
+        return jsonify({'success': False, 'error': 'Contrato não encontrado para esta empresa.'})
 
 @contratos_bp.route('/contratos/alterar', methods=['POST'])
 def alterar_contrato():
@@ -374,7 +376,6 @@ def buscar_contrato_por_numero(numero):
         print(f"ERRO: {str(e)}")
         return jsonify({'error': 'Erro ao processar a requisição'}), 500
 
-
 @contratos_bp.route('/set_contrato', methods=['POST'])
 def set_contrato():
     empresa_id = session.get('empresa')
@@ -519,7 +520,7 @@ def set_contrato():
         }), 500
 
 @contratos_bp.route('/api/contrato/<int:contract_id>/produtos', methods=['GET'])
-def get_contract_products(contract_id):
+def get_contrato_produtos(contract_id):
     associações = ContratoProduto.query.filter_by(contrato_id=contract_id).all()
     
     produtos = []
@@ -539,20 +540,27 @@ def get_contract_products(contract_id):
 @contratos_bp.route('/get/id/contatos', methods=['GET'])
 def get_id_contratos():
     search_term = request.args.get('search', '').strip()
-    
+    empresa_id = session.get('empresa')  # pega o empresa_id da sessão
+
     if not search_term:
         return jsonify({'erro': 'Termo de pesquisa não fornecido'}), 400
+
+    if not empresa_id:
+        return jsonify({'erro': 'Empresa não definida na sessão'}), 400
 
     try:
         query = text("""
             SELECT * FROM contratos
-            WHERE razao_social LIKE :term 
-               OR numero LIKE :term 
-               OR nome_fantasia LIKE :term
-               OR cnpj LIKE :term
+            WHERE empresa_id = :empresa_id
+              AND (
+                    razao_social LIKE :term 
+                 OR numero = :term 
+                 OR nome_fantasia LIKE :term
+                 OR cnpj_cpf LIKE :term
+              )
         """)
 
-        result = db.session.execute(query, {'term': f'%{search_term}%'})
+        result = db.session.execute(query, {'term': f'%{search_term}%', 'empresa_id': empresa_id})
         contratos = [dict(row._asdict()) for row in result]
 
         # Acrescentando total, página e itens por página

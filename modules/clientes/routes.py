@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash
+from flask import Blueprint, jsonify, request, render_template, redirect, url_for, flash, session
 from application.models.models import db, Cliente, Contrato, cliente_contrato, Revenda, Instalacao
 from sqlalchemy import text
 from datetime import datetime
@@ -64,8 +64,9 @@ def buscar_cliente_por_contrato(sequencia):
 
 @cliente_bp.route('/clientes/buscar-por-numero/<sequencia>', methods=['GET'])
 def buscar_cliente_por_contrato(sequencia):
+    empresa_id = session.get('empresa')
     try:
-        cliente = Cliente.query.filter_by(sequencia=sequencia).first()
+        cliente = Cliente.query.filter_by(sequencia=sequencia, empresa_id=empresa_id).first()
         if not cliente:
             return jsonify({'error': f'Cliente {sequencia} não encontrado'}), 404
 
@@ -287,18 +288,31 @@ def has_contracts():
 
 @cliente_bp.route('/api/contratos/numeros')
 def get_numeros_contrato():
+    empresa_id = session.get('empresa')
+    if not empresa_id:
+        return jsonify({'error': 'ID da empresa não encontrado na sessão'}), 400
+
     try:
-        contratos = Contrato.query.with_entities(
-            Contrato.numero,
-            Contrato.razao_social,
-            Contrato.nome_fantasia
-        ).order_by(Contrato.numero).all()
-        
-        return jsonify([{
-            'numero': c.numero,
-            'razao_social': c.razao_social,
-            'nome_fantasia': c.nome_fantasia
-        } for c in contratos])
+        contratos = (
+            Contrato.query
+            .with_entities(
+                Contrato.numero,
+                Contrato.razao_social,
+                Contrato.nome_fantasia
+            )
+            .filter(Contrato.empresa_id == empresa_id)
+            .order_by(Contrato.numero)
+            .all()
+        )
+
+        return jsonify([
+            {
+                'numero': c.numero,
+                'razao_social': c.razao_social,
+                'nome_fantasia': c.nome_fantasia
+            } for c in contratos
+        ])
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -360,7 +374,8 @@ def set_cliente():
             'dia_vencimento': int(request.form.get('dia_vencimento', 10)),
             'plano_nome': request.form.get('plano', '').strip(),
             'motivo_estado': request.form.get('motivo_estado', '').strip(),
-            'observacao': request.form.get('observacao', '').strip()
+            'observacao': request.form.get('observacao', '').strip(),
+            'empresa_id': session.get('empresa')
         }
 
         # Validação mínima dos campos obrigatórios
@@ -502,6 +517,7 @@ def update_cliente():
 def buscar_cliente():
     data = request.get_json()
     termo = data.get('termo', '')
+    empresa_id = session.get('empresa')
 
     def format_date(date):
             return date.strftime('%d/%m/%Y') if date else None
@@ -511,11 +527,12 @@ def buscar_cliente():
 
     # Aqui busca pela sequência, razão social, nome fantasia ou CNPJ
     cliente = Cliente.query.filter(
+        Cliente.empresa_id == empresa_id,(
         (Cliente.sequencia.ilike(f"%{termo}%")) |
         (Cliente.razao_social.ilike(f"%{termo}%")) |
         (Cliente.nome_fantasia.ilike(f"%{termo}%")) |
         (Cliente.cnpj.ilike(f"%{termo}%"))
-    ).first()
+    )).first()
 
     if cliente:
         return jsonify({
@@ -557,18 +574,19 @@ def buscar_cliente():
 
 @cliente_bp.route('/listar/clientes')
 def listar_clientes():
+    empresa_id = session.get('empresa')
     try:
         page = request.args.get('page', 1, type=int)
         per_page = 10  # Itens por página
         
         offset = (page - 1) * per_page
         resultado = db.session.execute(
-            text("SELECT * FROM clientes ORDER BY razao_social LIMIT :limit OFFSET :offset"),
-            {'limit': per_page, 'offset': offset}
+            text("SELECT * FROM clientes WHERE empresa_id = :empresa_id ORDER BY razao_social LIMIT :limit OFFSET :offset"),
+            {'empresa_id': empresa_id,'limit': per_page, 'offset': offset}
         )
         
         clientes = [dict(row._mapping) for row in resultado]
-        total = db.session.execute(text("SELECT COUNT(*) FROM clientes")).scalar()
+        total = db.session.execute(text(f"SELECT COUNT(*) FROM clientes WHERE empresa_id = {empresa_id}")).scalar()
         
         return render_template('listar_clientes.html', clientes=clientes, page=page, per_page=per_page, total=total)
         

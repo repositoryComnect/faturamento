@@ -1,13 +1,15 @@
+
 <script>
     let timeoutBuscarContratoId;
-    let clientesData = []; // Armazena os clientes para paginação
+    let clientesData = [];
     let currentPage = 1;
     const rowsPerPage = 5;
 
-    let planosData = []; // Armazena os planos para paginação
+    let planosData = [];
     let currentPlanoPage = 1;
     const planoRowsPerPage = 5;
 
+    // ----------- PAGINAÇÃO DE CLIENTES -----------
     function renderClientesPage() {
         const tbody = $('.clientes-table tbody');
         tbody.empty();
@@ -15,7 +17,10 @@
         if (!clientesData.length) {
             tbody.html(`
                 <tr>
-                    <td colspan="6" class="text-center">Nenhum cliente relacionado ao contrato encontrado.</td>
+                    <td colspan="6" class="text-center text-muted">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        Nenhum cliente relacionado ao contrato encontrado.
+                    </td>
                 </tr>
             `);
             $('#pageInfo').text('');
@@ -63,8 +68,7 @@
         }
     });
 
-    // -------- PAGINAÇÃO DE PLANOS --------
-
+    // ----------- PAGINAÇÃO DE PLANOS -----------
     function renderPlanosPage() {
         const tbody = $('.planos-table tbody');
         tbody.empty();
@@ -72,7 +76,7 @@
         if (!planosData.length) {
             tbody.html(`
                 <tr>
-                    <td colspan="5" class="text-center">
+                    <td colspan="5" class="text-center text-muted">
                         <i class="bi bi-exclamation-circle me-2"></i>
                         Nenhum plano associado encontrado
                     </td>
@@ -122,8 +126,7 @@
         }
     });
 
-    // -------- BUSCA DE CONTRATO --------
-
+    // ----------- BUSCA DE CONTRATO -----------
     function buscarDadosContrato(numeroContrato) {
         if (!numeroContrato) return;
 
@@ -137,8 +140,18 @@
                 success: function(data) {
                     console.log("Dados recebidos:", data);
 
-                    if (!data.cliente) {
-                        console.warn("Cliente não encontrado na resposta.");
+                    if (!data || Object.keys(data).length === 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Contrato não encontrado',
+                            text: 'Verifique se o número informado está correto.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 6000,
+                            timerProgressBar: true,
+                            showConfirmButton: true
+                        });
+                        return;
                     }
 
                     const fieldMap = {
@@ -174,24 +187,18 @@
 
                     Object.values(fieldMap).forEach(selector => {
                         const element = $(selector);
-                        if (element.length) {
-                            if (element.is('input[type="checkbox"]')) {
-                                element.prop('checked', false);
-                            } else {
-                                element.val('').trigger('change');
-                            }
+                        if (element.is('input[type="checkbox"]')) {
+                            element.prop('checked', false);
+                        } else {
+                            element.val('').trigger('change');
                         }
                     });
 
                     Object.keys(fieldMap).forEach(key => {
-                        const value = data[key];
                         const selector = fieldMap[key];
                         const element = $(selector);
-
-                        if (!element.length) {
-                            console.warn(`Elemento ${selector} não encontrado.`);
-                            return;
-                        }
+                        if (!element.length) return;
+                        const value = data[key];
 
                         if (key === 'estado_contrato') {
                             element.val(value || '')
@@ -202,29 +209,15 @@
                         }
                     });
 
-                    // Atualiza a TABELA DE CLIENTES com paginação
-                    if (data.clientes && Array.isArray(data.clientes)) {
-                        clientesData = data.clientes;
-                        currentPage = 1;
-                        renderClientesPage();
-                    } else {
-                        clientesData = [];
-                        renderClientesPage();
-                    }
+                    // Atualiza Tabelas
+                    clientesData = Array.isArray(data.clientes) ? data.clientes : [];
+                    planosData = Array.isArray(data.planos) ? data.planos : [];
+                    renderClientesPage();
+                    renderPlanosPage();
 
-                    // Atualiza a TABELA DE PLANOS com paginação
-                    if (data.planos && Array.isArray(data.planos)) {
-                        planosData = data.planos;
-                        currentPlanoPage = 1;
-                        renderPlanosPage();
-                    } else {
-                        planosData = [];
-                        renderPlanosPage();
-                    }
-
-                    // Atualiza a TABELA DE PRODUTOS
+                    // Produtos
                     if (data.produtos && Array.isArray(data.produtos)) {
-                        const linhasProdutos = data.produtos.map(produto => `
+                        const linhas = data.produtos.map(produto => `
                             <tr>
                                 <td>${produto.id || ''}</td>
                                 <td>${produto.nome || ''}</td>
@@ -233,11 +226,11 @@
                                 <td>R$ ${produto.valor_unitario ? produto.valor_unitario.toFixed(2) : '0.00'}</td>
                             </tr>
                         `).join('');
-                        $('.produtos-table tbody').html(linhasProdutos);
+                        $('.produtos-table tbody').html(linhas);
                     } else {
                         $('.produtos-table tbody').html(`
                             <tr>
-                                <td colspan="5" class="text-center">
+                                <td colspan="5" class="text-center text-muted">
                                     <i class="bi bi-exclamation-circle me-2"></i>
                                     Nenhum produto associado encontrado
                                 </td>
@@ -245,58 +238,48 @@
                         `);
                     }
 
-                    // ======= SOMA DOS VALORES DE PLANOS E PRODUTOS =======
-                    let totalPlanos = 0;
-                    if (data.planos && Array.isArray(data.planos)) {
-                        totalPlanos = data.planos.reduce((acc, plano) => acc + (plano.valor || 0), 0);
-                    }
-
-                    let totalProdutos = 0;
-                    if (data.produtos && Array.isArray(data.produtos)) {
-                        totalProdutos = data.produtos.reduce((acc, produto) => {
-                            const quantidade = produto.quantidade || 0;
-                            const valorUnitario = produto.valor_unitario || 0;
-                            return acc + (quantidade * valorUnitario);
-                        }, 0);
-                    }
-
-                    const valorTotalContrato = totalPlanos + totalProdutos;
-
-                    // Atualiza o campo #valor_contrato com o valor total
-                    $('#valor_contrato').val(valorTotalContrato.toFixed(2));
+                    // Soma de valores
+                    const totalPlanos = (data.planos || []).reduce((acc, p) => acc + (p.valor || 0), 0);
+                    const totalProdutos = (data.produtos || []).reduce((acc, p) => acc + ((p.quantidade || 0) * (p.valor_unitario || 0)), 0);
+                    $('#valor_contrato').val((totalPlanos + totalProdutos).toFixed(2));
                 },
                 error: function(xhr) {
                     console.error("Erro na requisição:", xhr);
-                    alert('Não foi possível localizar o contrato. Confirme se o número informado está correto e se você está no ambiente certo.'
-);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao buscar contrato',
+                        text: 'Não foi possível localizar o contrato. Verifique o número informado.',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
                 },
                 complete: function() {
-                    console.log("Requisição finalizada.");
                     $('#loadingContrato').addClass('d-none');
                 }
             });
         }, 500);
     }
 
-    // -------- CAPTURA DO ENTER OU BLUR NO CAMPO --------
+    // ----------- CAPTURA DO ENTER OU BLUR NO CAMPO -----------
     document.addEventListener("DOMContentLoaded", function () {
         const numeroContratoInput = document.getElementById("numeroContrato");
         if (numeroContratoInput) {
-            // Enter
             numeroContratoInput.addEventListener("keydown", function (e) {
                 if (e.key === "Enter") {
-                    e.preventDefault(); // impede submit do form
+                    e.preventDefault();
                     buscarDadosContrato(this.value);
                 }
             });
 
-            // Blur (quando perde o foco)
             numeroContratoInput.addEventListener("change", function () {
                 buscarDadosContrato(this.value);
             });
         }
     });
 </script>
+
 
 
 

@@ -294,88 +294,109 @@
 
 <!-- Bloco de buscar os dados do meu cliente PopUp Edit Cliente-->
 <script>
-    (function() {
-        var timeoutSeguenceEditId;
-    
-        function buscarCliente(termo) {
-            if (!termo) return;
-    
-            $('#loadingCliente').removeClass('d-none');
-            clearTimeout(timeoutSeguenceEditId);
-    
-            timeoutSeguenceEditId = setTimeout(() => {
-                $.ajax({
-                    url: '/buscar_cliente',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ termo: termo }),
-                    success: function(data) {
-                        console.log("Dados recebidos:", data);
-                        if (data.success) {
-                            const cliente = data.cliente;
-                            const fieldMap = {
-                                'sequel': '#sequel',
-                                'corporate_name': '#corporate_name',
-                                'second_name': '#second_name',
-                                'cadastramento': '#registration',
-                                'atualizacao': '#update',
-                                'tipo': '#type',
-                                'cpf_cnpj': '#cpf_cnpj',
-                                'ie': '#state_registration',
-                                'im': '#municipal_registration',
-                                'email_address': '#email_address',
-                                'phone_number': '#phone_number',
-                                'cep': '#postal_code',
-                                'street': '#street',
-                                'comp': '#comp',
-                                'neighbor': '#neighbor',
-                                'cit': '#cit',
-                                'state_uf': '#state_uf',
-                                'fator_juros': '#interest_rate_factor',
-                                'plano_nome': '#plan_name',
-                                'dia_vencimento': '#due_day',
-                                'observacao': '#observations',
-                                'data_estado': '#state_date',
-                                'contato': '#contact'
-                            };
-    
-                            for (const key in fieldMap) {
-                                const fieldSelector = fieldMap[key];
-                                const fieldValue = cliente[key];
-                                if (fieldValue !== null && fieldValue !== undefined) {
-                                    if (['atualizacao', 'cadastramento', 'data_estado'].includes(key)) {
-                                        $(fieldSelector).val(formatarData(fieldValue));
-                                    } else {
-                                        $(fieldSelector).val(fieldValue);
-                                    }
+(function() {
+    var timeoutSeguenceEditId;
+
+    function buscarCliente(termo) {
+        if (!termo) return;
+
+        $('#loadingCliente').removeClass('d-none');
+        clearTimeout(timeoutSeguenceEditId);
+
+        timeoutSeguenceEditId = setTimeout(() => {
+            $.ajax({
+                url: '/buscar_cliente',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ termo: termo }),
+                
+                success: function(data) {
+                    console.log("Dados recebidos:", data);
+                    if (data.success) {
+                        const cliente = data.cliente;
+                        const fieldMap = {
+                            'sequel': '#sequel',
+                            'corporate_name': '#corporate_name',
+                            'second_name': '#second_name',
+                            'cadastramento': '#registration',
+                            'atualizacao': '#update',
+                            'tipo': '#type',
+                            'cpf_cnpj': '#cpf_cnpj',
+                            'ie': '#state_registration',
+                            'im': '#municipal_registration',
+                            'email_address': '#email_address',
+                            'phone_number': '#phone_number',
+                            'cep': '#postal_code',
+                            'street': '#street',
+                            'comp': '#comp',
+                            'neighbor': '#neighbor',
+                            'cit': '#cit',
+                            'state_uf': '#state_uf',
+                            'fator_juros': '#interest_rate_factor',
+                            'plano_nome': '#plan_name',
+                            'dia_vencimento': '#due_day',
+                            'observacao': '#observations',
+                            'data_estado': '#state_date',
+                            'contato': '#contact'
+                        };
+
+                        for (const key in fieldMap) {
+                            const fieldSelector = fieldMap[key];
+                            const fieldValue = cliente[key];
+                            if (fieldValue !== null && fieldValue !== undefined) {
+                                if (['atualizacao', 'cadastramento', 'data_estado'].includes(key)) {
+                                    $(fieldSelector).val(formatarData(fieldValue));
+                                } else {
+                                    $(fieldSelector).val(fieldValue);
                                 }
                             }
-                        } else {
-                            alert('Cliente não encontrado!');
                         }
-    
-                        $('#loadingCliente').addClass('d-none');
-                    },
-                    error: function(xhr, status, error) {
-                        console.error("Erro na requisição:", status, error);
-                        alert('Erro ao buscar contrato. Verifique o console para mais detalhes.');
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Cliente não encontrado',
+                            text: 'Verifique o nome, razão social ou CNPJ informado.',
+                            timer: 6000,
+                            timerProgressBar: true,
+                            showConfirmButton: true,
+                            toast: true,
+                            position: 'top-end'
+                        });
                     }
-                });
-            }, 500);
-        }
-    
-        function formatarData(data) {
-            const date = new Date(data);
-            if (isNaN(date)) return '';
-            return date.toISOString().split('T')[0]; // yyyy-mm-dd
-        }
-    
-        $('#search_edit_client').on('input', function() {
-            const termo = $(this).val();
-            buscarCliente(termo);
-        });
-    })();
-    </script>
+
+                    $('#loadingCliente').addClass('d-none');
+                },
+                error: function(xhr, status, error) {
+                    console.error("Erro na requisição:", status, error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao buscar cliente',
+                        text: 'Ocorreu um problema na comunicação com o servidor. Verifique o console para mais detalhes.',
+                        timer: 6000,
+                        timerProgressBar: true,
+                        showConfirmButton: true,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                    $('#loadingCliente').addClass('d-none');
+                }
+            });
+        }, 500);
+    }
+
+    function formatarData(data) {
+        const date = new Date(data);
+        if (isNaN(date)) return '';
+        return date.toISOString().split('T')[0]; // yyyy-mm-dd
+    }
+
+    $('#search_edit_client').on('input', function() {
+        const termo = $(this).val();
+        buscarCliente(termo);
+    });
+})();
+</script>
+
 
 <!-- Bloco que me tras as revendas cadastradas -->
 <script>

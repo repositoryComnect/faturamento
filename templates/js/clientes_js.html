@@ -153,6 +153,20 @@
                 success: function(data) {
                     console.log("Dados recebidos:", data);
 
+                    if (!data || Object.keys(data).length === 0) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Cliente não encontrado',
+                            text: 'Verifique se o número informado está correto.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 6000,
+                            timerProgressBar: true,
+                            showConfirmButton: true
+                        });
+                        return;
+                    }
+
                     const fieldMap = {
                         'numero': '#numeroContrato',
                         'sequencia': '#sequencia',
@@ -218,10 +232,17 @@
                     $('#loadingCliente').addClass('d-none');
                 },
                 error: function(xhr, status, error) {
-                    console.error("Erro na requisição:", status, error);
-                    alert('Erro ao buscar cliente. Verifique o console para mais detalhes.');
-                    $('#loadingCliente').addClass('d-none');
-                }
+                    console.error("Erro na requisição:", xhr);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao buscar o cliente',
+                        text: 'Não foi possível localizar o contrato. Verifique o número informado.',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                },
             });
         }, 500);
     }
