@@ -6,62 +6,6 @@ import re
 
 cliente_bp = Blueprint('cliente_bp', __name__)
 
-'''@cliente_bp.route('/clientes/buscar-por-numero/<sequencia>', methods=['GET'])
-def buscar_cliente_por_contrato(sequencia):
-    try:
-        sequencia = Cliente.query.filter_by(sequencia=sequencia).first()
-        if not sequencia:
-            return jsonify({'error': f'Cliente {sequencia} não encontrado'}), 404
-
-        # Função auxiliar para formatar datas
-        def format_date(date):
-            return date.strftime('%d/%m/%Y') if date else None
-
-        data = {
-            'sequencia': sequencia.sequencia,
-            'cadastramento': format_date(sequencia.cadastramento),
-            'atualizacao': format_date(sequencia.atualizacao),
-            'razao_social': sequencia.razao_social or None,
-            'nome_fantasia': sequencia.nome_fantasia or None,
-            'contato': sequencia.contato_principal or None,
-            'email': sequencia.email or None,
-            'telefone': sequencia.telefone or None,
-            'tipo': sequencia.tipo or None,
-            'cnpj': sequencia.cnpj or None,
-            'im' : sequencia.im or None,
-            'ie' : sequencia.ie or None,
-            'revenda_nome': sequencia.revenda_nome or None,
-            'vendedor_nome': sequencia.vendedor_nome or None,
-            'tipo_servico' : sequencia.tipo_servico or None,
-            'localidade' : sequencia.localidade or None, 
-            'regiao' : sequencia.regiao or None,
-            'atividade' : sequencia.atividade or None,
-            'cep': sequencia.cep or None,
-            'endereco': sequencia.endereco or None,
-            'complemento': sequencia.complemento or None,
-            'bairro' :sequencia.bairro or None,
-            'cidade' : sequencia.cidade or None,
-            'cep_cobranca': sequencia.cep_cobranca or None,
-            'endereco_cobranca': sequencia.endereco_cobranca or None,
-            'cidade_cobranca': sequencia.cidade_cobranca or None,
-            'telefone_cobranca': sequencia.telefone_cobranca or None,
-            'bairro_cobranca': sequencia.bairro_cobranca or None,
-            'uf_cobranca': sequencia.uf_cobranca or None,
-            'estado' : sequencia.estado or None,
-            'fator_juros': sequencia.fator_juros or None,
-            'plano_nome': sequencia.plano_nome or None,
-            'observacao': sequencia.observacao or None,
-            'data_estado': format_date(sequencia.data_estado) or None,
-            'dia_vencimento': sequencia.dia_vencimento or None
-
-            
-        }
-        return jsonify(data)
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500'''
-
-
 @cliente_bp.route('/clientes/buscar-por-numero/<sequencia>', methods=['GET'])
 def buscar_cliente_por_contrato(sequencia):
     empresa_id = session.get('empresa')
