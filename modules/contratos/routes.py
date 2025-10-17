@@ -593,8 +593,6 @@ def get_id_contratos():
     except Exception as e:
         return jsonify({'erro': str(e), 'sucesso': False}), 500
 
-
-
 @contratos_bp.route('/revendas_ativas', methods=['GET'])
 def get_revendas_ativas():
     revendas = Revenda.query.filter_by(status='Ativo').order_by(Revenda.nome).all()

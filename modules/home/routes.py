@@ -21,7 +21,6 @@ def render_contratos():
         print(f"Erro ao acessar contratos: {str(e)}")
         return render_template('contratos.html', contrato=None)
 
-    
 @home_bp.route('/clientes', methods=['GET'])
 @login_required
 def render_clientes():
@@ -147,14 +146,14 @@ def trocar_empresa():
 
     return redirect(url_for('login.home'))
 
-
 @home_bp.route('/faturamento', methods=['GET'])
 @login_required
 def render_faturamento():
+    empresa_id = session.get('empresa')
     page = request.args.get('page', 1, type=int)
     per_page = 10  # contratos por página
 
-    contratos_paginados = Contrato.query.filter_by(estado_contrato="Ativo").order_by(Contrato.id.desc()).paginate(page=page, per_page=per_page)
+    contratos_paginados = Contrato.query.filter_by(estado_contrato="Ativo", empresa_id=empresa_id).order_by(Contrato.id.desc()).paginate(page=page, per_page=per_page)
 
     current_month = datetime.now().month
     current_year = datetime.now().year

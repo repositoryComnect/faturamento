@@ -1,0 +1,49 @@
+
+    function toggleCollapse(id) {
+        const collapse = document.getElementById(id);
+        const icon = collapse.previousElementSibling.querySelector('i');
+        
+        collapse.classList.toggle('show');
+        
+        if (collapse.classList.contains('show')) {
+            icon.classList.remove('bi-chevron-up');
+            icon.classList.add('bi-chevron-down');
+        } else {
+            icon.classList.remove('bi-chevron-down');
+            icon.classList.add('bi-chevron-up');
+        }
+    }
+    
+    function confirmarExclusao(planoId) {
+        if (confirm('Tem certeza que deseja excluir este plano?')) {
+            window.location.href = '/planos/excluir/' + planoId;
+        }
+    }
+
+
+
+//<!-- SCRIPT PARA CARREGAR CONTRATOS -->
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch("/contratos_ativos")
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById("contrato_id");
+                select.innerHTML = '<option value="">Selecione um contrato</option>';
+                const planoContratoId = "{{ plano.contrato_id or '' }}";
+    
+                data.forEach(contrato => {
+                    const option = document.createElement("option");
+                    option.value = contrato.id;
+                    option.text = `${contrato.numero} - ${contrato.razao_social}`;
+                    if (planoContratoId && planoContratoId == contrato.id.toString()) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("Erro ao carregar contratos:", error);
+                const select = document.getElementById("contrato_id");
+                select.innerHTML = '<option value="">Erro ao carregar contratos</option>';
+            });
+    });

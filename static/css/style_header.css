@@ -23,7 +23,7 @@
    HEADER VYRTOS (empresa 2)
    ========================= */
 .navbar-vyrtos {
-    background: linear-gradient(to right, #ff9dea, #6fb1fc); /* azul → rosa */
+    background: linear-gradient(to right, #f586dd, #2c85eb); /* azul → rosa */
 }
 
 .navbar-vyrtos .nav-link,
