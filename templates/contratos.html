@@ -111,24 +111,24 @@
                                 <label class="form-label">Fone:</label>
                                 <input type="text" class="form-control" id="telefone" name="telefone" value="{{ contrato.telefone }}" readonly>
                             </div>
-                            <div class="col-md-2">
+                            <!--<div class="col-md-2">
                                 <label class="form-label">Responsável:</label>
                                 <input type="text" class="form-control" id="responsavel" name="responsavel" value="{{ contrato.responsavel }}" readonly>
-                            </div>
+                            </div>-->
                             <div class="col-md-2">
                                 <label class="form-label">CPF/CNPJ:</label>
-                                <input type="text" class="form-control" id="cnpj" name="cnpj" value="{{ contrato.cnpj }}" readonly>
+                                <input type="text" class="form-control" id="cnpjCPFContrato" name="cnpjCPFContrato" value="{{ contrato.cnpj_cpf }}" readonly>
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label">Tipo:</label>
                                 <input type="text" class="form-control" id="tipo_pessoa" name="tipo_pessoa" value="{{ contrato.tipo_pessoa }}" readonly>
                             </div>
                             
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label class="form-label">Revenda:</label>
                                 <input type="text" class="form-control" id="revenda" name="revenda" value="{{ contrato.revenda_contrato }}" readonly>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label class="form-label">Distribuidor:</label>
                                 <input type="text" class="form-control" id="vendedor" name="vendedor" value="{{ contrato.vendedor_contrato }}" readonly>
                             </div>
@@ -146,7 +146,7 @@
                         <div class="row g-3">
                             <div class="col-md-2">
                                 <label class="form-label">CEP:</label>
-                                <input type="text" class="form-control" name="code_residence"  id="code_residence" value="{{ contrato.cep }}" readonly>
+                                <input type="text" class="form-control" name="cep"  id="cep" value="{{ contrato.cep }}" readonly>
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Endereço:</label>
@@ -436,7 +436,8 @@
 {% endblock %}
 
 {% block scripts %}
-{% include 'js/contratos_js.html' %}
+<script src="{{ url_for('static', filename='js/contratos/contratos.js') }}"></script>
+
     {% include 'popup/contratos/popup_vincular_produto.html' %}
     {% include 'popup/contratos/popup_vincular_plano.html' %}
     {% include 'popup/contratos/popup_vincular_cliente.html' %}

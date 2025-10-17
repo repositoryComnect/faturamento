@@ -299,12 +299,11 @@
 {% endblock %}
     
 {% block scripts %}
+    <script src="{{ url_for('static', filename='js/clientes/clientes.js') }}"></script>
     {% include 'popup/clientes/popup_cliente.html' %}
     {% include 'popup/clientes/popup_vincular_instalacao.html' %}
     {% include 'popup/clientes/popup_desvincular_instalacoes.html' %}
     {% include 'popup/clientes/popup_delete_cliente.html' %}
     {% include 'popup/clientes/popup_editar_cliente.html' %}
-    {% include 'js/clientes_js.html' %}
     {% include 'extensions/links_popup.html' %}
-
 {% endblock %}

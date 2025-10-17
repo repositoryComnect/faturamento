@@ -15,7 +15,6 @@ login_bp = Blueprint('login', __name__)
 def home():
     return render_template('dashboard.html')
 
-
 @login_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -56,7 +55,6 @@ def login():
 
         # Verifique se a senha armazenada no banco corresponde à senha fornecida
         if user and user.password == password:
-            print(f"Senha correta para o usuário {username}. Login bem-sucedido.")
             login_user(user)  # Autentica o usuário
 
             # Armazena o nome de usuário na sessão

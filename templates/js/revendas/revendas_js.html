@@ -21,3 +21,21 @@
             });
     });
 </script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/proximo_codigo_revenda')
+            .then(response => response.json())
+            .then(data => {
+                if (data.proximo_codigo_revenda) {
+                    document.getElementById('codigo_revenda').value = data.proximo_codigo_revenda;
+                } else {
+                    console.warn("Código de revenda não retornado pela API.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao buscar código de revenda:", error);
+            });
+    });
+</script>

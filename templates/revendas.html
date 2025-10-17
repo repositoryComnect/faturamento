@@ -8,8 +8,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-7 mb-1">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="container mt-5 mb-4">
+    <div class="d-flex justify-content-between align-items-center ">
 
         <h2>Revendas</h2>
         <div class="d-flex gap-2">
@@ -147,7 +147,7 @@
                     <div class="col-md-4">
                         <label for="vendedor_selecionado">Selecionar Distribuidor</label>
                         <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
-                            <option value="">-- Selecione um distribuidor --</option>
+                            <option value="">Selecione um distribuidor</option>
                             {% for vendedor in vendedores %}
                                 <option value="{{ vendedor.id }}">{{ vendedor.nome }}</option>
                             {% endfor %}
@@ -167,22 +167,7 @@
 </div>
 
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        fetch('/proximo_codigo_revenda')
-            .then(response => response.json())
-            .then(data => {
-                if (data.proximo_codigo_revenda) {
-                    document.getElementById('codigo_revenda').value = data.proximo_codigo_revenda;
-                } else {
-                    console.warn("Código de revenda não retornado pela API.");
-                }
-            })
-            .catch(error => {
-                console.error("Erro ao buscar código de revenda:", error);
-            });
-    });
-</script>
+
 
 
 {% endblock %}

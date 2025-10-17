@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, request, redirect, url_for, flash, render_template
+from flask import Blueprint, jsonify, request, redirect, url_for, flash, render_template, session
 from application.models.models import Instalacao, db
-from datetime import datetime
+from datetime import datetime, date
 import re
 from sqlalchemy import text
 
@@ -9,6 +9,7 @@ instalacoes_bp = Blueprint('instalacoes_bp', __name__)
 
 @instalacoes_bp.route('/insert/instalacoes', methods=['POST'])
 def insert_instalacoes():
+    empresa_id = session.get('empresa')
     form_data = request.form.to_dict()
 
     def parse_date(date_str):
@@ -40,7 +41,8 @@ def insert_instalacoes():
         'bairro': form_data.get('bairro'),
         'uf': form_data.get('uf'),
         'observacao': form_data.get('observacao'),
-        'cliente_id': int(cliente_id)
+        'cliente_id': int(cliente_id),
+        'empresa_id' : empresa_id
     }
 
     # Verifica se instalação já existe
@@ -97,44 +99,61 @@ def delete_instalacao():
     
     return redirect(request.referrer or url_for('instalacoes_bp.listar_instalacoes'))
 
+
 @instalacoes_bp.route('/get/instalacoes', methods=['GET'])
 def get_instalacoes():
+    empresa_id = session.get('empresa')
     search_term = request.args.get('search', '').strip()
-    
+
     if not search_term:
-        return jsonify({'erro': 'Termo de pesquisa não fornecido'}), 400
+        return jsonify({'erro': 'Termo de pesquisa não fornecido', 'sucesso': False}), 400
 
     try:
         query = text("""
             SELECT * FROM instalacoes
-            WHERE codigo_instalacao LIKE :term 
-               OR razao_social LIKE :term
+            WHERE empresa_id = :empresa_id
+                AND (
+                    codigo_instalacao LIKE :term 
+                    OR razao_social LIKE :term
+                )
             ORDER BY codigo_instalacao
         """)
 
-        result = db.session.execute(query, {'term': f'%{search_term}%'})
-        instalacoes = [dict(row._mapping) for row in result]
+        result = db.session.execute(query, {
+            'term': f'%{search_term}%',
+            'empresa_id': empresa_id
+        })
 
-        total = len(instalacoes)
-        page = 1
-        per_page = total  # pode ajustar para um valor fixo se desejar
+        instalacoes = []
+        for row in result:
+            inst = dict(row._mapping)
+            
+            # Formata a data corretamente
+            if isinstance(inst.get("cadastramento"), (date, datetime)):
+                inst["cadastramento"] = inst["cadastramento"].strftime("%d/%m/%Y")
 
-        return render_template(
-            'listar_instalacoes.html',  # seu template adaptado para instalações
-            instalacoes=instalacoes,
-            total=total,
-            page=page,
-            per_page=per_page
-        )
-        
+            
+            instalacoes.append(inst)
+
+        if not instalacoes:
+            return jsonify({'erro': 'Nenhuma instalação encontrada para esse termo.', 'sucesso': False}), 200
+
+        return jsonify({
+            'sucesso': True,
+            'instalacoes': instalacoes
+        }), 200
+
     except Exception as e:
         return jsonify({
             'erro': str(e),
             'sucesso': False
         }), 500
 
+
+
 @instalacoes_bp.route('/listar/instalacoes')
 def listar_instalacoes():
+    empresa_id = session.get('empresa')
     try:
         page = request.args.get('page', 1, type=int)
         per_page = 10
@@ -142,13 +161,13 @@ def listar_instalacoes():
         offset = (page - 1) * per_page
 
         resultado = db.session.execute(
-            text("SELECT * FROM instalacoes ORDER BY codigo_instalacao LIMIT :limit OFFSET :offset"),
-            {'limit': per_page, 'offset': offset}
+            text("SELECT * FROM instalacoes WHERE empresa_id = :empresa_id ORDER BY codigo_instalacao LIMIT :limit OFFSET :offset"),
+            {'empresa_id': empresa_id, 'limit': per_page, 'offset': offset}
         )
 
         instalacoes = [dict(row._mapping) for row in resultado]
 
-        total = db.session.execute(text("SELECT COUNT(*) FROM instalacoes")).scalar()
+        total = db.session.execute(text(f"SELECT COUNT(*) FROM instalacoes WHERE empresa_id = {empresa_id}")).scalar()
 
         return render_template('listar_instalacoes.html',
                                instalacoes=instalacoes,

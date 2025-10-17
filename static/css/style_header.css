@@ -1,8 +1,43 @@
-/* CSS com seletores mais específicos */
+/* LOGO: tamanho fixo e responsivo */
 .navbar-brand img {
     height: 70px !important;
     width: auto !important;
     object-fit: contain !important;
     max-width: 200px !important;
+}
+
+/* =========================
+   HEADER COMNECT (empresa 1)
+   ========================= */
+.navbar-comnect {
+    background: linear-gradient(to right, #012347, #92c1f8); /* azul claro → azul escuro */
+}
+
+.navbar-comnect .nav-link,
+.navbar-comnect .navbar-text,
+.navbar-comnect .navbar-brand {
+    color: white !important;
+}
+
+/* =========================
+   HEADER VYRTOS (empresa 2)
+   ========================= */
+.navbar-vyrtos {
+    background: linear-gradient(to right, #ff9dea, #6fb1fc); /* azul → rosa */
+}
+
+.navbar-vyrtos .nav-link,
+.navbar-vyrtos .navbar-text,
+.navbar-vyrtos .navbar-brand {
+    color: white !important;
+}
+
+/* Dropdowns */
+.navbar .dropdown-menu {
+    background-color: #ffffff; /* branco neutro */
+}
+
+.navbar .dropdown-item:hover {
+    background-color: #e9ecef; /* cinza claro no hover */
 }
 

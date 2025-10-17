@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash
+from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from application.models.models import db, Plano, Contrato, Produto
 from sqlalchemy import text
 from datetime import datetime
@@ -10,18 +10,38 @@ planos_bp = Blueprint('planos_bp', __name__)
 def get_planos():
     page = request.args.get('page', 1, type=int)
     per_page = 5  # Itens por página
-
     offset = (page - 1) * per_page
 
+    # Consulta paginada
     resultado = db.session.execute(
         text("SELECT * FROM planos ORDER BY id LIMIT :limit OFFSET :offset"),
         {"limit": per_page, "offset": offset}
     )
     planos = [dict(row._mapping) for row in resultado]
 
+    # Total de registros
     total = db.session.execute(text("SELECT COUNT(*) FROM planos")).scalar()
 
-    return render_template('listar_planos.html', planos=planos, page=page, per_page=per_page, total=total)
+    # Criar dicionário de paginação
+    pagination = {
+        'page': page,
+        'per_page': per_page,
+        'pages': (total + per_page - 1) // per_page,  # arredonda para cima
+        'has_prev': page > 1,
+        'has_next': page * per_page < total,
+        'prev_num': page - 1,
+        'next_num': page + 1
+    }
+
+    return render_template(
+        'listar_planos.html',
+        planos=planos,
+        page=page,
+        per_page=per_page,
+        total=total,
+        pagination=pagination  # <-- ENVIA PARA O TEMPLATE
+    )
+
 
 @planos_bp.route('/insert/planos', methods=['POST'])
 def insert_planos():
@@ -104,9 +124,21 @@ def insert_planos():
 
 @planos_bp.route('/contratos_ativos', methods=['GET'])
 def contratos_ativos():
-    contratos = Contrato.query.order_by(Contrato.numero).all()
-    resultado = [{'id': c.id, 'numero': c.numero, 'razao_social': c.razao_social} for c in contratos]
-    return jsonify(resultado)    
+    empresa_id = session.get('empresa')
+
+    if not empresa_id:
+        return jsonify({'erro': 'Empresa não definida na sessão'}), 401
+
+    # Filtra os contratos da empresa logada
+    contratos = Contrato.query.filter_by(empresa_id=empresa_id).order_by(Contrato.numero).all()
+
+    resultado = [
+        {'id': c.id, 'numero': c.numero, 'razao_social': c.razao_social}
+        for c in contratos
+    ]
+    
+    return jsonify(resultado)
+
 
 @planos_bp.route('/get/id/planos', methods=['GET'])
 def get_list_planos():
@@ -128,7 +160,7 @@ def get_list_planos():
         # Acrescentando total, página e itens por página
         total = len(planos)
         page = 1
-        per_page = total  # ou defina um valor fixo, ex: 10
+        per_page = 5  # ou defina um valor fixo, ex: 10
         
         return render_template('listar_planos.html', planos=planos, total=total, page=page, per_page=per_page)  # Fixed variable name
         

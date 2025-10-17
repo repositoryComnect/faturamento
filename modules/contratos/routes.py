@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, request, session
 from application.models.models import Contrato, db, Cliente, Produto, Plano, ContratoProduto, Revenda, cliente_contrato
-from datetime import datetime
+from datetime import datetime, date
 from sqlalchemy import text
 import re
 
@@ -25,13 +25,22 @@ def proximo_numero_contrato():
 
 @contratos_bp.route('/produtos_ativos', methods=['GET'])
 def produtos_ativos():
-    produtos = Produto.query.filter_by(ativo=True).order_by(Produto.nome).all()
-    resultado = [{'id': p.id, 'nome': p.nome} for p in produtos]
+    empresa_id = session.get('empresa')
+    produtos = Produto.query.filter_by(ativo='Ativo', empresa_id=empresa_id).order_by(Produto.nome).all()
+    resultado = [
+    {
+        'id': p.id,
+        'nome': p.nome,
+        'preco_base': float(p.preco_base) if p.preco_base is not None else 0.0
+    }
+    for p in produtos
+]
     return jsonify(resultado)
 
 @contratos_bp.route('/planos_ativos', methods=['GET'])
 def planos_ativos():
-    planos = Plano.query.order_by(Plano.nome).all()
+    empresa_id = session.get('empresa')
+    planos = Plano.query.filter_by(empresa_id=empresa_id).order_by(Plano.nome).all()
     resultado = [{'id': p.id, 'nome': p.nome, 'valor': str(p.valor)} for p in planos]
     return jsonify(resultado)
 
@@ -540,7 +549,7 @@ def get_contrato_produtos(contract_id):
 @contratos_bp.route('/get/id/contatos', methods=['GET'])
 def get_id_contratos():
     search_term = request.args.get('search', '').strip()
-    empresa_id = session.get('empresa')  # pega o empresa_id da sessão
+    empresa_id = session.get('empresa')
 
     if not search_term:
         return jsonify({'erro': 'Termo de pesquisa não fornecido'}), 400
@@ -553,20 +562,25 @@ def get_id_contratos():
             SELECT * FROM contratos
             WHERE empresa_id = :empresa_id
               AND (
-                    razao_social LIKE :term 
-                 OR numero = :term 
-                 OR nome_fantasia LIKE :term
-                 OR cnpj_cpf LIKE :term
+                    razao_social LIKE :term_like
+                 OR numero = :term_exact
+                 OR nome_fantasia LIKE :term_like
+                 OR cnpj_cpf LIKE :term_like
               )
         """)
 
-        result = db.session.execute(query, {'term': f'%{search_term}%', 'empresa_id': empresa_id})
-        contratos = [dict(row._asdict()) for row in result]
+        params = {
+            'empresa_id': empresa_id,
+            'term_exact': search_term,
+            'term_like': f'%{search_term}%',
+        }
 
-        # Acrescentando total, página e itens por página
+        result = db.session.execute(query, params)
+        contratos = [dict(row._mapping) for row in result]
+
         total = len(contratos)
         page = 1
-        per_page = total  # ou defina um valor fixo, ex: 10
+        per_page = total
 
         return render_template(
             'listar_contratos.html',
@@ -575,12 +589,11 @@ def get_id_contratos():
             page=page,
             per_page=per_page
         )
-        
+
     except Exception as e:
-        return jsonify({
-            'erro': str(e),
-            'sucesso': False
-        }), 500
+        return jsonify({'erro': str(e), 'sucesso': False}), 500
+
+
 
 @contratos_bp.route('/revendas_ativas', methods=['GET'])
 def get_revendas_ativas():
@@ -590,7 +603,17 @@ def get_revendas_ativas():
 
 @contratos_bp.route('/get/list/clientes', methods=['GET'])
 def get_list_clientes():
-    clientes = Cliente.query.filter_by(estado_atual='Ativo').order_by(Cliente.razao_social).all()
+    empresa_id = session.get('empresa')
+
+    if not empresa_id:
+        return jsonify({'erro': 'Empresa não definida na sessão'}), 401
+
+    # Filtra clientes ativos e pertencentes à empresa da sessão
+    clientes = Cliente.query.filter_by(
+        estado_atual='Ativo',
+        empresa_id=empresa_id
+    ).order_by(Cliente.razao_social).all()
+
     resultado = [{'id': c.id, 'razao_social': c.razao_social} for c in clientes]
     return jsonify(resultado)
 
@@ -673,12 +696,13 @@ def desvincular_clientes():
 
 @contratos_bp.route('/vincular-planos', methods=['POST'])
 def vincular_planos():
+    empresa_id = session.get('empresa')
     try:
         db.session.begin()
 
         # 1. Obter o contrato pelo ID
         contrato_id = request.form.get('contrato_id')
-        contrato = Contrato.query.get(contrato_id)
+        contrato = Contrato.query.filter_by.get(contrato_id)
 
         if not contrato:
             raise ValueError("Contrato não encontrado.")
@@ -770,6 +794,7 @@ def planos_por_contrato(contrato_id):
 @contratos_bp.route('/vincular-produtos', methods=['POST'])
 def vincular_produtos():
     try:
+        empresa_id = session.get('empresa')
         contrato_id = request.form.get('contrato_id')
         produto_ids = request.form.getlist('produto_ids')
 
@@ -832,3 +857,19 @@ def desvincular_produtos():
         #flash(f"Erro ao desvincular produtos: {str(e)}", "danger")
         return redirect(request.referrer or url_for('home_bp.render_contratos'))
 
+@contratos_bp.route('/list/contratos_ativos', methods=['GET'])
+def contratos_ativos():
+    empresa_id = session.get('empresa')
+
+    if not empresa_id:
+        return jsonify({'erro': 'Empresa não definida na sessão'}), 401
+
+    # Filtra os contratos da empresa logada
+    contratos = Contrato.query.filter_by(empresa_id=empresa_id).order_by(Contrato.numero).all()
+
+    resultado = [
+        {'id': c.id, 'numero': c.numero, 'razao_social': c.razao_social}
+        for c in contratos
+    ]
+    
+    return jsonify(resultado)

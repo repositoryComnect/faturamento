@@ -1,5 +1,5 @@
-from flask import Blueprint, jsonify, render_template, request
-from application.models.models import db, Contrato, Cliente, Plano, Produto, Vendedor
+from flask import Blueprint, jsonify, render_template, request, session, redirect, url_for, flash
+from application.models.models import db, Contrato, Cliente, Plano, Produto, Vendedor, Empresa
 from flask_login import login_required
 from sqlalchemy import text, extract, func
 from datetime import datetime
@@ -9,23 +9,25 @@ home_bp = Blueprint('home_bp', __name__)
 @home_bp.route('/contratos', methods=['GET'])
 @login_required
 def render_contratos():
+    empresa_id = session.get('empresa')
     try:
-        contrato = db.session.execute(db.select(Contrato).limit(1)).scalar_one_or_none()
-        if contrato:
-            return render_template('contratos.html', contrato=contrato)
-        else:
-            return render_template('contratos.html', contrato=None)
+        contrato = db.session.execute(
+            db.select(Contrato).filter_by(empresa_id=empresa_id).limit(1)
+        ).scalar_one_or_none()
+
+        return render_template('contratos.html', contrato=contrato)
         
     except Exception as e:
         print(f"Erro ao acessar contratos: {str(e)}")
         return render_template('contratos.html', contrato=None)
+
     
 @home_bp.route('/clientes', methods=['GET'])
 @login_required
 def render_clientes():
+    empresa_id = session.get('empresa')
     try:
-        # Usando a nova sintaxe do SQLAlchemy 2.0
-        cliente = Cliente.query.first()        
+        cliente = Cliente.query.filter_by(empresa_id=empresa_id).first()        
         if cliente:
             return render_template('clientes.html', cliente=cliente)
         else:
@@ -37,14 +39,30 @@ def render_clientes():
 @home_bp.route('/planos', methods=['GET'])
 @login_required
 def render_planos():
-    planos = db.session.execute(db.select(Plano).limit(1)).scalar_one_or_none()
+    empresa_id = session.get('empresa')
+
     page = request.args.get('page', 1, type=int)
-    per_page = 15  # Itens por página
-    
-    # Consulta paginada
-    planos_paginados = Plano.query.paginate(page=page, per_page=per_page, error_out=False)
-    
-    return render_template('planos.html', plano=planos, planos=planos_paginados.items, pagination=planos_paginados)
+    per_page = 10 
+
+    try:
+        plano = db.session.execute(
+            db.select(Plano).filter_by(empresa_id=empresa_id).limit(1)
+        ).scalar_one_or_none()
+
+        # Consulta paginada filtrada por empresa
+        planos_paginados = Plano.query.filter_by(empresa_id=empresa_id)\
+                                      .order_by(Plano.id)\
+                                      .paginate(page=page, per_page=per_page, error_out=False)
+
+        return render_template(
+            'planos.html',
+            plano=plano,
+            planos=planos_paginados.items,
+            pagination=planos_paginados
+        )
+    except Exception as e:
+        print(f"Erro ao carregar planos: {str(e)}")
+        return render_template('planos.html', plano=None, planos=[], pagination=None)
 
 @home_bp.route('/ferramentas', methods=['GET'])
 @login_required
@@ -54,13 +72,20 @@ def render_ferramentas():
 @home_bp.route('/produtos', methods=['GET'])
 @login_required
 def render_produtos():
+    empresa_id = session.get('empresa')
     page = request.args.get('page', 1, type=int)
     per_page = 15  # Itens por página
     
-    # Consulta paginada
-    produtos_paginados = Produto.query.paginate(page=page, per_page=per_page, error_out=False)
+    # Consulta paginada com filtro por empresa
+    produtos_paginados = Produto.query \
+        .filter_by(empresa_id=empresa_id) \
+        .paginate(page=page, per_page=per_page, error_out=False)
 
-    return render_template('produtos.html', produtos=produtos_paginados.items, pagination=produtos_paginados)
+    return render_template(
+        'produtos.html',
+        produtos=produtos_paginados.items,
+        pagination=produtos_paginados
+    )
 
 @home_bp.route('/revendas', methods=['GET'])
 @login_required
@@ -92,6 +117,36 @@ def render_titulos():
 @login_required
 def render_instalacoes():
     return render_template('instalacoes.html')
+
+@home_bp.route('/trocar_empresa', methods=['POST'])
+@login_required
+def trocar_empresa():
+    empresa_atual_id = session.get('empresa')
+
+    # Busca todas as empresas ativas, ordenadas por ID
+    empresas_ativas = Empresa.query.filter_by(status='ativo').order_by(Empresa.id).all()
+
+    if not empresas_ativas:
+        flash("Nenhuma empresa ativa encontrada.", "warning")
+        return redirect(url_for('login.home'))
+
+    # Lista só com os IDs das empresas
+    ids_empresas = [str(emp.id) for emp in empresas_ativas]
+
+    # Se a empresa atual está na lista, pega o próximo ID (ou o primeiro se for a última)
+    if empresa_atual_id in ids_empresas:
+        index_atual = ids_empresas.index(empresa_atual_id)
+        proximo_index = (index_atual + 1) % len(ids_empresas)
+        nova_empresa_id = ids_empresas[proximo_index]
+    else:
+        # Se empresa atual não está na lista, define a primeira da lista
+        nova_empresa_id = ids_empresas[0]
+
+    session['empresa'] = nova_empresa_id
+    print(f"Empresa alterada para: {session['empresa']}")
+
+    return redirect(url_for('login.home'))
+
 
 @home_bp.route('/faturamento', methods=['GET'])
 @login_required

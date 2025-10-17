@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, request
+from flask import Blueprint, render_template, redirect, url_for, flash, jsonify, request, session
 from application.models.models import Produto, db
 from datetime import datetime
 from sqlalchemy import text
@@ -8,13 +8,15 @@ produtos_bp = Blueprint('produtos_bp', __name__)
 
 @produtos_bp.route('/set/produtos', methods=['POST'])
 def set_produtos():
+    empresa_id = session.get('empresa')
     try:
         produto_data = {
             'codigo': request.form.get('codigo'),
             'nome': request.form.get('nome'),
             'descricao': request.form.get('descricao'),
             'preco_base': request.form.get('preco_base'),
-            'ativo': request.form.get('status'),    
+            'ativo': request.form.get('status'),
+            'empresa_id' : empresa_id,    
             }
         
         if Produto.query.filter_by(codigo=produto_data['codigo']).first():
