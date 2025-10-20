@@ -301,7 +301,6 @@
                                         <th>Código</th>
                                         <th>Nome do Plano</th>
                                         <th>Valor</th>
-                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -312,11 +311,7 @@
                                             <td>{{ plano.codigo }}</td>
                                             <td>{{ plano.nome }}</td>
                                             <td>R$ {{ "%.2f"|format(plano.valor) }}</td>
-                                            <td>
-                                                <span class="badge {% if plano.status == 'Ativo' %}bg-success{% else %}bg-danger{% endif %}">
-                                                    {{ plano.status }}
-                                                </span>
-                                            </td>
+                
                                         </tr>
                                         {% endfor %}
                                     {% else %}

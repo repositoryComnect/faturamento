@@ -8,14 +8,15 @@ planos_bp = Blueprint('planos_bp', __name__)
 
 @planos_bp.route('/get/planos', methods=['GET'])
 def get_planos():
+    empresa_id = session.get('empresa')
     page = request.args.get('page', 1, type=int)
     per_page = 5  # Itens por página
     offset = (page - 1) * per_page
 
     # Consulta paginada
     resultado = db.session.execute(
-        text("SELECT * FROM planos ORDER BY id LIMIT :limit OFFSET :offset"),
-        {"limit": per_page, "offset": offset}
+        text("SELECT * FROM planos WHERE empresa_id = :empresa_id ORDER BY id LIMIT :limit OFFSET :offset"),
+        {"empresa_id": empresa_id,"limit": per_page, "offset": offset}
     )
     planos = [dict(row._mapping) for row in resultado]
 
@@ -45,6 +46,7 @@ def get_planos():
 
 @planos_bp.route('/insert/planos', methods=['POST'])
 def insert_planos():
+    empresa_id = session.get('empresa')
     try:
         db.session.rollback()
         form_data = request.form.to_dict()
@@ -98,7 +100,8 @@ def insert_planos():
             'qtd_produto' : qtd_produto,
             'desc_nf_licenca': desc_nf_licenca,
             'data_criacao': datetime.now(),
-            'data_atualizacao': datetime.now()
+            'data_atualizacao': datetime.now(),
+            'empresa_id': empresa_id
         }
 
         novo_plano = Plano(**plano_data)
