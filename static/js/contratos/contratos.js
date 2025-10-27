@@ -98,11 +98,6 @@
                     <td>${plano.codigo}</td>
                     <td>${plano.nome}</td>
                     <td>R$ ${plano.valor.toFixed(2)}</td>
-                    <td>
-                        <span class="badge ${plano.status === 'Ativo' ? 'bg-success' : 'bg-danger'}">
-                            ${plano.status}
-                        </span>
-                    </td>
                 </tr>
             `);
         });

@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, render_template, request
+from flask import Blueprint, jsonify, render_template, request, session
 from application.models.models import db, Contrato, Cliente, Plano, Produto
 from flask_login import login_required
 from sqlalchemy import text, extract, func
@@ -7,8 +7,9 @@ from datetime import datetime
 dashboard_bp = Blueprint('dashboard_bp', __name__)
 
 
-@dashboard_bp.route('/api/chart_data')
-def chart_data():
+@dashboard_bp.route('/contratosChart')
+def contratosChart():
+    empresa_id = session.get('empresa')
     try:
         engine = db.get_engine()
         engine_name = engine.dialect.name
@@ -24,7 +25,8 @@ def chart_data():
             month_func.label('month'),
             db.func.count(Contrato.id).label('count')
         ).filter(
-            Contrato.cadastramento != None
+            Contrato.cadastramento != None,
+            Contrato.empresa_id == empresa_id,
         ).group_by(
             'month'
         ).order_by(
@@ -49,19 +51,15 @@ def chart_data():
         print(erro_detalhado)
         return jsonify({"error": str(e), "trace": erro_detalhado}), 500
 
-
-
-
-
-
-
-@dashboard_bp.route('/api/chart_pie')
-def chart_pie():
+@dashboard_bp.route('/statusChart')
+def statusChart():
+    empresa_id = session.get('empresa')
     try:
         # Consulta para contar cadastros por status
         status_counts = db.session.query(
             Contrato.estado_contrato,
-            func.count(Contrato.id).label('count')
+            func.count(Contrato.id).label('count')).filter(
+                Contrato.empresa_id == empresa_id,
         ).group_by(
             Contrato.estado_contrato
         ).all()

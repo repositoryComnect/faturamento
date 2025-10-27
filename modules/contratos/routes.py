@@ -174,7 +174,7 @@ def alterar_contrato():
         tipo = request.form.get('type')
         responsavel = request.form.get('responsible')
         contato = request.form.get('contact')
-        email = request.form.get('email')
+        email = request.form.get('email_edit_contract')
         telefone = request.form.get('phone')
         cep = request.form.get('cep')
         endereco = request.form.get('address')
@@ -282,10 +282,6 @@ def listar_contratos():
         total = db.session.execute(
             text("SELECT COUNT(*) FROM contratos WHERE empresa_id = :empresa_id"),
             {'empresa_id': empresa_id}).scalar()
-
-        # Para depuração: print os dados de contratos e total
-        print("Contratos:", contratos)
-        print("Total:", total)
         
         return render_template('listar_contratos.html', 
                                contratos=contratos,
@@ -362,7 +358,6 @@ def buscar_contrato_por_numero(numero):
             'codigo': p.codigo,
             'nome': p.nome,
             'valor': float(p.valor),
-            'status': 'Ativo'
         } for p in contrato.planos] if contrato.planos else []
 
         # Produtos associados via tabela intermediária

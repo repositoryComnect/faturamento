@@ -145,6 +145,7 @@ def contratos_ativos():
 
 @planos_bp.route('/get/id/planos', methods=['GET'])
 def get_list_planos():
+    empresa_id = session.get('empresa')
     search_term = request.args.get('search', '').strip()
     
     if not search_term:
@@ -153,11 +154,13 @@ def get_list_planos():
     try:
         query = text("""
             SELECT * FROM planos
-            WHERE codigo LIKE :term 
+            WHERE empresa_id = :empresa_id
+                     AND ( codigo LIKE :term 
                OR nome LIKE :term 
+                     )
         """)
 
-        result = db.session.execute(query, {'term': f'%{search_term}%'})
+        result = db.session.execute(query, {'term': f'%{search_term}%', 'empresa_id': f'%{empresa_id}%'})
         planos = [dict(row._asdict()) for row in result]
 
         # Acrescentando total, página e itens por página

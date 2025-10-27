@@ -100,7 +100,7 @@ def render_notas_fiscais():
 @home_bp.route('/dashboard_contratos', methods=['GET'])
 @login_required
 def render_dashboard():
-    return render_template('dashboard_contratos.html')
+    return render_template('dashboard.html')
 
 @home_bp.route('/vendedores', methods=['GET'])
 @login_required
