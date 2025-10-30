@@ -347,7 +347,7 @@
                                             </button>
                                         </div>
                                         <div class="d-flex gap-2">    
-                                            <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularPlanoContractModal">
+                                            <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createPlanosModal">
                                                 <i class="bi bi-plus-circle me-2"></i>  Criar Plano
                                             </button>
                                         </div>
@@ -438,41 +438,45 @@
                 </div>
                 
         </div>
-        
-        
-        
-        {% endif %}
+    {% endif %}
+    
+    
+</div>  
 
-        
-           
-
-    </div>  
 {% endblock %}
 
 {% block scripts %}
+
+<script src="{{ url_for('static', filename='js/contratos/contratos.js') }}"></script>
+    
+    <!--Popus contratos-->
+    {% include 'popup/contratos/popup_delete_contrato.html' %}
+    {% include 'popup/contratos/popup_contratos.html' %}
+    {% include 'popup/contratos/popup_editar_contrato.html' %}
+
+
     <!-- Popups clientes-->
     {% include 'popup/clientes/popup_cliente.html' %}
 
     <!-- Popups produtos-->
     {% include 'popup/produto/popup_produto.html' %}
 
+    <!--Popus planos-->
+    {% include 'popup/planos/popup_planos.html' %}
 
-    <!--Popus contratos-->
-    {% include 'popup/contratos/popup_delete_contrato.html' %}
-    {% include 'popup/contratos/popup_contratos.html' %}
-    {% include 'popup/contratos/popup_editar_contrato.html' %}
-
-    <!--Popus vinculos-->
+     <!--Popus vinculos-->
     {% include 'popup/contratos/popup_vincular_produto.html' %}
     {% include 'popup/contratos/popup_vincular_plano.html' %}
     {% include 'popup/contratos/popup_vincular_cliente.html' %}
     {% include 'popup/contratos/popup_desvincular_cliente.html' %}
     {% include 'popup/contratos/popup_desvincular_produto.html' %}
     {% include 'popup/contratos/popup_desvincular_plano.html' %}
-    
+
+
     <!-- Links úteis -->
     {% include 'extensions/links_popup.html' %}
-    <script src="{{ url_for('static', filename='js/contratos/contratos.js') }}"></script>
+        
+
 
 {% endblock %}
 

@@ -11,7 +11,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="contractForm" action="{{ url_for('contratos_bp.set_contrato') }}" method="POST">
+                    <form id="createContractForm" action="{{ url_for('contratos_bp.set_contrato') }}" method="POST">
                         <!-- Basic Information Section -->
                         <div class="modal-section-header">Informações Básicas</div>
                         <div class="row g-3 mb-4">
@@ -225,9 +225,7 @@
         </div>
     </div>
 
-<!--<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_contratos.js') }}"></script>-->
+<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_contratos.js') }}"></script>
 
-    {% include 'js/contratos_popup_js.html' %}
-    {% include 'extensions/links_popup.html' %}
 </body>
 </html>

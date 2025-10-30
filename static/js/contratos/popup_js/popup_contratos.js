@@ -1,17 +1,21 @@
 //<!-- Módulo que busca o próximo número de Contrato disponível -->
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const modal = document.getElementById('createContractModal');
-    
-        modal.addEventListener('show.bs.modal', function () {
-            fetch('{{ url_for("contratos_bp.proximo_numero_contrato") }}')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('numero_contrato').value = data.proximo_numero;
-                })
-                .catch(error => console.error('Erro ao buscar número de contrato:', error));
-        });
+   document.addEventListener('DOMContentLoaded', function () {
+    const modal = document.getElementById('createContractModal');
+
+    modal.addEventListener('show.bs.modal', function () {
+        // Caminho relativo
+        const url = '/proximo_numero_contrato';
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('numero_contrato').value = data.proximo_numero;
+            })
+            .catch(error => console.error('Erro ao buscar número de contrato:', error));
     });
+});
+
 
 
 //<!-- Módulo que busca dinâmicamente os produtos disponíveis -->

@@ -1,0 +1,115 @@
+<head>
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/style_planos.css' )}}">
+</head>
+<body>
+    <!-- Create Plan Modal -->
+    <div class="modal fade" id="createPlanosModal" tabindex="-1" aria-labelledby="createPlanosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content">
+                <!-- Cabeçalho -->
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="createPlanosModalLabel">Novo Plano</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <!-- Corpo do Modal -->
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('planos_bp.insert_planos') }}">
+                        <!-- Informações Básicas -->
+                        <div class="card mb-2">
+                            <div class="card-header section-header d-flex justify-content-between align-items-center" 
+                                data-bs-toggle="collapse" data-bs-target="#planosInfoCollapse" 
+                                aria-expanded="true" aria-controls="planosInfoCollapse">
+                                <h5 class="mb-0">Informações Básicas</h5>
+                            </div>
+                            <div class="collapse show" id="planosInfoCollapse">
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-1">
+                                            <label for="codigo_plan" class="form-label">Código:</label>
+                                            <input type="text" id="codigo_plan" name="codigo_plan" class="form-control" readonly placeholder="000">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label for="nome_plan" class="form-label">Nome do Plano:</label>
+                                            <input type="text" id="nome_plan" name="nome_plan" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="valor_plan" class="form-label">Valor:</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">R$</span>
+                                                <input type="number" id="valor_plan" name="valor_plan" class="form-control" step="0.01" placeholder="0.00">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="id_produto_plan" class="form-label">Id Produto Portal:</label>
+                                            <input type="text" id="id_produto_plan" name="id_produto_plan" class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="contrato_id_plan" class="form-label">Vincular a Contrato:</label>
+                                            <select id="contrato_id_plan" name="contrato_id_plan" class="form-select">
+                                                <option value="">Carregando contratos...</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="produto_id_plan" class="form-label">Vincular Produto:</label>
+                                            <select id="produto_id_plan" name="produto_id_plan" class="form-select">
+                                                <option value="">Carregando produtos...</option>
+                                                {% for produto in produtos %}
+                                                    <option value="{{ produto.id }}" data-preco="{{ produto.preco_base }}">{{ produto.nome }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="qtd_produto_plan" class="form-label">Quantidade Produto:</label>
+                                            <input type="number" id="qtd_produto_plan" name="qtd_produto_plan" class="form-control" placeholder="0">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Informações Fiscais -->
+                        <div class="card mb-2">
+                            <div class="card-header section-header d-flex justify-content-between align-items-center" 
+                                data-bs-toggle="collapse" data-bs-target="#secFiscaisCollapse" 
+                                aria-expanded="false" aria-controls="secFiscaisCollapse">
+                                <h5 class="mb-0">Informações Fiscais</h5>
+                            </div>
+                            <div class="collapse" id="secFiscaisCollapse">
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-5">
+                                            <label for="desc_boleto_plan" class="form-label">Descrição Boleto:</label>
+                                            <input type="text" id="desc_boleto_plan" name="desc_boleto_plan" class="form-control">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="aliquota_sp_plan" class="form-label">Alíquota:</label>
+                                            <input type="text" id="aliquota_sp_plan" name="aliquota_sp_plan" class="form-control" placeholder="0.00">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="cod_servico_sp_plan" class="form-label">Código Serviço:</label>
+                                            <input type="text" id="cod_servico_sp_plan" name="cod_servico_sp_plan" class="form-control" placeholder="000">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label for="desc_nf_plan" class="form-label">Descrição para NF:</label>
+                                            <textarea id="desc_nf_plan" name="desc_nf_plan" class="form-control"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Footer do Modal -->
+                        <div class="modal-footer mt-3">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar</button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'js/planos/planos_js.html' %}
+</body>
