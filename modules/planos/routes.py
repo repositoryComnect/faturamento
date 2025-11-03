@@ -179,7 +179,7 @@ def get_list_planos():
 @planos_bp.route('/delete/planos', methods=['POST'])
 def delete_planos():
     codigo = request.form.get('delete_codigo_plano')
-    print(f"🔍 Código recebido para exclusão: {codigo}")
+    print(f"Código recebido para exclusão: {codigo}")
     
     try:
         # 1. Buscar ID do plano
@@ -190,7 +190,7 @@ def delete_planos():
 
         if not plano_id_result:
             flash('Plano não encontrado com esse código.', 'error')
-            print("❌ Plano não encontrado.")
+            print("Plano não encontrado.")
             return redirect(url_for('home_bp.render_planos'))
 
         plano_id = plano_id_result[0]
@@ -201,7 +201,7 @@ def delete_planos():
             text("DELETE FROM contrato_plano WHERE plano_id = :plano_id"),
             {'plano_id': plano_id}
         )
-        print(f"🔗 Vínculos removidos: {deleted_links.rowcount}")
+        print(f"Vínculos removidos: {deleted_links.rowcount}")
 
         # 3. Deletar o plano
         deleted_plan = db.session.execute(

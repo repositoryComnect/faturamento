@@ -126,11 +126,19 @@
                             
                             <div class="col-md-3">
                                 <label class="form-label">Revenda:</label>
-                                <input type="text" class="form-control" id="revenda" name="revenda" value="{{ contrato.revenda_contrato }}" readonly>
+                                    <input 
+                                        type="text" 
+                                        class="form-control" 
+                                        id="revenda" 
+                                        name="revenda" 
+                                        value="{{ contrato.revenda if contrato.revenda else 'Não possui revenda' }}" 
+                                        readonly
+                                        >
+
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Distribuidor:</label>
-                                <input type="text" class="form-control" id="vendedor" name="vendedor" value="{{ contrato.vendedor_contrato }}" readonly>
+                                <input type="text" class="form-control" id="vendedor" name="vendedor" value="{{ contrato.vendedor if contrato.vendedor else 'Não possui vendedor' }}" readonly>
                             </div>
                         </div>
                     </div>
@@ -187,7 +195,6 @@
                                         <tr>
                                             <th>Nome Fantasia</th>
                                             <th>Razão Social</th>
-                                            <th>CNPJ</th>
                                             <th>Atividade</th>
                                             <th>Cidade</th>
                                             <th>Status</th>
@@ -199,7 +206,6 @@
                                             <tr>
                                                 <td>{{ cliente.nome_fantasia }}</td>
                                                 <td>{{ cliente.razao_social }}</td>
-                                                <td>{{ cliente.localidade }}</td>
                                                 <td>{{ cliente.atividade }}</td>
                                                 <td>{{ cliente.cidade }}</td>
                                                 <td>
@@ -233,7 +239,7 @@
                                             </div>
 
                                             <div class="d-flex gap-2">    
-                                                <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createClientModal">
+                                                <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#cliente_createModal">
                                                     <i class="bi bi-plus-circle me-2"></i>  Criar Cliente
                                                 </button>
                                             </div>
@@ -448,6 +454,7 @@
 {% block scripts %}
 
 <script src="{{ url_for('static', filename='js/contratos/contratos.js') }}"></script>
+
     
     <!--Popus contratos-->
     {% include 'popup/contratos/popup_delete_contrato.html' %}
@@ -456,7 +463,7 @@
 
 
     <!-- Popups clientes-->
-    {% include 'popup/clientes/popup_cliente.html' %}
+    {% include 'popup/contratos/popup_contratos_clientes.html' %}
 
     <!-- Popups produtos-->
     {% include 'popup/produto/popup_produto.html' %}

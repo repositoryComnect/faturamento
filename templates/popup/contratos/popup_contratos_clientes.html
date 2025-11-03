@@ -1,0 +1,216 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_clientes.css') }}">
+</head>
+<body>
+    <!-- Create Client Modal -->
+<div class="modal fade" id="cliente_createModal" tabindex="-1" aria-labelledby="cliente_createModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="cliente_createModalLabel">Novo Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="cliente_form" action="{{ url_for('contratos_bp.set_cliente_popup_contrato') }}" method="POST">
+                    <!-- Flash Messages -->
+                    <div id="cliente_flash_messages">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+
+                    <!-- Search Contracts -->
+                    <div class="card mb-2">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">Procurar Contratos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-12">
+                                    <label for="cliente_buscar_contrato" class="form-label">Insira o número do contrato ou razão social</label>
+                                    <input type="text" class="form-control" id="cliente_buscar_contrato" name="cliente_buscar_contrato" placeholder="Procurar contratos...">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Basic Information -->
+                    <div class="modal-section-header">Informações Básicas</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-2">
+                            <label class="form-label">N° Contrato:</label>
+                            <input type="text" class="form-control" id="cliente_numero_contrato" name="cliente_numero_contrato" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Sequência:</label>
+                            <input type="text" class="form-control" id="cliente_sequencia" name="cliente_sequencia" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Razão Social:</label>
+                            <input type="text" class="form-control" id="cliente_nome_empresa" name="cliente_nome_empresa">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Nome Fantasia:</label>
+                            <input type="text" class="form-control" id="cliente_nome_fantasia" name="cliente_nome_fantasia">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Cadastramento:</label>
+                            <input type="text" class="form-control" id="cliente_cadastramento" name="cliente_cadastramento" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Atualização:</label>
+                            <input type="text" class="form-control" id="cliente_atualizacao" name="cliente_atualizacao" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Tipo:</label>
+                            <input type="text" class="form-control" id="cliente_tipo" name="cliente_tipo" readonly>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">CNPJ/CPF:</label>
+                            <input type="text" class="form-control" id="cliente_cnpj_cpf" name="cliente_cnpj_cpf">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">IE:</label>
+                            <input type="text" class="form-control" id="cliente_ie" name="cliente_ie">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">IM:</label>
+                            <input type="text" class="form-control" id="cliente_im" name="cliente_im">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Contato:</label>
+                            <input type="text" class="form-control" id="cliente_contato" name="cliente_contato">
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">E-mail:</label>
+                            <input type="email" class="form-control" id="cliente_email" name="cliente_email">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Telefone:</label>
+                            <input type="tel" class="form-control" id="cliente_telefone" name="cliente_telefone">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Tipo de Serviço:</label>
+                            <input type="text" class="form-control" id="cliente_tipo_servico" name="cliente_tipo_servico">
+                        </div>
+                    </div>
+
+                    <!-- Commercial Information -->
+                    <div class="modal-section-header">Informações Comerciais</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-2">
+                            <label class="form-label">CEP:</label>
+                            <input type="text" class="form-control" id="cliente_cep" name="cliente_cep" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Endereço</label>
+                            <input type="text" class="form-control" id="cliente_endereco" name="cliente_endereco" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Complemento:</label>
+                            <input type="text" class="form-control" id="cliente_complemento" name="cliente_complemento" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Bairro:</label>
+                            <input type="text" class="form-control" id="cliente_bairro" name="cliente_bairro" readonly>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Cidade:</label>
+                            <input type="text" class="form-control" id="cliente_cidade" name="cliente_cidade" readonly>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">UF:</label>
+                            <input type="text" class="form-control" id="cliente_uf" name="cliente_uf" readonly>
+                        </div>
+                    </div>
+
+                    <!-- Billing Address -->
+                    <div class="modal-section-header">Endereço de Cobrança do Cliente</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-2">
+                            <label class="form-label">CEP Cobrança:</label>
+                            <input type="text" class="form-control" id="cliente_cep_cobranca" name="cliente_cep_cobranca">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Endereço Cobrança:</label>
+                            <input type="text" class="form-control" id="cliente_endereco_cobranca" name="cliente_endereco_cobranca">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Cidade Cobrança:</label>
+                            <input type="text" class="form-control" id="cliente_cidade_cobranca" name="cliente_cidade_cobranca">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">UF Cobrança:</label>
+                            <select class="form-select" id="cliente_uf_cobranca" name="cliente_uf_cobranca" required>
+                                <option value="">Selecione</option>
+                                <option value="RJ">RJ</option>
+                                <option value="SP">SP</option>
+                                <option value="MG">MG</option>
+                                <option value="DF">DF</option>
+                                <option value="SC">SC</option>
+                                <option value="ES">ES</option>
+                                <option value="AC">AC</option>
+                                <option value="CE">CE</option>
+                                <option value="AL">AL</option>
+                                <option value="BA">BA</option>
+                                <option value="AM">AM</option>
+                                <option value="SE">SE</option>
+                                <option value="TO">TO</option>
+                                <option value="RR">RR</option>
+                                <option value="PI">PI</option>
+                                <option value="RN">RN</option>
+                                <option value="RS">RS</option>
+                                <option value="PB">PB</option>
+                                <option value="PR">PR</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Telefone Cobrança:</label>
+                            <input type="text" class="form-control" id="cliente_telefone_cobranca" name="cliente_telefone_cobranca">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Bairro Cobrança:</label>
+                            <input type="text" class="form-control" id="cliente_bairro_cobranca" name="cliente_bairro_cobranca">
+                        </div>
+                    </div>
+
+                    <!-- Contract Associations -->
+                    <div class="modal-section-header">Contratos</div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-12">
+                            <label class="form-label">Contratos Disponíveis</label>
+                            <select class="form-select" id="cliente_contratos_associados" name="cliente_contratos_associados" multiple></select>
+                            <small class="text-muted">Segure Ctrl (Windows) ou Command (Mac) para selecionar múltiplos itens</small>
+                        </div>
+                    </div>
+
+                    <!-- Observations -->
+                    <div class="modal-section-header">Observações</div>
+                    <div class="mb-4">
+                        <textarea class="form-control" id="cliente_observacao" name="cliente_observacao" rows="4"></textarea>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="cliente_saveBtn">Salvar Cliente</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_contratos_clientes.js') }}"></script>
+
+
+  
+</body>
+</html>

@@ -121,7 +121,7 @@ class Cliente(db.Model):
     
     # Dados jurídicos
     tipo = db.Column(db.String(30))
-    cnpj = db.Column(db.String(18))
+    cnpj_cpf = db.Column(db.String(18))
     ie = db.Column(db.String(20))
     im = db.Column(db.String(20))
     

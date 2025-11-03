@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint, jsonify, request, redirect, url_for
+from flask import render_template, Blueprint, jsonify, request, redirect, url_for, session
 from application.models.models import Vendedor, Revenda, db
 from sqlalchemy import text
 from datetime import datetime
@@ -26,6 +26,7 @@ def delete_revendas():
 
 @revendas_bp.route('/set/revendas', methods=['POST'])
 def set_revendas():
+    empresa_id = session.get('empresa')
     try:
         revenda_data = {
             'codigo': request.form.get('codigo_revenda'),
@@ -41,6 +42,7 @@ def set_revendas():
             'endereco': request.form.get('endereco'),
             'bairro': request.form.get('bairro'),
             'cidade': request.form.get('cidade'),
+            'empresa_id': empresa_id,
         }
 
         vendedor_id = request.form.get('vendedor_selecionado')

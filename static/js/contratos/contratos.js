@@ -37,7 +37,6 @@
                 <tr>
                     <td>${cliente.nome_fantasia || ''}</td>
                     <td>${cliente.razao_social || ''}</td>
-                    <td>${cliente.cnpj || ''}</td>
                     <td>${cliente.atividade || ''}</td>
                     <td>${cliente.cidade || ''}</td>
                     <td>
@@ -412,8 +411,16 @@ function preencherCamposContrato(contrato) {
     document.getElementById("responsavel").value = contrato.responsavel || "";
     document.getElementById("cnpj").value = contrato.cnpj || contrato.cnpj_cpf || "";
     document.getElementById("tipo_pessoa").value = contrato.tipo_pessoa || "";
-    document.getElementById("revenda").value = contrato.revenda_contrato || "";
-    document.getElementById("vendedor").value = contrato.vendedor_contrato || "";
+    document.getElementById("revenda").value =
+    contrato.revenda_contrato === null || contrato.revenda_contrato === undefined || contrato.revenda_contrato === ""
+        ? "Não possui revenda"
+        : contrato.revenda_contrato;
+
+    document.getElementById("vendedor").value =
+    contrato.vendedor_contrato === null || contrato.vendedor_contrato === undefined || contrato.vendedor_contrato === ""
+        ? "Não possui vendedor"
+        : contrato.vendedor_contrato;
+
 
     // Endereço
     document.getElementById("code_residence").value = contrato.cep || "";

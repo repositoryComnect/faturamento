@@ -28,7 +28,7 @@ def buscar_cliente_por_contrato(sequencia):
             'email': cliente.email or None,
             'telefone': cliente.telefone or None,
             'tipo': cliente.tipo or None,
-            'cnpj': cliente.cnpj or None,
+            'cnpj_cpf': cliente.cnpj_cpf or None,
             'im': cliente.im or None,
             'ie': cliente.ie or None,
             'revenda_nome': cliente.revenda_nome or None,
@@ -288,7 +288,7 @@ def set_cliente():
             'razao_social': request.form.get('company_name', '').strip(),
             'nome_fantasia': request.form.get('trade_name', '').strip(),
             'tipo': request.form.get('type'),
-            'cnpj': request.form.get('cnpj_cpf', '').strip(),
+            'cnpj_cpf': request.form.get('cnpj_cpf', '').strip(),
             'ie': request.form.get('ie', '').strip(),
             'im': request.form.get('im', '').strip(),
             'contato_principal': request.form.get('contact', '').strip(),
@@ -326,7 +326,7 @@ def set_cliente():
         if not cliente_data['razao_social']:
             raise ValueError("Razão Social é obrigatória")
         
-        if not cliente_data['cnpj']:
+        if not cliente_data['cnpj_cpf']:
             raise ValueError("CNPJ/CPF é obrigatório")
 
         novo_cliente = Cliente(**cliente_data)

@@ -102,7 +102,7 @@
                         'atualizacao': '#atualizacao',
                         'tipo': '#tipo',
                         'contato': '#contato',
-                        'cnpj': '#cnpj',
+                        'cnpj_cpf': '#cnpj_cpf',
                         'ie': '#ie',
                         'im': '#im',
                         'email': '#email',

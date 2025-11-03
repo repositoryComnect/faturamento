@@ -300,23 +300,30 @@ def buscar_contrato_por_numero(numero):
     if not empresa_id:
         return jsonify({'error': 'Empresa não selecionada'}), 400
 
+    def safe_float(value, default=None):
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+
+    def safe_date(value):
+        try:
+            return value.strftime('%d/%m/%Y') if value else None
+        except Exception:
+            return None
+
     try:
-        # Filtra pelo número e pela empresa da session
         contrato = Contrato.query.filter_by(numero=numero, empresa_id=empresa_id).first()
-        
         if not contrato:
             return jsonify({'error': f'Contrato {numero} não encontrado'}), 404
-
-        def format_date(date):
-            return date.strftime('%d/%m/%Y') if date else None
 
         data = {
             'id': contrato.id,
             'numero': contrato.numero,
             'razao_social': contrato.razao_social or None,
             'nome_fantasia': contrato.nome_fantasia or None,
-            'atualizacao': format_date(contrato.atualizacao),
-            'cadastramento': format_date(contrato.cadastramento),
+            'atualizacao': safe_date(contrato.atualizacao),
+            'cadastramento': safe_date(contrato.cadastramento),
             'tipo': contrato.tipo or None,
             'contato': contrato.contato or None,
             'id_matriz_portal': contrato.id_matriz_portal or None,
@@ -325,60 +332,71 @@ def buscar_contrato_por_numero(numero):
             'responsavel': contrato.responsavel or None,
             'cep': contrato.cep or None,
             'cnpj_cpf': contrato.cnpj_cpf or None,
-            'revenda': contrato.revenda or None,
-            'vendedor': contrato.vendedor or None,
+
+            # 👇 Aqui o tratamento direto no backend
+            'revenda': contrato.revenda if contrato.revenda not in (None, "", "null") else "Não possui revenda",
+            'vendedor': contrato.vendedor if contrato.vendedor not in (None, "", "null") else "Não possui vendedor",
+
             'endereco': contrato.endereco or None,
             'complemento': contrato.complemento or None,
             'bairro': contrato.bairro or None,
             'cidade': contrato.cidade or None,
             'estado': contrato.estado or None,
             'dia_vencimento': contrato.dia_vencimento or None,
-            'fator_juros': float(contrato.fator_juros) if contrato.fator_juros else None,
+            'fator_juros': safe_float(contrato.fator_juros),
             'contrato_revenda': contrato.contrato_revenda or None,
             'faturamento_contrato': contrato.faturamento_contrato or None,
             'estado_contrato': contrato.estado_contrato or None,
-            'data_estado': format_date(contrato.data_estado),
+            'data_estado': safe_date(contrato.data_estado),
             'motivo_estado': contrato.motivo_estado or None,
         }
 
         # Clientes associados
-        data['clientes'] = [{
-            'nome_fantasia': c.nome_fantasia or None,
-            'razao_social': c.razao_social or None,
-            'cnpj': c.cnpj or None,
-            'atividade': c.atividade or None,
-            'cidade': c.cidade or None,
-            'estado_atual': c.estado_atual or None,
-            'numero_contrato_cadastrado': c.numero_contrato
-        } for c in contrato.clientes] if contrato.clientes else []
+        data['clientes'] = []
+        if hasattr(contrato, 'clientes') and contrato.clientes:
+            for c in contrato.clientes:
+                data['clientes'].append({
+                    'nome_fantasia': c.nome_fantasia or None,
+                    'razao_social': c.razao_social or None,
+                    'cnpj_cpf': c.cnpj_cpf or None,
+                    'atividade': c.atividade or None,
+                    'cidade': c.cidade or None,
+                    'estado_atual': c.estado_atual or None,
+                    'numero_contrato_cadastrado': c.numero_contrato or None
+                })
 
-        # Planos associados (N:N)
-        data['planos'] = [{
-            'id': p.id,
-            'codigo': p.codigo,
-            'nome': p.nome,
-            'valor': float(p.valor),
-        } for p in contrato.planos] if contrato.planos else []
+        # Planos associados
+        data['planos'] = []
+        if hasattr(contrato, 'planos') and contrato.planos:
+            for p in contrato.planos:
+                data['planos'].append({
+                    'id': p.id,
+                    'codigo': p.codigo,
+                    'nome': p.nome,
+                    'valor': safe_float(p.valor, 0.00)
+                })
 
-        # Produtos associados via tabela intermediária
-        associacoes = ContratoProduto.query.filter_by(contrato_id=contrato.id).all()
+        # Produtos associados
         data['produtos'] = []
+        associacoes = ContratoProduto.query.filter_by(contrato_id=contrato.id).all()
         for assoc in associacoes:
             produto = Produto.query.get(assoc.produto_id)
             if produto:
                 data['produtos'].append({
                     'id': produto.id,
-                    'nome': produto.nome,
-                    'quantidade': assoc.quantidade,
-                    'descricao': produto.descricao,
-                    'valor_unitario': float(produto.preco_base) if produto.preco_base else 0.00
+                    'nome': produto.nome or None,
+                    'descricao': produto.descricao or 'N/A',
+                    'quantidade': assoc.quantidade or 0,
+                    'valor_unitario': safe_float(produto.preco_base, 0.00)
                 })
 
         return jsonify(data)
-    
+
     except Exception as e:
-        print(f"ERRO: {str(e)}")
+        print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
         return jsonify({'error': 'Erro ao processar a requisição'}), 500
+
+
 
 @contratos_bp.route('/set_contrato', methods=['POST'])
 def set_contrato():
@@ -866,3 +884,121 @@ def contratos_ativos():
     ]
     
     return jsonify(resultado)
+
+
+@contratos_bp.route('/set/cliente/contrato', methods=['POST'])
+def set_cliente_popup_contrato():
+    def parse_date(date_str):
+            if not date_str:
+                return None
+            try:
+                for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
+                    try:
+                        return datetime.strptime(date_str, fmt).date()
+                    except ValueError:
+                        continue
+                return None
+            except Exception:
+                return None
+
+    try:
+        # Iniciar transação (equivalente ao BEGIN TRANSACTION)
+        db.session.begin()
+
+        # 1. Inserir o novo cliente (equivalente ao primeiro INSERT)
+        cliente_data = {
+            'numero_contrato': request.form.get('cliente_numero_contrato'),
+            'sequencia': request.form.get('cliente_sequencia'),
+            'cadastramento': parse_date(request.form.get('cliente_cadastramento')),
+            'atualizacao': parse_date(request.form.get('cliente_atualizacao')),
+            'razao_social': request.form.get('cliente_nome_empresa', '').strip(),
+            'nome_fantasia': request.form.get('cliente_nome_fantasia', '').strip(),
+            'tipo': request.form.get('cliente_tipo'),
+            'cnpj_cpf': request.form.get('cliente_cnpj_cpf', '').strip(),
+            'ie': request.form.get('cliente_ie', '').strip(),
+            'im': request.form.get('cliente_im', '').strip(),
+            'contato_principal': request.form.get('cliente_contato', '').strip(),
+            'email': request.form.get('cliente_email', '').strip(),
+            'telefone': request.form.get('cliente_telefone', '').strip(),
+            'revenda_nome': request.form.get('revenda_selecionada_client', '').strip(),
+            'vendedor_nome': request.form.get('vendedor_selecionado_client', '').strip(),
+            'tipo_servico': request.form.get('cliente_tipo_servico'),
+            'localidade': request.form.get('localidade', '').strip(),
+            'regiao': request.form.get('regiao', '').strip(),
+            'atividade': request.form.get('atividade', '').strip(),
+            'cep': request.form.get('cliente_cep', '').strip(),
+            'endereco': request.form.get('cliente_endereco', '').strip(),
+            'complemento': request.form.get('cliente_complemento', '').strip(),
+            'bairro': request.form.get('cliente_bairro', '').strip(),
+            'cidade': request.form.get('cliente_cidade', '').strip(),
+            'cep_cobranca': request.form.get('cliente_cep_cobranca'),
+            'endereco_cobranca': request.form.get('cliente_endereco_cobranca'),
+            'cidade_cobranca': request.form.get('cliente_cidade_cobranca'),
+            'telefone_cobranca': request.form.get('cliente_telefone_cobranca'),
+            'bairro_cobranca': request.form.get('cliente_bairro_cobranca'),
+            'uf_cobranca': request.form.get('cliente_uf_cobranca'),
+            'estado': request.form.get('cliente_uf'),
+            'fator_juros': float(request.form.get('fator_juros', 0)),
+            'estado_atual': request.form.get('estado_atual', 'Ativo'),
+            'data_estado': parse_date(request.form.get('date_estate')),
+            'dia_vencimento': int(request.form.get('dia_vencimento', 10)),
+            'plano_nome': request.form.get('plano', '').strip(),
+            'motivo_estado': request.form.get('motivo_estado', '').strip(),
+            'observacao': request.form.get('cliente_observacao', '').strip(),
+            'empresa_id': session.get('empresa')
+        }
+
+
+
+        novo_cliente = Cliente(**cliente_data)
+        db.session.add(novo_cliente)
+        db.session.flush()  # Força o INSERT para obter o ID (equivalente ao seu SELECT do ID)
+
+        # 2. Obter o ID do cliente (já temos em novo_cliente.id)
+
+        # 3. Processar associação com contratos
+        numeros_contratos = request.form.getlist('cliente_contratos_associados')
+        contratos_nao_encontrados = []
+
+        for numero_contrato in numeros_contratos:
+            # Buscar contrato pelo número (equivalente ao seu terceiro bloco SQL)
+            contrato = Contrato.query.filter_by(numero=numero_contrato).first()
+            
+            if contrato:
+                # 4. Associar cliente ao contrato (equivalente ao quarto INSERT)
+                stmt = cliente_contrato.insert().values(
+                    cliente_id=novo_cliente.id,
+                    contrato_id=contrato.id
+                )
+                db.session.execute(stmt)
+            else:
+                contratos_nao_encontrados.append(numero_contrato)
+
+        # Se algum contrato não foi encontrado, cancelar a operação
+        if contratos_nao_encontrados:
+            raise ValueError(f"Contratos não encontrados: {', '.join(contratos_nao_encontrados)}")
+
+        # Commit da transação (equivalente ao COMMIT)
+        db.session.commit()
+
+        # Tentativa de ajuste do autoincrement (mantendo sua lógica original)
+        try:
+            db.session.execute(
+                text("ALTER TABLE clientes AUTO_INCREMENT = :id"),
+                {'id': novo_cliente.id + 1}
+            )
+            db.session.commit()
+        except Exception as e:
+            print("Não foi possível realizar o autoincrement")
+
+        return redirect(url_for('home_bp.render_contratos'))
+
+    except ValueError as ve:
+        db.session.rollback()
+        flash(f"Erro de validação: {str(ve)}", "error")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash("Ocorreu um erro ao criar o cliente. Por favor, tente novamente.", "error")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
