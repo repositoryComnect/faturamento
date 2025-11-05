@@ -1,3 +1,4 @@
+<script>
 
     function toggleCollapse(id) {
         const collapse = document.getElementById(id);
@@ -19,16 +20,18 @@
             window.location.href = '/planos/excluir/' + planoId;
         }
     }
+    </script>
 
 
 
-//<!-- SCRIPT PARA CARREGAR CONTRATOS -->
+<!-- SCRIPT PARA CARREGAR CONTRATOS -->
+<script>
     document.addEventListener("DOMContentLoaded", function () {
         fetch("/contratos_ativos")
             .then(response => response.json())
             .then(data => {
                 const select = document.getElementById("contrato_id");
-                select.innerHTML = '<option value="">Selecione um contrato</option>';
+                select.innerHTML = '<option value="">-- Selecione um contrato --</option>';
                 const planoContratoId = "{{ plano.contrato_id or '' }}";
     
                 data.forEach(contrato => {
@@ -47,11 +50,10 @@
                 select.innerHTML = '<option value="">Erro ao carregar contratos</option>';
             });
     });
+    </script>
 
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
     fetch("/clientes_ativos_planos")
         .then(response => response.json())
         .then(data => {
@@ -80,3 +82,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 });
 
+</script>

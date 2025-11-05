@@ -183,5 +183,6 @@
 {% endblock %}
 
 {% block scripts %}
-{% include 'js/planos/planos_js.html' %}
+<script src="{{ url_for('static', filename='js/planos/planos.js') }}"></script>
+
 {% endblock %}

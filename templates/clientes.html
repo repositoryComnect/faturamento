@@ -53,7 +53,7 @@
         {% else %}
         <!-- Basic Information Card -->
         <div class="card mb-2">
-            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" aria-expanded="true" aria-controls="basicInfoCollapse">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" aria-controls="basicInfoCollapse">
                 <h5 class="mb-0">Informações Básicas</h5>
             </div>
             <div class="collapse show" id="basicInfoCollapse">
@@ -76,11 +76,15 @@
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Cadastramento:</label>
-                            <input type="text" class="form-control" value="{{ cliente.cadastramento }}" id="cadastramento" readonly>
+                            <input type="text" class="form-control"
+                                    value="{{ cliente.cadastramento.strftime('%d/%m/%Y') if cliente.cadastramento else '' }}"
+                                    id="cadastramento" readonly>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Atualização:</label>
-                            <input type="text" class="form-control" value="{{ cliente.atualizacao }}" id="atualizacao" readonly>
+                            <input type="text" class="form-control"
+                                value="{{ cliente.atualizacao.strftime('%d/%m/%Y') if cliente.atualizacao else '' }}"
+                                id="atualizacao" readonly>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Tipo:</label>
@@ -113,7 +117,7 @@
         
         <!-- Customer Address Section -->
         <div class="card mb-2">
-            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#addressCollapse" aria-expanded="false" aria-controls="addressCollapse">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#addressCollapse" aria-controls="addressCollapse">
                 <h5 class="mb-0">Endereço do Cliente</h5>
             </div>
             <div class="collapse show" id="addressCollapse">
@@ -184,105 +188,125 @@
             </div>
         </div>
         
-        <!-- Contract Conditions Section -->
-        <!--<div class="card mb-2">
-            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#contractCollapse" aria-expanded="true" aria-controls="contractCollapse">
-                <h5 class="mb-0">Instalações</h5>
+                <!-- Seção de Planos Associadas -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#planosCollapse">
+                <h5 class="mb-0">Planos Associadas ao Cliente</h5>
             </div>
-            <div class="collapse show" id="contractCollapse">
+            <div class="collapse" id="planosCollapse">
                 <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label">Fator moderador da taxa de juros:</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" value="{{ cliente.fator_juros }}" id="fator_juros" readonly>
-                                <span class="input-group-text">%</span>
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                            <table class="plano-table table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Código</th>
+                                        <th>Nome do Plano</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- O JS preencherá esta parte -->
+                                </tbody>
+                            </table>
+
+                            <!-- Paginação para instalações -->
+                            <div id="instalacao-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="instalacao-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="instalacao-pageInfo" class="align-self-center"></span>
+                                <button id="instalacao-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Estado:</label>
-                            <input type="text" class="form-control status-ativo" value="{{ cliente.estado_atual }}" id="estado_atual" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Tipo Cobrança:</label>
-                            <input type="text" class="form-control status-ativo" value="{{ cliente.cobranca_tipo }}" id="cobranca_tipo" readonly>
-                        </div>
-                        
-                        <div class="col-md-3">
-                            <label class="form-label">Data:</label>
-                            <input type="text" class="form-control" value="{{ cliente.data_estado }}" id="data_estado" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Plano:</label>
-                            <input type="text" class="form-control" value="{{ cliente.plano_nome }}" id="plano_nome" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Dia Vencimento:</label>
-                            <input type="text" class="form-control" value="{{ cliente.dia_vencimento }}" id="dia_vencimento" readonly>
+
+                            <!-- Botões de ação -->
+                            <div class="container mt-5 mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
+                                            <i class="bi bi-diagram-2"></i> Vincular Plano
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
+                                            <i class="bi bi-plus-circle me-2"></i> Criar Plano
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularInstalacaoModal">
+                                            <i class="bi bi-trash me-2"></i> Desvincular Plano
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>-->
-        <!-- Seção de Instalações Associadas -->
-<div class="card mb-2">
-    <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#instalacaoCollapse">
-        <h5 class="mb-0">Instalações Associadas ao Cliente</h5>
-    </div>
-    <div class="collapse" id="instalacaoCollapse">
-        <div class="card-body">
-            <div class="row g-2">
-                <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
-                    <table class="instalacao-table table table-striped table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Código</th>
-                                <th>Endereço</th>
-                                <th>Bairro</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- O JS preencherá esta parte -->
-                        </tbody>
-                    </table>
-
-                    <!-- Paginação para instalações -->
-                    <div id="instalacao-pagination" class="d-flex justify-content-center mt-3">
-                        <button id="instalacao-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
-                        <span id="instalacao-pageInfo" class="align-self-center"></span>
-                        <button id="instalacao-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
-                    </div>
-
-                    <!-- Botões de ação -->
-                    <div class="container mt-5 mb-4">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
-                                    <i class="bi bi-diagram-2"></i> Vincular Instalação
-                                </button>
-                            </div>
-
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
-                                    <i class="bi bi-plus-circle me-2"></i> Criar Instalação
-                                </button>
-                            </div>
-
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularInstalacaoModal">
-                                    <i class="bi bi-trash me-2"></i> Desvincular Instalação
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
-    </div>
-</div>
+
+        
+        <!-- Seção de Instalações Associadas -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#instalacaoCollapse">
+                <h5 class="mb-0">Instalações Associadas ao Cliente</h5>
+            </div>
+            <div class="collapse" id="instalacaoCollapse">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                            <table class="instalacao-table table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Código</th>
+                                        <th>Endereço</th>
+                                        <th>Bairro</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- O JS preencherá esta parte -->
+                                </tbody>
+                            </table>
+
+                            <!-- Paginação para instalações -->
+                            <div id="instalacao-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="instalacao-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="instalacao-pageInfo" class="align-self-center"></span>
+                                <button id="instalacao-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                            </div>
+
+                            <!-- Botões de ação -->
+                            <div class="container mt-5 mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
+                                            <i class="bi bi-diagram-2"></i> Vincular Instalação
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
+                                            <i class="bi bi-plus-circle me-2"></i> Criar Instalação
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularInstalacaoModal">
+                                            <i class="bi bi-trash me-2"></i> Desvincular Instalação
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         
         <!-- Other Details Section -->

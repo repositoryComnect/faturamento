@@ -53,7 +53,10 @@ def delete_contrato():
         if not numero:
             return jsonify({'error': True, 'message': 'Número do contrato não foi informado'}), 400
 
-        contrato = db.session.execute(text("SELECT id, numero FROM contratos WHERE numero = :numero"), {'numero': numero}).fetchone()
+        contrato = db.session.execute(
+            text("SELECT id, numero FROM contratos WHERE numero = :numero"),
+            {'numero': numero}
+        ).fetchone()
 
         if not contrato:
             return jsonify({'error': True, 'message': f'Contrato {numero} não encontrado'}), 404
@@ -61,7 +64,11 @@ def delete_contrato():
         contrato_id = contrato[0]
 
         if action == 'check':
-            count = db.session.execute(text("SELECT COUNT(*) FROM cliente_contrato WHERE contrato_id = :id"), {'id': contrato_id}).scalar()
+            count = db.session.execute(
+                text("SELECT COUNT(*) FROM cliente_contrato WHERE contrato_id = :id"),
+                {'id': contrato_id}
+            ).scalar()
+
             return jsonify({
                 'success': True,
                 'hasClients': count > 0,
@@ -74,24 +81,29 @@ def delete_contrato():
             })
 
         elif action == 'unlink':
-            # Excluindo dependências primeiro
+            # Desvincula todas as relações antes da inativação
             db.session.execute(text("DELETE FROM cliente_contrato WHERE contrato_id = :id"), {'id': contrato_id})
             db.session.execute(text("DELETE FROM contrato_plano WHERE contrato_id = :id"), {'id': contrato_id})
             db.session.execute(text("DELETE FROM contratos_produtos WHERE contrato_id = :id"), {'id': contrato_id})
             db.session.commit()
+
             return jsonify({'success': True, 'message': f'Contrato {numero} desvinculado com sucesso'})
 
         elif action == 'delete':
-            # Excluindo dependências primeiro
+            # Soft delete: primeiro desvincula e depois arquiva
             db.session.execute(text("DELETE FROM cliente_contrato WHERE contrato_id = :id"), {'id': contrato_id})
             db.session.execute(text("DELETE FROM contrato_plano WHERE contrato_id = :id"), {'id': contrato_id})
             db.session.execute(text("DELETE FROM contratos_produtos WHERE contrato_id = :id"), {'id': contrato_id})
 
-            # Agora, excluindo o contrato
-            db.session.execute(text("DELETE FROM contratos WHERE id = :id"), {'id': contrato_id})
+            # Em vez de deletar o contrato, apenas altera o estado
+            db.session.execute(
+                text("UPDATE contratos SET estado_contrato = 'Arquivado' WHERE id = :id"),
+                {'id': contrato_id}
+            )
+
             db.session.commit()
 
-            return jsonify({'success': True, 'message': f'Contrato {numero} excluído com sucesso'})
+            return jsonify({'success': True, 'message': f'Contrato {numero} arquivado com sucesso'})
 
         return jsonify({'error': True, 'message': 'Ação inválida'}), 400
 
@@ -176,7 +188,7 @@ def alterar_contrato():
         contato = request.form.get('contact')
         email = request.form.get('email_edit_contract')
         telefone = request.form.get('phone')
-        cep = request.form.get('cep')
+        cep = request.form.get('zip_code_edit')
         endereco = request.form.get('address')
         complemento = request.form.get('complement')
         bairro = request.form.get('neighborhood')
@@ -395,8 +407,6 @@ def buscar_contrato_por_numero(numero):
     except Exception as e:
         print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
         return jsonify({'error': 'Erro ao processar a requisição'}), 500
-
-
 
 @contratos_bp.route('/set_contrato', methods=['POST'])
 def set_contrato():
@@ -884,7 +894,6 @@ def contratos_ativos():
     ]
     
     return jsonify(resultado)
-
 
 @contratos_bp.route('/set/cliente/contrato', methods=['POST'])
 def set_cliente_popup_contrato():

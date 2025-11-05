@@ -5,6 +5,41 @@ from datetime import datetime
 # Inicializa o db, que será importado no app.py
 db = SQLAlchemy()
 
+# Tabela associativa N:N entre Cliente e Contrato
+cliente_contrato = db.Table(
+    'cliente_contrato',
+    db.Column('cliente_id', db.Integer, db.ForeignKey('clientes.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id', ondelete='CASCADE'), primary_key=True)
+)
+
+contrato_plano = db.Table(
+    'contrato_plano',
+    db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('plano_id', db.Integer, db.ForeignKey('planos.id', ondelete='CASCADE'), primary_key=True)
+)
+
+# Associação Cliente <-> Plano
+cliente_plano = db.Table(
+    'cliente_plano',
+    db.Column('cliente_id', db.Integer, db.ForeignKey('clientes.id'), primary_key=True),
+    db.Column('plano_id', db.Integer, db.ForeignKey('planos.id'), primary_key=True)
+)
+
+# Associação Cliente <-> Produto
+cliente_produto = db.Table(
+    'cliente_produto',
+    db.Column('cliente_id', db.Integer, db.ForeignKey('clientes.id'), primary_key=True),
+    db.Column('produto_id', db.Integer, db.ForeignKey('produtos.id'), primary_key=True)
+)
+
+
+# Enumerations
+tipo_agrupamento_enum = ('contrato', 'produto', 'cliente', 'instalacao', 'cnpj')
+tipo_faturamento_enum = (
+    'individual_contrato', 'individual_cliente', 'individual_instalacao',
+    'agrupado_contrato', 'agrupado_produto', 'agrupado_grupo_faturamento'
+)
+status_fatura_enum = ('pendente', 'pago', 'cancelado')
 
 class Empresa(db.Model):
     __tablename__ = 'empresa'
@@ -27,19 +62,6 @@ class Empresa(db.Model):
     email = db.Column(db.String(50))
     telefone = db.Column(db.String(15))  # telefone
     status = db.Column(db.String(10))
-
-# Tabela associativa N:N entre Cliente e Contrato
-cliente_contrato = db.Table(
-    'cliente_contrato',
-    db.Column('cliente_id', db.Integer, db.ForeignKey('clientes.id', ondelete='CASCADE'), primary_key=True),
-    db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id', ondelete='CASCADE'), primary_key=True)
-)
-
-contrato_plano = db.Table(
-    'contrato_plano',
-    db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id', ondelete='CASCADE'), primary_key=True),
-    db.Column('plano_id', db.Integer, db.ForeignKey('planos.id', ondelete='CASCADE'), primary_key=True)
-)
 
 class User(db.Model, UserMixin):
     __tablename__ = 'usuarios'
@@ -178,6 +200,23 @@ class Cliente(db.Model):
         back_populates='clientes',
         lazy=True
     )
+
+    # Relacionamento N:N com Plano
+    planos = db.relationship(
+        'Plano',
+        secondary=cliente_plano,
+        back_populates='clientes',
+        lazy=True
+    )
+
+    # Relacionamento N:N com Produto
+    produtos = db.relationship(
+        'Produto',
+        secondary=cliente_produto,
+        back_populates='clientes',
+        lazy=True
+    )
+
     instalacoes = db.relationship('Instalacao', back_populates='cliente', lazy=True)
 
 class Produto(db.Model):
@@ -199,6 +238,12 @@ class Produto(db.Model):
     contratos = db.relationship(
         'Contrato',
         secondary='contratos_produtos',
+        back_populates='produtos'
+    )
+
+    clientes = db.relationship(
+        'Cliente',
+        secondary=cliente_produto,
         back_populates='produtos'
     )
 
@@ -392,19 +437,16 @@ class Plano(db.Model):
         back_populates='planos',
         lazy=True
     )
+
+    clientes = db.relationship(
+        'Cliente',
+        secondary=cliente_plano,
+        back_populates='planos'
+    )
     
     def __repr__(self):
         return f'<Plano {self.codigo} - {self.nome}>'
     
-
-# Enumerations
-tipo_agrupamento_enum = ('contrato', 'produto', 'cliente', 'instalacao', 'cnpj')
-tipo_faturamento_enum = (
-    'individual_contrato', 'individual_cliente', 'individual_instalacao',
-    'agrupado_contrato', 'agrupado_produto', 'agrupado_grupo_faturamento'
-)
-status_fatura_enum = ('pendente', 'pago', 'cancelado')
-
 class FaturamentoGrupo(db.Model):
     __tablename__ = 'faturamento_grupo'
     id = db.Column(db.Integer, primary_key=True)

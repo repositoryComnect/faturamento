@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from application.models.models import db, Plano, Contrato, Produto
+from application.models.models import db, Plano, Contrato, Produto, Cliente
 from sqlalchemy import text
 from datetime import datetime
 import re
@@ -42,7 +42,6 @@ def get_planos():
         total=total,
         pagination=pagination  # <-- ENVIA PARA O TEMPLATE
     )
-
 
 @planos_bp.route('/insert/planos', methods=['POST'])
 def insert_planos():
@@ -124,7 +123,6 @@ def insert_planos():
             'message': f'Erro ao criar plano: {str(e)}'
         }), 500
 
-
 @planos_bp.route('/contratos_ativos', methods=['GET'])
 def contratos_ativos():
     empresa_id = session.get('empresa')
@@ -142,6 +140,22 @@ def contratos_ativos():
     
     return jsonify(resultado)
 
+@planos_bp.route('/clientes_ativos_planos', methods=['GET'])
+def clientes_ativos_planos():
+    empresa_id = session.get('empresa')
+
+    if not empresa_id:
+        return jsonify({'erro': 'Empresa não definida na sessão'}), 401
+
+    # Filtra os contratos da empresa logada
+    clientes = Cliente.query.filter_by(empresa_id=empresa_id).order_by(Cliente.sequencia).all()
+
+    resultado = [
+        {'id': c.id, 'sequencia': c.sequencia, 'razao_social': c.razao_social}
+        for c in clientes
+    ]
+    
+    return jsonify(resultado)
 
 @planos_bp.route('/get/id/planos', methods=['GET'])
 def get_list_planos():
