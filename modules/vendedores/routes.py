@@ -1,4 +1,4 @@
-from flask import render_template, Blueprint, jsonify, request, redirect, url_for
+from flask import render_template, Blueprint, jsonify, request, redirect, url_for, session
 from application.models.models import  db, Vendedor
 from sqlalchemy import text
 from datetime import datetime
@@ -9,6 +9,7 @@ vendedores_bp = Blueprint('vendedores_bp', __name__)
 
 @vendedores_bp.route('/insert/vendedores', methods=['POST'])
 def insert_vendedores():
+    empresa_id = session.get('empresa')
     try:
         revenda_data = {
             'codigo': request.form.get('codigo'),
@@ -16,7 +17,8 @@ def insert_vendedores():
             'cpf': request.form.get('cpf_vendedor'),
             'telefone': request.form.get('telefone_vendedor'),
             'email': request.form.get('email_vendedor'),
-            'ativo': request.form.get('status') == '1'
+            'ativo': request.form.get('status') == '1',
+            'empresa_id' : empresa_id
         }
 
         novo_vendedor = Vendedor(**revenda_data)

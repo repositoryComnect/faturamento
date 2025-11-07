@@ -10,7 +10,16 @@ cliente_bp = Blueprint('cliente_bp', __name__)
 def buscar_cliente_por_contrato(sequencia):
     empresa_id = session.get('empresa')
     try:
-        cliente = Cliente.query.filter_by(sequencia=sequencia, empresa_id=empresa_id).first()
+        cliente = (
+            Cliente.query
+            .filter(
+                Cliente.sequencia == sequencia,
+                Cliente.empresa_id == empresa_id,
+                Cliente.estado_atual != 'Arquivado'
+            )
+            .first()
+        )
+
         if not cliente:
             return jsonify({'error': f'Cliente {sequencia} não encontrado'}), 404
 
@@ -183,7 +192,7 @@ def delete_cliente():
         elif action == 'delete':
             # Remove o cliente
             db.session.execute(
-                text("DELETE FROM clientes WHERE id = :cliente_id"),
+                text("UPDATE clientes SET estado_atual = 'Arquivado' WHERE id = :cliente_id"),
                 {'cliente_id': cliente_id}
             )
             db.session.commit()

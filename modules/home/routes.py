@@ -26,7 +26,15 @@ def render_contratos():
 def render_clientes():
     empresa_id = session.get('empresa')
     try:
-        cliente = Cliente.query.filter_by(empresa_id=empresa_id).first()        
+        cliente = (
+            Cliente.query
+            .filter(
+                Cliente.empresa_id == empresa_id,
+                Cliente.estado_atual != 'Arquivado'
+            )
+            .first()
+        )
+      
         if cliente:
             return render_template('clientes.html', cliente=cliente)
         else:

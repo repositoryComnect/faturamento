@@ -341,11 +341,9 @@ def buscar_contrato_por_numero(numero):
             'id_matriz_portal': contrato.id_matriz_portal or None,
             'email': contrato.email or None,
             'telefone': contrato.telefone or None,
-            'responsavel': contrato.responsavel or None,
             'cep': contrato.cep or None,
             'cnpj_cpf': contrato.cnpj_cpf or None,
 
-            # 👇 Aqui o tratamento direto no backend
             'revenda': contrato.revenda if contrato.revenda not in (None, "", "null") else "Não possui revenda",
             'vendedor': contrato.vendedor if contrato.vendedor not in (None, "", "null") else "Não possui vendedor",
 
@@ -1011,3 +1009,112 @@ def set_cliente_popup_contrato():
         db.session.rollback()
         flash("Ocorreu um erro ao criar o cliente. Por favor, tente novamente.", "error")
         return redirect(request.referrer or url_for('home_bp.render_contratos'))
+    
+
+
+@contratos_bp.route('/contratos/buscar-por-numero-listagem/<numero>', methods=['GET'])
+def buscar_contrato_listagem(numero):
+    empresa_id = session.get('empresa')
+    if not empresa_id:
+        return jsonify({'error': 'Empresa não selecionada'}), 400
+
+    def safe_float(value, default=None):
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            return default
+
+    try:
+        contrato = Contrato.query.filter_by(numero=numero, empresa_id=empresa_id).first()
+        if not contrato:
+            return jsonify({'error': f'Contrato {numero} não encontrado'}), 404
+
+        data = {
+            'id': contrato.id,
+            'numero': contrato.numero,
+            'razao_social': contrato.razao_social or None,
+            'nome_fantasia': contrato.nome_fantasia or None,
+            'atualizacao': contrato.atualizacao,
+            'cadastramento': contrato.cadastramento,
+            'tipo': contrato.tipo or None,
+            'contato': contrato.contato or None,
+            'id_matriz_portal': contrato.id_matriz_portal or None,
+            'email': contrato.email or None,
+            'telefone': contrato.telefone or None,
+            
+            'cep': contrato.cep or None,
+            'cnpj_cpf': contrato.cnpj_cpf or None,
+
+            'revenda': contrato.revenda if contrato.revenda not in (None, "", "null") else "Não possui revenda",
+            'vendedor': contrato.vendedor if contrato.vendedor not in (None, "", "null") else "Não possui vendedor",
+
+            'endereco': contrato.endereco or None,
+            'complemento': contrato.complemento or None,
+            'bairro': contrato.bairro or None,
+            'cidade': contrato.cidade or None,
+            'estado': contrato.estado or None,
+            'dia_vencimento': contrato.dia_vencimento or None,
+            'fator_juros': safe_float(contrato.fator_juros),
+            'contrato_revenda': contrato.contrato_revenda or None,
+            'faturamento_contrato': contrato.faturamento_contrato or None,
+            'estado_contrato': contrato.estado_contrato or None,
+            'data_estado': contrato.data_estado,
+            'motivo_estado': contrato.motivo_estado or None,
+        }
+
+        # --- Clientes associados ---
+        data['clientes'] = []
+        if hasattr(contrato, 'clientes') and contrato.clientes:
+            for c in contrato.clientes:
+                data['clientes'].append({
+                    'nome_fantasia': c.nome_fantasia or None,
+                    'razao_social': c.razao_social or None,
+                    'cnpj_cpf': c.cnpj_cpf or None,
+                    'atividade': c.atividade or None,
+                    'cidade': c.cidade or None,
+                    'estado_atual': c.estado_atual or None,
+                    'numero_contrato_cadastrado': c.numero_contrato or None
+                })
+
+        # --- Planos associados ---
+        data['planos'] = []
+        if hasattr(contrato, 'planos') and contrato.planos:
+            for p in contrato.planos:
+                data['planos'].append({
+                    'id': p.id,
+                    'codigo': p.codigo,
+                    'nome': p.nome,
+                    'valor': safe_float(p.valor, 0.00)
+                })
+
+        # --- Produtos associados (ajustado para o template) ---
+        class ProdutoAssoc:
+            def __init__(self, produto, quantidade, valor_unitario):
+                self.produto = produto
+                self.quantidade = quantidade
+                self.valor_unitario = valor_unitario
+
+        data['produtos_associados'] = []
+        associacoes = ContratoProduto.query.filter_by(contrato_id=contrato.id).all()
+        for assoc in associacoes:
+            produto = Produto.query.get(assoc.produto_id)
+            if produto:
+                data['produtos_associados'].append(
+                    ProdutoAssoc(
+                        produto=produto,
+                        quantidade=assoc.quantidade or 0,
+                        valor_unitario=safe_float(produto.preco_base, 0.00)
+                    )
+                )
+
+        # Renderiza template
+        return render_template(
+            'contratos.html',
+            contrato=data,
+            clientes=data['clientes']
+        )
+
+    except Exception as e:
+        print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
+        return jsonify({'error': 'Erro ao processar a requisição'}), 500
+

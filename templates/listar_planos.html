@@ -11,7 +11,7 @@
     <a href="{{ url_for('home_bp.render_planos') }}" class="btn btn-primary btn-voltar">Voltar</a>       
 </div>
 
-<div class="container">
+<div class="container-fluid">
     <!-- Centralizar título -->
     <div class="d-flex justify-content-center align-items-center mb-3">
         <h2 class="text-center">Lista de Planos</h2>
@@ -42,7 +42,7 @@
                 <tbody>
                     {% for plano in planos %}
                     <tr>
-                        <td>{{ plano.codigo }}</td>
+                        <td><a href="">{{ plano.codigo }}</a></td>
                         <td>{{ plano.nome }}</td>
                         <td>{{ plano.valor }}</td>
                         <td>{{ plano.id_portal }}</td>

@@ -11,7 +11,7 @@
 <div class="voltar-wrapper">
     <a href="{{ url_for('home_bp.render_contratos') }}" class="btn btn-primary btn-voltar">Voltar</a>       
 </div>
-<div class="container ">
+<div class="container-fluid ">
     <div class="d-flex justify-content-center align-items-center mb-3">
         <h2 class="text-center">Lista de Contratos</h2>
     </div>
@@ -24,7 +24,7 @@
         <div class="table-responsive">
             <table class="table table-bordered table-striped align-middle">
                 <thead class="table-light">
-                    <tr>
+                    <tr class="text-center">
                         <th>Contrato</th>
                         <th>Cadastramento</th>
                         <th>Atualização</th>
@@ -42,7 +42,7 @@
                 <tbody>
                     {% for contrato in contratos %}
                         <tr>
-                            <td>{{ contrato.numero }}</td>
+                            <td><a href="{{ url_for('contratos_bp.buscar_contrato_listagem', numero=contrato.numero) }}">{{ contrato.numero }}</a></td>
                             <td>{{ contrato.cadastramento.strftime('%d/%m/%Y') if contrato.cadastramento else 'N/A' }}</td>
                             <td>{{ contrato.atualizacao.strftime('%d/%m/%Y %H:%M') if contrato.atualizacao else 'N/A' }}</td>
                             <td>{{ contrato.tipo }}</td>
@@ -54,7 +54,16 @@
                             <td>{{ contrato.endereco }}</td>
                             <td>{{ contrato.cidade }}</td>
                             <td>
-                                <span class="badge {% if contrato.estado_contrato == 'Ativo' %}bg-success{% else %}bg-danger{% endif %}">
+                                <span class="badge 
+                                    {% if contrato.estado_contrato == 'Ativo' %}
+                                        bg-success
+                                    {% elif contrato.estado_contrato == 'Suspenso' %}
+                                        bg-warning text-dark
+                                    {% elif contrato.estado_contrato == 'Arquivado' %}
+                                        bg-orange text-white
+                                    {% else %}
+                                        bg-danger
+                                    {% endif %}">
                                     {{ contrato.estado_contrato or 'N/A' }}
                                 </span>
                             </td>
@@ -101,5 +110,6 @@
 {% endblock %}
 
 {% block scripts %}
-<!-- scripts adicionais se necessário -->
+
+
 {% endblock %}

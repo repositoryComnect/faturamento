@@ -19,7 +19,7 @@
         {% endif %}
     {% endwith %}
     
-    <div class="container mt-5 mb-4">
+    <div class="container-fluid mt-5 mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <h2>Clientes</h2>
             <div class="d-flex gap-2"> <!-- Adicionei a classe gap-2 para espaçamento uniforme -->
@@ -51,6 +51,8 @@
                 Nenhum cliente encontrado. Por favor, crie um novo cliente ou selecione um existente.
             </div>
         {% else %}
+
+
         <!-- Basic Information Card -->
         <div class="card mb-2">
             <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" aria-controls="basicInfoCollapse">
@@ -212,29 +214,29 @@
                             </table>
 
                             <!-- Paginação para instalações -->
-                            <div id="instalacao-pagination" class="d-flex justify-content-center mt-3">
-                                <button id="instalacao-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
-                                <span id="instalacao-pageInfo" class="align-self-center"></span>
-                                <button id="instalacao-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                            <div id="plano-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="plano-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="plano-pageInfo" class="align-self-center"></span>
+                                <button id="plano-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
                             </div>
 
                             <!-- Botões de ação -->
                             <div class="container mt-5 mb-4">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularPlanoModal">
                                             <i class="bi bi-diagram-2"></i> Vincular Plano
                                         </button>
                                     </div>
 
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPlanoModal">
                                             <i class="bi bi-plus-circle me-2"></i> Criar Plano
                                         </button>
                                     </div>
 
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularInstalacaoModal">
+                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularPlanoModal">
                                             <i class="bi bi-trash me-2"></i> Desvincular Plano
                                         </button>
                                     </div>
@@ -297,6 +299,67 @@
                                     <div class="d-flex gap-2">
                                         <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularInstalacaoModal">
                                             <i class="bi bi-trash me-2"></i> Desvincular Instalação
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+                <!-- Seção de Planos Associadas -->
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#produtosCollapse">
+                <h5 class="mb-0">Produtos Associadas ao Cliente</h5>
+            </div>
+            <div class="collapse" id="produtosCollapse">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                            <table class="produto-table table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nome do Produto</th>
+                                        <th>Descrição</th>
+                                        <th>Quantidade</th>
+                                        <th>Preço Unitário</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- O JS preencherá esta parte -->
+                                </tbody>
+                            </table>
+
+                            <!-- Paginação para instalações -->
+                            <div id="produto-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="produto-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="produto-pageInfo" class="align-self-center"></span>
+                                <button id="produto-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                            </div>
+
+                            <!-- Botões de ação -->
+                            <div class="container mt-5 mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularProdutoModal">
+                                            <i class="bi bi-diagram-2"></i> Vincular Produto
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProdutoModal">
+                                            <i class="bi bi-plus-circle me-2"></i> Criar Produto
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex gap-2">
+                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularProdutoModal">
+                                            <i class="bi bi-trash me-2"></i> Desvincular Produto
                                         </button>
                                     </div>
                                 </div>

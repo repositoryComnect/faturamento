@@ -256,7 +256,6 @@ class Contrato(db.Model):
     atualizacao = db.Column(db.Date)
     tipo = db.Column(db.String(50))
     id_matriz_portal = db.Column(db.String(50))
-    responsavel = db.Column(db.String(100))
     cnpj_cpf = db.Column(db.String(20))
     tipo_pessoa = db.Column(db.String(40))
     revenda = db.Column(db.String(50))

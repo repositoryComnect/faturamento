@@ -10,7 +10,7 @@
 <div class="voltar-wrapper">
     <a href="{{ url_for('home_bp.render_vendedores') }}" class="btn btn-primary btn-voltar">Voltar</a>       
 </div>
-<div class="container">
+<div class="container-fluid">
     <!-- Centralização do título -->
     <div class="d-flex justify-content-center align-items-center mb-3">
         <h2 class="text-center">Lista de Vendedores</h2>
@@ -42,7 +42,7 @@
                 <tbody>
                     {% for vendedor in vendedores %}
                     <tr>
-                        <td>{{ vendedor.codigo }}</td>
+                        <td><a href="">{{ vendedor.codigo }}</a></td>
                         <td>{{ vendedor.nome }}</td>
                         <td>{{ vendedor.cpf }}</td>
                         <td>{{ vendedor.telefone }}</td>

@@ -12,7 +12,7 @@
     <a href="{{ url_for('home_bp.render_clientes') }}" class="btn btn-primary btn-voltar">Voltar</a>
 </div>
 
-<div class="container">
+<div class="container-fluid">
     <div class="d-flex justify-content-center align-items-center mb-3">
         <h2 class="text-center">Lista de Clientes</h2>
     </div>
@@ -25,7 +25,7 @@
         <div class="table-responsive">
             <table class="table table-bordered table-striped align-middle">
                 <thead class="table-light">
-                    <tr>
+                    <tr class="text-center">
                         <th>Sequência</th>
                         <th>Cadastramento</th>
                         <th>Atualização</th>
@@ -34,7 +34,7 @@
                         <th>Contato</th>
                         <th>Email</th>
                         <th>Telefone</th>
-                        <th>CNPJ</th>
+                        <th>CNPJ/CPF</th>
                         <th>Revenda</th>
                         <th>Vendedor</th>
                         <th>Serviço</th>
@@ -47,15 +47,22 @@
                 <tbody>
                     {% for cliente in clientes %}
                     <tr>
-                        <td>{{ cliente.sequencia }}</td>
+                        <td><a href="">{{ cliente.sequencia }}</a></td>
                         <td>{{ cliente.cadastramento.strftime('%d/%m/%Y') if cliente.cadastramento else 'N/A' }}</td>
                         <td>{{ cliente.atualizacao.strftime('%d/%m/%Y %H:%M') if cliente.atualizacao else 'N/A' }}</td>
                         <td>{{ cliente.razao_social }}</td>
                         <td>{{ cliente.nome_fantasia }}</td>
                         <td>{{ cliente.contato_principal }}</td>
                         <td>{{ cliente.email }}</td>
-                        <td>{{ cliente.telefone }}</td>
-                        <td>{{ cliente.cnpj }}</td>
+                        <td>
+                            {% if cliente.telefone and cliente.telefone|length >= 10 %}
+                                ({{ cliente.telefone[:2] }}){{ cliente.telefone[2:7] }}-{{ cliente.telefone[7:] }}
+                            {% else %}
+                                {{ cliente.telefone or 'N/A' }}
+                            {% endif %}
+                        </td>
+
+                        <td>{{ cliente.cnpj_cpf }}</td>
                         <td>{{ cliente.revenda_nome }}</td>
                         <td>{{ cliente.vendedor_nome }}</td>
                         <td>{{ cliente.tipo_servico }}</td>
@@ -63,8 +70,18 @@
                         <td>{{ cliente.endereco }}</td>
                         <td>{{ cliente.cidade }}</td>
                         <td>
-                            <span class="badge {% if cliente.estado_atual == 'Ativo' %}bg-success{% else %}bg-danger{% endif %}">
-                                {{ cliente.estado_atual or 'N/A' }}
+                                <span class="badge 
+                                    {% if cliente.estado_atual == 'Ativo' %}
+                                        bg-success
+                                    {% elif cliente.estado_atual == 'Suspenso' %}
+                                        bg-warning text-dark
+                                    {% elif cliente.estado_atual == 'Arquivado' %}
+                                        bg-orange text-white
+                                    {% else %}
+                                        bg-danger
+                                    {% endif %}">
+                                    {{ cliente.estado_atual or 'N/A' }}
+                                </span>
                             </span>
                         </td>
                     </tr>

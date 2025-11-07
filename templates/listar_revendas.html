@@ -11,7 +11,7 @@
     <a href="{{ url_for('home_bp.render_revendas') }}" class="btn btn-primary btn-voltar">Voltar</a>       
 </div>
 
-<div class="container">
+<div class="container-fluid">
     <!-- Centralizar título -->
     <div class="d-flex justify-content-center align-items-center mb-3">
         <h2 class="text-center">Lista de Revendas</h2>
@@ -30,7 +30,7 @@
         <div class="table-responsive">
             <table class="table table-bordered table-striped align-middle">
                 <thead class="table-light">
-                    <tr>
+                    <tr class="text-center">
                         <th>Código</th>
                         <th>Nome Revenda</th>
                         <th>ID Portal</th>
@@ -48,18 +48,44 @@
                 <tbody>
                     {% for revenda in revendas %}
                     <tr>
-                        <td>{{ revenda.codigo }}</td>
+                        <td><a href="">{{ revenda.codigo }}</a></td>
                         <td>{{ revenda.nome }}</td>
                         <td>{{ revenda.id_conta }}</td>
                         <td>{{ revenda.tipo_conta }}</td>
                         <td>{{ revenda.cnpj }}</td>
-                        <td>{{ revenda.telefone }}</td>
+                            <td>
+                            {% if revenda.telefone and revenda.telefone|length >= 10 %}
+                                ({{ revenda.telefone[:2] }}){{ revenda.telefone[2:7] }}-{{ revenda.telefone[7:] }}
+                            {% else %}
+                                {{ revenda.telefone or 'N/A' }}
+                            {% endif %}
+                            </td>
                         <td>{{ revenda.email }}</td>
-                        <td>{{ revenda.cep }}</td>
+                            <td>
+                            {% if revenda.cep and revenda.cep|length >= 7 %}
+                                {{ revenda.cep[:4] }}-{{ revenda.cep[4:7] }}
+                            {% else %}
+                                {{ revenda.cep or 'N/A' }}
+                            {% endif %}
+                            </td>
+                        
                         <td>{{ revenda.endereco }}</td>
                         <td>{{ revenda.bairro }}</td>
                         <td>{{ revenda.cidade }}</td>
-                        <td>{{ revenda.status }}</td>
+                        <td>
+                            <span class="badge 
+                                    {% if revenda.status == 'Ativo' %}
+                                        bg-success
+                                    {% elif revenda.status == 'Suspenso' %}
+                                        bg-warning text-dark
+                                    {% elif revenda.status == 'Arquivado' %}
+                                        bg-orange text-white
+                                    {% else %}
+                                        bg-danger
+                                    {% endif %}">
+                                    {{ revenda.status or 'N/A' }}
+                                </span>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
