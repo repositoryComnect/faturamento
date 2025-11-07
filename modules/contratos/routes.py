@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, jsonify,
 from application.models.models import Contrato, db, Cliente, Produto, Plano, ContratoProduto, Revenda, cliente_contrato
 from datetime import datetime, date
 from sqlalchemy import text
+from modules.contratos.utils import formatar_telefone, safe_float, safe_date, parse_date
 import re
 
 contratos_bp = Blueprint('contratos_bp', __name__)
@@ -311,18 +312,6 @@ def buscar_contrato_por_numero(numero):
     empresa_id = session.get('empresa')
     if not empresa_id:
         return jsonify({'error': 'Empresa não selecionada'}), 400
-
-    def safe_float(value, default=None):
-        try:
-            return float(value)
-        except (ValueError, TypeError):
-            return default
-
-    def safe_date(value):
-        try:
-            return value.strftime('%d/%m/%Y') if value else None
-        except Exception:
-            return None
 
     try:
         contrato = Contrato.query.filter_by(numero=numero, empresa_id=empresa_id).first()
@@ -895,19 +884,6 @@ def contratos_ativos():
 
 @contratos_bp.route('/set/cliente/contrato', methods=['POST'])
 def set_cliente_popup_contrato():
-    def parse_date(date_str):
-            if not date_str:
-                return None
-            try:
-                for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
-                    try:
-                        return datetime.strptime(date_str, fmt).date()
-                    except ValueError:
-                        continue
-                return None
-            except Exception:
-                return None
-
     try:
         # Iniciar transação (equivalente ao BEGIN TRANSACTION)
         db.session.begin()
@@ -954,8 +930,6 @@ def set_cliente_popup_contrato():
             'observacao': request.form.get('cliente_observacao', '').strip(),
             'empresa_id': session.get('empresa')
         }
-
-
 
         novo_cliente = Cliente(**cliente_data)
         db.session.add(novo_cliente)
@@ -1010,20 +984,11 @@ def set_cliente_popup_contrato():
         flash("Ocorreu um erro ao criar o cliente. Por favor, tente novamente.", "error")
         return redirect(request.referrer or url_for('home_bp.render_contratos'))
     
-
-
 @contratos_bp.route('/contratos/buscar-por-numero-listagem/<numero>', methods=['GET'])
 def buscar_contrato_listagem(numero):
     empresa_id = session.get('empresa')
     if not empresa_id:
         return jsonify({'error': 'Empresa não selecionada'}), 400
-
-    def safe_float(value, default=None):
-        try:
-            return float(value)
-        except (ValueError, TypeError):
-            return default
-
     try:
         contrato = Contrato.query.filter_by(numero=numero, empresa_id=empresa_id).first()
         if not contrato:
@@ -1040,7 +1005,7 @@ def buscar_contrato_listagem(numero):
             'contato': contrato.contato or None,
             'id_matriz_portal': contrato.id_matriz_portal or None,
             'email': contrato.email or None,
-            'telefone': contrato.telefone or None,
+            'telefone': formatar_telefone(contrato.telefone) or None,
             
             'cep': contrato.cep or None,
             'cnpj_cpf': contrato.cnpj_cpf or None,
