@@ -84,7 +84,6 @@ def buscar_cliente_por_contrato(sequencia):
                 for inst in cliente.instalacoes
             ]
         }
-        print(data)
 
         return jsonify(data)
 

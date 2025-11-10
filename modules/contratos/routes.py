@@ -147,7 +147,6 @@ def buscar_contrato():
                 'telefone': contrato.telefone or None,
                 'tipo': contrato.tipo or None,
                 'id_matriz_portal': contrato.id_matriz_portal or None,
-                'responsavel': contrato.responsavel or None,
                 'zip_code_cep': contrato.cep or None,
                 'cnpj_cpf': contrato.cnpj_cpf or None,
                 'endereco': contrato.endereco or None,
@@ -623,7 +622,7 @@ def get_list_clientes():
         empresa_id=empresa_id
     ).order_by(Cliente.razao_social).all()
 
-    resultado = [{'id': c.id, 'razao_social': c.razao_social} for c in clientes]
+    resultado = [{'id': c.id, 'razao_social': c.razao_social, 'codigo': c.sequencia, 'cnpj_cpf': c.cnpj_cpf} for c in clientes]
     return jsonify(resultado)
 
 @contratos_bp.route('/vincular-clientes', methods=['POST'])
@@ -877,7 +876,7 @@ def contratos_ativos():
     contratos = Contrato.query.filter_by(empresa_id=empresa_id).order_by(Contrato.numero).all()
 
     resultado = [
-        {'id': c.id, 'numero': c.numero, 'razao_social': c.razao_social}
+        {'id': c.id, 'numero': c.numero, 'razao_social': c.razao_social, 'cnpj_cpf': c.cnpj_cpf}
         for c in contratos
     ]
     
@@ -889,7 +888,6 @@ def set_cliente_popup_contrato():
         # Iniciar transação (equivalente ao BEGIN TRANSACTION)
         db.session.begin()
 
-        # 1. Inserir o novo cliente (equivalente ao primeiro INSERT)
         cliente_data = {
             'numero_contrato': request.form.get('cliente_numero_contrato'),
             'sequencia': request.form.get('cliente_sequencia'),
@@ -934,9 +932,7 @@ def set_cliente_popup_contrato():
 
         novo_cliente = Cliente(**cliente_data)
         db.session.add(novo_cliente)
-        db.session.flush()  # Força o INSERT para obter o ID (equivalente ao seu SELECT do ID)
-
-        # 2. Obter o ID do cliente (já temos em novo_cliente.id)
+        db.session.flush()  
 
         # 3. Processar associação com contratos
         numeros_contratos = request.form.getlist('cliente_contratos_associados')

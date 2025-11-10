@@ -135,7 +135,6 @@
                 'id_matriz_portal': '#id_matriz_portal',
                 'email': '#email',
                 'telefone': '#telefone',
-                'responsavel': '#responsavel',
                 'code_residence': '#code_residence',
                 'cnpj_cpf': '#cnpjCPFContrato',
                 'revenda': '#revenda',
@@ -271,7 +270,6 @@
                             'id_matriz_portal': '#id_matriz_portal',
                             'address_email': '#address_email',
                             'telefone': '#phone',
-                            'responsavel': '#responsible',
                             'cep': '#cep',
                             'cnpj_cpf': '#cnpj_cpf',
                             'endereco': '#address',
@@ -374,7 +372,6 @@ function preencherCamposContrato(contrato) {
     document.getElementById("id_matriz_portal").value = contrato.id_matriz_portal || "";
     document.getElementById("email").value = contrato.email || "";
     document.getElementById("telefone").value = contrato.telefone || "";
-    document.getElementById("responsavel").value = contrato.responsavel || "";
     document.getElementById("cnpj").value = contrato.cnpj || contrato.cnpj_cpf || "";
     document.getElementById("tipo_pessoa").value = contrato.tipo_pessoa || "";
     document.getElementById("revenda").value =

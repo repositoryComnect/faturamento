@@ -1,18 +1,18 @@
-<!-- Modal de Listagem de Contratos -->
-<div class="modal fade" id="listarContratosModal" tabindex="-1" aria-labelledby="listarContratosModalLabel" aria-hidden="true">
+<!-- Modal de Listagem de Clientes -->
+<div class="modal fade" id="listarClientesModal" tabindex="-1" aria-labelledby="listarClientesModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header bg-secondary text-white">
-        <h5 class="modal-title" id="listarContratosModalLabel">Selecionar Contrato</h5>
+        <h5 class="modal-title" id="listarClientesModalLabel">Selecionar Cliente</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
       </div>
 
       <div class="modal-body">
         <div class="table-responsive">
-          <table class="table table-hover" id="contratosModalTable">
+          <table class="table table-hover" id="clientesModalTable">
             <thead>
               <tr>
-                <th>Código Contrato</th>
+                <th>Código Cliente</th>
                 <th>Razão Social</th>
                 <th>CPF/CNPJ</th>
                 <th>Ação</th>
@@ -20,13 +20,13 @@
             </thead>
             <tbody>
               <tr>
-                <td colspan="5" class="text-center text-muted">Carregando contratos...</td>
+                <td colspan="5" class="text-center text-muted">Carregando clientes...</td>
               </tr>
             </tbody>
           </table>
         </div>
         <nav>
-          <ul class="pagination justify-content-center" id="contratosModalPagination"></ul>
+          <ul class="pagination justify-content-center" id="clientesModalPagination"></ul>
         </nav>
       </div>
 
@@ -37,5 +37,5 @@
   </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_listar_contratos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/clientes/popup_js/popup_listar_clientes.js') }}"></script>
 

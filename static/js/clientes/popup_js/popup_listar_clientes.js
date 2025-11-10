@@ -1,47 +1,53 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const modal = document.getElementById('listarContratosModal');
-    const tbody = document.querySelector('#contratosModalTable tbody');
-    const pagination = document.getElementById('contratosModalPagination');
-    const inputContrato = document.getElementById('numeroContrato');
+    const modal = document.getElementById('listarClientesModal');
+    const tbody = document.querySelector('#clientesModalTable tbody');
+    const pagination = document.getElementById('clientesModalPagination');
+    const inputSequencia = document.getElementById('sequencia'); // campo de sequência do cliente
 
-    const perPage = 10; // contratos por página
-    let contratos = [];
+    const perPage = 10; // clientes por página
+    let clientes = [];
     let currentPage = 1;
     let totalPages = 1;
 
+    // Renderiza a tabela de clientes
     function renderTable() {
         tbody.innerHTML = '';
-        if (!contratos.length) {
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center text-muted">Nenhum contrato ativo encontrado</td></tr>`;
+        if (!clientes.length) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Nenhum cliente encontrado</td></tr>`;
             return;
         }
 
         const start = (currentPage - 1) * perPage;
         const end = start + perPage;
-        const pageContracts = contratos.slice(start, end);
+        const pageClients = clientes.slice(start, end);
 
-        pageContracts.forEach(contrato => {
+        pageClients.forEach(cliente => {
             const tr = document.createElement('tr');
 
-            const tdNumero = document.createElement('td');
-            tdNumero.innerText = contrato.numero;
-            tr.appendChild(tdNumero);
+            // Coluna: Código (sequência)
+            const tdSeq = document.createElement('td');
+            tdSeq.innerText = cliente.codigo || '';
+            tr.appendChild(tdSeq);
 
+            // Coluna: Razão Social
             const tdRazao = document.createElement('td');
-            tdRazao.innerText = contrato.razao_social;
+            tdRazao.innerText = cliente.razao_social || '';
             tr.appendChild(tdRazao);
 
-            const tdCnpjCpf = document.createElement('td');
-            tdCnpjCpf.innerText = contrato.cnpj_cpf;
-            tr.appendChild(tdCnpjCpf);
+            // Coluna: CNPJ/CPF
+            const tdCnpj = document.createElement('td');
+            tdCnpj.innerText = cliente.cnpj_cpf || '';
+            tr.appendChild(tdCnpj);
 
+            // Coluna: Ação
             const tdAcao = document.createElement('td');
             const btn = document.createElement('button');
             btn.classList.add('btn', 'btn-sm', 'btn-secondary');
             btn.innerText = 'Selecionar';
             btn.addEventListener('click', () => {
-                inputContrato.value = contrato.numero;
-                buscarDadosContrato(contrato.numero);
+                // Preenche o campo e busca os dados do cliente pela SEQUÊNCIA
+                inputSequencia.value = cliente.codigo;
+                buscarDadosCliente(cliente.codigo);
                 const modalInstance = bootstrap.Modal.getInstance(modal);
                 modalInstance.hide();
             });
@@ -54,9 +60,10 @@ document.addEventListener("DOMContentLoaded", function () {
         renderPagination();
     }
 
+    // Renderiza a paginação
     function renderPagination() {
         pagination.innerHTML = '';
-        totalPages = Math.ceil(contratos.length / perPage);
+        totalPages = Math.ceil(clientes.length / perPage);
 
         const createPageItem = (page, text = null, disabled = false, active = false) => {
             const li = document.createElement('li');
@@ -80,30 +87,32 @@ document.addEventListener("DOMContentLoaded", function () {
             return li;
         };
 
-        // Previous
         pagination.appendChild(createPageItem(currentPage - 1, 'Anterior', currentPage === 1));
 
-        // Pages
         for (let i = 1; i <= totalPages; i++) {
             pagination.appendChild(createPageItem(i, null, false, i === currentPage));
         }
 
-        // Next
         pagination.appendChild(createPageItem(currentPage + 1, 'Próximo', currentPage === totalPages));
     }
 
+    // Quando o modal for aberto
     modal.addEventListener('show.bs.modal', function () {
-        tbody.innerHTML = `<tr><td colspan="3" class="text-center">Carregando contratos...</td></tr>`;
-        fetch("/list/contratos_ativos")
-            .then(response => response.json())
+        tbody.innerHTML = `<tr><td colspan="4" class="text-center">Carregando clientes...</td></tr>`;
+
+        fetch("/get/list/clientes")
+            .then(response => {
+                if (!response.ok) throw new Error("Erro ao buscar clientes");
+                return response.json();
+            })
             .then(data => {
-                contratos = data;
+                clientes = data;
                 currentPage = 1;
                 renderTable();
             })
             .catch(error => {
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger">Erro ao carregar contratos</td></tr>`;
-                console.error("Erro ao carregar contratos:", error);
+                console.error("Erro ao carregar clientes:", error);
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Erro ao carregar clientes</td></tr>`;
             });
     });
 });

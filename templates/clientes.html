@@ -4,6 +4,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_clientes.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -60,19 +61,34 @@
             </div>
             <div class="collapse show" id="basicInfoCollapse">
                 <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-2">
-                            <label class="form-label">ID Cliente:</label>
-                            <input type="text" class="form-control" value="{{ cliente.sequencia }}" id="sequencia" onchange="buscarDadosCliente(this.value)">
-                            <div id="loadingCliente" class="input-group-text d-none">
-                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <label class="form-label">ID Cliente:</label>
+                            <div class="input-group">
+
+                                <input type="text" class="form-control" value="{{ cliente.sequencia }}" id="sequencia" onchange="buscarDadosCliente(this.value)">
+                                
+                                        <button class="btn btn-secondary" type="button" onclick="buscarDadosCliente(document.getElementById('sequencia').value)">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+
+
+                                        <!-- Botão de listagem para abrir modal -->
+                                        <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#listarClientesModal">
+                                            <i class="bi bi-card-list"></i>
+                                        </button>
+
+                                <div id="loadingCliente" class="input-group-text d-none">
+                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+
+                        <div class="col-md-2">
                             <label class="form-label">Razão Social:</label>
                             <input type="text" class="form-control" value="{{ cliente.razao_social }}" id="razao_social" readonly>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="form-label">Nome Fantasia:</label>
                             <input type="text" class="form-control" value="{{ cliente.nome_fantasia }}" id="nome_fantasia" readonly>
                         </div>
@@ -109,7 +125,7 @@
                             <input type="text" class="form-control" value="{{ cliente.email }}" id="email" readonly>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Fone:</label>
+                            <label class="form-label">Telefone:</label>
                             <input type="text" class="form-control" value="{{ cliente.telefone }}" id="telefone" readonly>
                         </div>
                     </div>
@@ -198,7 +214,7 @@
             <div class="collapse" id="planosCollapse">
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
                             <table class="plano-table table table-striped table-bordered">
                                 <thead>
                                     <tr>
@@ -258,7 +274,7 @@
             <div class="collapse" id="instalacaoCollapse">
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
                             <table class="instalacao-table table table-striped table-bordered">
                                 <thead>
                                     <tr>
@@ -319,7 +335,7 @@
             <div class="collapse" id="produtosCollapse">
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
                             <table class="produto-table table table-striped table-bordered">
                                 <thead>
                                     <tr>
@@ -394,10 +410,16 @@
     
 {% block scripts %}
     <script src="{{ url_for('static', filename='js/clientes/clientes.js') }}"></script>
+
     {% include 'popup/clientes/popup_cliente.html' %}
+    {% include 'popup/clientes/popup_editar_cliente.html' %}
+    {% include 'popup/clientes/popup_delete_cliente.html' %}
+    {% include 'popup/clientes/popup_listar_cliente.html' %}
+
+
+
     {% include 'popup/clientes/popup_vincular_instalacao.html' %}
     {% include 'popup/clientes/popup_desvincular_instalacoes.html' %}
-    {% include 'popup/clientes/popup_delete_cliente.html' %}
-    {% include 'popup/clientes/popup_editar_cliente.html' %}
+    
     {% include 'extensions/links_popup.html' %}
 {% endblock %}
