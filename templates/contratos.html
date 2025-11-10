@@ -64,14 +64,28 @@
                             <div class="col-md-2">
                                 <label class="form-label">Nº Contrato:</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="numeroContrato" 
+                                    <input type="text" class="form-control" id="numeroContrato"
                                         value="{{ contrato.numero if contrato else '' }}" 
                                         onchange="buscarDadosContrato(this.value)">
-                                    <div id="loadingContrato" class="input-group-text d-none">
+                                    
+                                    <!-- Botão de buscar por código -->
+                                    <button class="btn btn-secondary" type="button" onclick="buscarDadosContrato(numeroContrato.value)">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+
+                                    <!-- Botão de listagem para abrir modal -->
+                                    <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#listarContratosModal">
+                                        <i class="bi bi-card-list"></i>
+                                    </button>
+
+                                    <!-- Spinner de loading -->
+                                    <span id="loadingContrato" class="input-group-text d-none">
                                         <div class="spinner-border spinner-border-sm" role="status"></div>
-                                    </div>
+                                    </span>
                                 </div>
                             </div>
+
+
                             <div class="col-md-5">
                                 <label class="form-label">Razão Social:</label>
                                 <input type="text" class="form-control" id="razao_social" name="razao_social" value="{{ contrato.razao_social }}" readonly>
@@ -178,80 +192,111 @@
                 </div>
             </div>
 
+            <!-- ====================== -->
+            <!-- SEÇÃO DE CLIENTES -->
+            <!-- ====================== -->
             <div class="card mb-2">
-                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#relationCollapse">
+                <div class="card-header section-header d-flex justify-content-between align-items-center"
+                    data-bs-toggle="collapse" href="#relationCollapse">
                     <h5 class="mb-0">Relação de Clientes Vinculados ao Contrato</h5>
                 </div>
+
                 <div class="collapse" id="relationCollapse">
                     <div class="card-body">
-                        <div class="row g-2">
-                            <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
-                                <table class="clientes-table table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Nome Fantasia</th>
-                                            <th>Razão Social</th>
-                                            <th>Atividade</th>
-                                            <th>Cidade</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% if clientes %}
-                                            {% for cliente in clientes %}
-                                            <tr>
-                                                <td>{{ cliente.nome_fantasia }}</td>
-                                                <td>{{ cliente.razao_social }}</td>
-                                                <td>{{ cliente.atividade }}</td>
-                                                <td>{{ cliente.cidade }}</td>
-                                                <td>
-                                                    <span class="status-badge {% if cliente.estado_atual and cliente.estado_atual|upper == 'ATIVO' %}status-ativo{% else %}status-inativo{% endif %}">
-                                                        {{ cliente.estado_atual or 'N/A' }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        {% else %}
-                                            <tr>
-                                                <td colspan="6" class="text-center">Nenhum cliente relacionado ao contrato encontrado.</td>
-                                            </tr>
-                                        {% endif %}
-                                    </tbody>
-                                </table>
-                                <!-- Paginação -->
-                                <div id="clientes-pagination" class="d-flex justify-content-center mt-3">
-                                    <button id="prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
-                                    <span id="pageInfo" class="align-self-center"></span>
-                                    <button id="nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
-                                </div>
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
+                        <table class="clientes-table table table-striped table-bordered">
+                            <thead>
+                            <tr class="text-center">
+                                <th>Código</th>
+                                <th>Nome Fantasia</th>
+                                <th>Razão Social</th>
+                                <th>Atividade</th>
+                                <th>Cidade</th>
+                                <th>Status</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if clientes %}
+                                {% for cliente in clientes %}
+                                <tr>
+                                <td>{{ loop.index }}</td>  <!-- Número automático -->
+                                <td>
+                                    <a href="">
+                                        {{ cliente.sequencia }}
+                                    </a>
+                                </td>
 
-                                <div class="container mt-5 mb-4">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        
-                                            <div class="d-flex gap-2">    
-                                                <button type="button" class="btn btn-success me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularContractModal">
-                                                    <i class="fas fa-users"></i>  Vincular Cliente
-                                                </button>
-                                            </div>
+                                <td>{{ cliente.nome_fantasia }}</td>
+                                <td>{{ cliente.razao_social }}</td>
+                                <td>{{ cliente.atividade }}</td>
+                                <td>{{ cliente.cidade }}</td>
+                                <td>
+                                    <span class="status-badge 
+                                    {% if cliente.estado_atual and cliente.estado_atual|upper == 'ATIVO' %}
+                                        status-ativo
+                                    {% else %}
+                                        status-inativo
+                                    {% endif %}">
+                                    {{ cliente.estado_atual or 'N/A' }}
+                                    </span>
+                                </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                Nenhum cliente relacionado ao contrato encontrado.
+                                </td>
+                            </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
 
-                                            <div class="d-flex gap-2">    
-                                                <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#cliente_createModal">
-                                                    <i class="bi bi-plus-circle me-2"></i>  Criar Cliente
-                                                </button>
-                                            </div>
+                        <!-- Paginação -->
+                        <div id="clientes-pagination" class="d-flex justify-content-center mt-3">
+                            <button id="prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                            <span id="pageInfo" class="align-self-center"></span>
+                            <button id="nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                        </div>
 
-                                            <div class="d-flex gap-2">    
-                                                <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularContractModal">
-                                                    <i class="bi bi-trash me-2"></i>Desvincular Cliente
-                                                </button>
-                                            </div>
-                                    </div>   
-                                </div>
+                        <!-- Botões de Ação -->
+                        <div class="container mt-5 mb-4">
+                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-success me-2 btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#vincularContractModal">
+                                <i class="fas fa-users"></i> Vincular Cliente
+                                </button>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-primary me-2 btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#cliente_createModal">
+                                <i class="bi bi-plus-circle me-2"></i> Criar Cliente
+                                </button>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-danger me-2 btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#desvincularContractModal">
+                                <i class="bi bi-trash me-2"></i> Desvincular Cliente
+                                </button>
+                            </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
+
+                        </div> <!-- table-responsive -->
+                    </div> <!-- row -->
+                    </div> <!-- card-body -->
+                </div> <!-- collapse -->
+            </div> <!-- card -->
+
+
+
+
+
+
             <div class="card mb-2">
                 <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#detailsCollapse">
                     <h5 class="mb-0">Detalhes do Contrato</h5>
@@ -294,79 +339,90 @@
                     </div>
                 </div>
             </div>
-        <!-- Seção de Planos Associados SIMPLIFICADA -->
+
+
+        <!-- ====================== -->
+        <!-- SEÇÃO DE PLANOS -->
+        <!-- ====================== -->
         <div class="card mb-2">
-            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#plansCollapse">
-                <h5 class="mb-0">Plano Associado ao Contrato</h5>  <!-- Singular agora -->
-            </div>
-            <div class="collapse" id="plansCollapse">
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
-                            <table class="planos-table table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Código</th>
-                                        <th>Nome do Plano</th>
-                                        <th>Valor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% if contrato.planos and contrato.planos|length > 0 %}
-                                        {% for plano in contrato.planos %}
-                                        <tr>
-                                            <td>{{ plano.id }}</td>
-                                            <td>{{ plano.codigo }}</td>
-                                            <td>{{ plano.nome }}</td>
-                                            <td>R$ {{ "%.2f"|format(plano.valor) }}</td>
-                
-                                        </tr>
-                                        {% endfor %}
-                                    {% else %}
-                                        <tr>
-                                            <td colspan="5" class="text-center">
-                                                <i class="bi bi-exclamation-circle me-2"></i>
-                                                Nenhum plano associado encontrado
-                                            </td>
-                                        </tr>
-                                    {% endif %}
-                                </tbody>
-                            </table>
-        
-                            <!-- Paginação específica para Planos -->
-                            <div id="planos-pagination" class="d-flex justify-content-center mt-3">
-                                <button id="planos-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
-                                <span id="planos-pageInfo" class="align-self-center"></span>
-                                <button id="planos-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
-                            </div>
-                            <div class="container mt-5 mb-4">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    
-                                        <div class="d-flex gap-2">    
-                                            <button type="button" class="btn btn-success me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularPlanoContractModal">
-                                                <i class="fas fa-list-alt"></i>  Vincular Plano
-                                            </button>
-                                        </div>
-                                        <div class="d-flex gap-2">    
-                                            <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createPlanosModal">
-                                                <i class="bi bi-plus-circle me-2"></i>  Criar Plano
-                                            </button>
-                                        </div>
-                                        <div class="d-flex gap-2">    
-                                            <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularPlanoContractModal">
-                                                <i class="bi bi-trash me-2"></i>Desvincular Plano
-                                            </button>
-                                        </div>
-                                </div>   
-                            </div>
-                        </div>
+        <div class="card-header section-header d-flex justify-content-between align-items-center"
+            data-bs-toggle="collapse" href="#plansCollapse">
+            <h5 class="mb-0">Plano Associado ao Contrato</h5>
+        </div>
+
+        <div class="collapse" id="plansCollapse">
+            <div class="card-body">
+            <div class="row g-2">
+                <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
+                <table class="planos-table table table-striped table-bordered">
+                    <thead>
+                    <tr class="text-center">
+                        <th>Código</th>
+                        <th>Nome do Plano</th>
+                        <th>Valor</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if contrato.planos and contrato.planos|length > 0 %}
+                        {% for plano in contrato.planos %}
+                        <tr>
+                        <td>{{ plano.id }}</td>
+                        <td>{{ plano.codigo }}</td>
+                        <td>{{ plano.nome }}</td>
+                        <td>R$ {{ "%.2f"|format(plano.valor) }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        Nenhum plano associado encontrado
+                        </td>
+                    </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+
+                <!-- Paginação de Planos -->
+                <div id="planos-pagination" class="d-flex justify-content-center mt-3">
+                    <button id="planos-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                    <span id="planos-pageInfo" class="align-self-center"></span>
+                    <button id="planos-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="container mt-5 mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-success me-2 btn-sm"
+                                data-bs-toggle="modal" data-bs-target="#vincularPlanoContractModal">
+                        <i class="fas fa-list-alt"></i> Vincular Plano
+                        </button>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-primary me-2 btn-sm"
+                                data-bs-toggle="modal" data-bs-target="#createPlanosModal">
+                        <i class="bi bi-plus-circle me-2"></i> Criar Plano
+                        </button>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-danger me-2 btn-sm"
+                                data-bs-toggle="modal" data-bs-target="#desvincularPlanoContractModal">
+                        <i class="bi bi-trash me-2"></i> Desvincular Plano
+                        </button>
+                    </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        
+
+                </div> <!-- /table-responsive -->
+            </div> <!-- /row -->
+            </div> <!-- /card-body -->
+        </div> <!-- /collapse -->
+        </div> <!-- /card -->
+
+
         <!-- Seção de Produtos Associados -->
         <div class="card mb-2">
             <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#productsCollapse">
@@ -375,11 +431,11 @@
             <div class="collapse" id="productsCollapse">
                 <div class="card-body">
                     <div class="row g-2">
-                        <div class="table-responsive" style="width: 100%; max-width: 1000px; margin: 0 auto;">
+                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
                             <table class="produtos-table table table-striped table-bordered">
                                 <thead>
-                                    <tr>
-                                        <th>ID</th>
+                                    <tr class="text-center">
+                                        <th>Código</th>
                                         <th>Nome do Produto</th>
                                         <th>Descrição</th>
                                         <th>Quantidade</th>
@@ -390,7 +446,7 @@
                                     {% if contrato.produtos_associados %}
                                         {% for assoc in contrato.produtos_associados %}
                                         <tr>
-                                            <td>{{ assoc.produto.id }}</td>
+                                            <td>{{ assoc.produto.codigo }}</td>
                                             <td>{{ assoc.produto.nome }}</td>
                                             <td>{{ assoc.produto.descricao or 'N/A' }}</td>
                                             <td>{{ assoc.quantidade }}</td>
@@ -456,6 +512,7 @@
     {% include 'popup/contratos/popup_delete_contrato.html' %}
     {% include 'popup/contratos/popup_contratos.html' %}
     {% include 'popup/contratos/popup_editar_contrato.html' %}
+    {% include 'popup/contratos/popup_listar_contratos.html' %}
 
 
     <!-- Popups clientes-->

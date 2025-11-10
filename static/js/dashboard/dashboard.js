@@ -1,50 +1,46 @@
 document.addEventListener("DOMContentLoaded", async () => {
-    // ====== Gráfico de Barras ======
     try {
         const responseBar = await fetch('/contratosChart');
         const dataBar = await responseBar.json();
 
         const ctxBar = document.getElementById('contratosChart').getContext('2d');
+
         new Chart(ctxBar, {
             type: 'bar',
             data: {
                 labels: dataBar.map(item => item.month),
-                datasets: [{
-                    label: 'Cadastros',
-                    data: dataBar.map(item => item.count),
-                    backgroundColor: '#4CAF50',
-                    borderRadius: 6,
-                    borderWidth: 1
-                }]
+                datasets: [
+                    {
+                        label: 'Cadastrados',
+                        data: dataBar.map(item => item.ativo),
+                        backgroundColor: '#4CAF50'
+                    },
+                    {
+                        label: 'Suspensos',
+                        data: dataBar.map(item => item.suspenso),
+                        backgroundColor: '#FFC107'
+                    },
+                    {
+                        label: 'Cancelados',
+                        data: dataBar.map(item => item.cancelado),
+                        backgroundColor: '#F44336'
+                    }
+                ]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // 🔑 permite o gráfico se adaptar ao espaço
-                layout: {
-                    padding: { top: 20, bottom: 10, left: 15, right: 15 }
-                },
+                maintainAspectRatio: false,
                 plugins: {
-                    title: {
-                        display: true,
-                        font: { size: 16 }
-                    },
                     tooltip: {
                         callbacks: {
-                            label: (context) => `${context.parsed.y} cadastros`
+                            label: (context) => `${context.dataset.label}: ${context.parsed.y}`
                         }
                     },
-                    legend: { display: false }
+                    legend: { position: 'top' }
                 },
                 scales: {
-                    x: {
-                        ticks: { maxRotation: 45, minRotation: 45 },
-                        grid: { display: false },
-                        barPercentage: 0.6,      // 🔹 controla largura relativa das barras
-                        categoryPercentage: 0.6   // 🔹 evita que fiquem muito finas ou largas
-                    },
-                    y: {
-                        beginAtZero: true
-                    }
+                    x: { stacked: false },
+                    y: { beginAtZero: true, stacked: false }
                 }
             }
         });
@@ -53,6 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('contratosChart').outerHTML =
             '<div class="alert alert-danger">Erro ao carregar dados do gráfico de barras</div>';
     }
+
 
     // ====== Gráfico de Pizza ======
     try {

@@ -1,38 +1,38 @@
-<!-- Modal de Vinculação de Clientes ao Contrato -->
+<!-- Modal de Vinculação de Planos ao Contrato -->
 <div class="modal fade" id="vincularPlanoContractModal" tabindex="-1" aria-labelledby="vincularPlanoContractModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-x3">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
       <form method="POST" action="{{ url_for('contratos_bp.vincular_planos') }}">
-        <div class="modal-content">
-          <div class="modal-header bg-primary text-white">
-            <h5 class="modal-title" id="vincularPlanoContractModalLabel">Vincular Plano ao Contrato</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="vincularPlanoContractModalLabel">Vincular Plano ao Contrato</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+
+        <div class="modal-body">
+
+          <!-- Seletor de contrato -->
+          <div class="mb-3">
+            <label for="contrato_id" class="form-label">Selecione um Contrato:</label>
+            <select class="form-select" name="contrato_id" id="contrato_id" required>
+            </select>
           </div>
-          <div class="modal-body">
-  
-            <!-- Seletor de contrato -->
-            <div class="mb-3">
-              <label for="contrato_id" class="form-label">Selecione um Contrato:</label>
-              <select class="form-select" name="contrato_id" id="contrato_id" required>
-              </select>
-            </div>
-  
-            <!-- Seletor múltiplo de planos -->
-            <div class="mb-3">
-              <label for="plano_ids" class="form-label">Selecione Plano(s):</label>
-              <select class="form-select" name="plano_ids" id="plano_ids" multiple required size="10">
-              </select>
-            </div>
-  
+
+          <!-- Seletor múltiplo de planos -->
+          <div class="mb-3">
+            <label for="plano_ids" class="form-label">Selecione Plano(s):</label>
+            <select class="form-select" name="plano_ids" id="plano_ids" multiple required size="10">
+            </select>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn btn-primary">Vincular</button>
-          </div>
+
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Vincular</button>
         </div>
       </form>
     </div>
   </div>
+</div>
 
-   <script src="{{ url_for('static', filename='js/contratos/popup_js/popup_vincular_plano.js') }}"></script>
-
-    
+<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_vincular_plano.js') }}"></script>

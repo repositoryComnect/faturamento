@@ -355,6 +355,7 @@ def buscar_contrato_por_numero(numero):
         if hasattr(contrato, 'clientes') and contrato.clientes:
             for c in contrato.clientes:
                 data['clientes'].append({
+                    'sequencia' : c.sequencia or None,
                     'nome_fantasia': c.nome_fantasia or None,
                     'razao_social': c.razao_social or None,
                     'cnpj_cpf': c.cnpj_cpf or None,
@@ -382,6 +383,7 @@ def buscar_contrato_por_numero(numero):
             produto = Produto.query.get(assoc.produto_id)
             if produto:
                 data['produtos'].append({
+                    'codigo' : produto.codigo,
                     'id': produto.id,
                     'nome': produto.nome or None,
                     'descricao': produto.descricao or 'N/A',
@@ -442,7 +444,6 @@ def set_contrato():
             'atualizacao': parse_date(form_data.get('update_datetime')),
             'tipo': form_data.get('tipo_contrato'),
             'id_matriz_portal': form_data.get('portal_id'),
-            'responsavel': form_data.get('responsavel'),
             'cnpj_cpf': form_data.get('cnpj'),
             'tipo_pessoa': form_data.get('people_type'),
             'revenda': form_data.get('revenda_selecionada'),

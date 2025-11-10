@@ -14,6 +14,7 @@ def contratosChart():
         engine = db.get_engine()
         engine_name = engine.dialect.name
 
+        # Função para extrair mês dependendo do banco
         if engine_name == 'sqlite':
             month_func = db.func.strftime('%m', Contrato.cadastramento)
         elif engine_name == 'postgresql':
@@ -21,17 +22,15 @@ def contratosChart():
         else:  # mysql, mariadb, etc.
             month_func = db.func.month(Contrato.cadastramento)
 
-        cadastros_por_mes = db.session.query(
+        # Query: contar contratos por mês e status
+        cadastros = db.session.query(
             month_func.label('month'),
+            Contrato.estado_contrato.label('status'),
             db.func.count(Contrato.id).label('count')
         ).filter(
             Contrato.cadastramento != None,
-            Contrato.empresa_id == empresa_id,
-        ).group_by(
-            'month'
-        ).order_by(
-            'month'
-        ).all()
+            Contrato.empresa_id == empresa_id
+        ).group_by('month', 'status').order_by('month').all()
 
         meses = {
             1: "Janeiro", 2: "Fevereiro", 3: "Março", 4: "Abril",
@@ -39,17 +38,35 @@ def contratosChart():
             9: "Setembro", 10: "Outubro", 11: "Novembro", 12: "Dezembro"
         }
 
-        data = [{
-            "month": meses.get(int(month), "Desconhecido"),
-            "count": count
-        } for month, count in cadastros_por_mes]
+        # Organiza os dados por mês
+        data_dict = {}
+        for month, status, count in cadastros:
+            month_name = meses.get(int(month), "Desconhecido")
+            if month_name not in data_dict:
+                data_dict[month_name] = {'ativo': 0, 'suspenso': 0, 'cancelado': 0}
+            data_dict[month_name][status.lower()] = count
+
+        # Transformar em lista para JS
+        data = []
+        for month_name, counts in data_dict.items():
+            data.append({
+                'month': month_name,
+                'ativo': counts.get('ativo', 0),
+                'suspenso': counts.get('suspenso', 0),
+                'cancelado': counts.get('cancelado', 0)
+            })
 
         return jsonify(data)
+
     except Exception as e:
         import traceback
         erro_detalhado = traceback.format_exc()
         print(erro_detalhado)
         return jsonify({"error": str(e), "trace": erro_detalhado}), 500
+
+
+
+
 
 @dashboard_bp.route('/statusChart')
 def statusChart():
