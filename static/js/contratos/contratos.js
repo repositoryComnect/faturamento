@@ -80,7 +80,7 @@
             planosData.slice(start, end).forEach(plano => {
                 tbody.append(`
                     <tr>
-                        <td>${createLink(`/plano_render/${plano.codigo}`, plano.codigo)}</td>
+                        <td>${createLink(`/planos/${plano.codigo}`, plano.codigo)}</td>
                         <td>${plano.nome}</td>
                         <td>${formatCurrency(plano.valor)}</td>
                     </tr>
