@@ -80,3 +80,51 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 });
 
+
+//  Busca o próximo código de plano
+document.addEventListener("DOMContentLoaded", function () {
+        fetch('/proximo_codigo_plano')
+            .then(response => response.json())
+            .then(data => {
+                if (data.proximo_codigo) {
+                    document.getElementById('codigo').value = data.proximo_codigo;
+                } else {
+                    console.warn("Código de plano não retornado pela API.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao buscar código de plano:", error);
+            });
+    });
+
+
+
+// Script que traz os produtos
+ document.addEventListener("DOMContentLoaded", function () {
+        fetch("/planos/get_produtos", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById("produto_id");
+                select.innerHTML = '<option value="">Selecione um produto</option>';
+
+                // Garante que o template não quebre se 'plano' não estiver definido
+                const planoProdutoId = "{{ plano.produto_id if plano is defined else '' }}";
+
+                data.forEach(produto => {
+                    const option = document.createElement("option");
+                    option.value = produto.id;
+                    option.text = `${produto.codigo} - ${produto.nome} - ${produto.preco_base} R$`;
+
+                    if (planoProdutoId && planoProdutoId == produto.id.toString()) {
+                        option.selected = true;
+                    }
+
+                    select.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("Erro ao carregar produtos:", error);
+                const select = document.getElementById("produto_id");
+                select.innerHTML = '<option value="">Erro ao carregar produtos</option>';
+            });
+    });

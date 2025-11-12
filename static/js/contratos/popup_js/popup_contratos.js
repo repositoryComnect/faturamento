@@ -239,107 +239,121 @@
 
 
 $(document).ready(function () {
-    let timeoutIdEdit;
 
-    // Função principal de busca de contrato
-    function buscarContrato(termo) {
-        if (!termo) return;
-
-        // Desabilita o campo enquanto busca
-        const $input = $('#fetch_contract');
-        $input.prop('disabled', true);
-
-        clearTimeout(timeoutIdEdit);
-
-        timeoutIdEdit = setTimeout(() => {
-            $.ajax({
-                url: '/buscar_contrato',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ termo: termo }),
-                success: function(data) {
-                    console.log("Dados recebidos:", data);
-
-                    if (data.success) {
-                        const contrato = data.contrato;
-                        const fieldMap = {
-                            'numero': '#contract_number',
-                            'razao_social': '#company_name',
-                            'nome_fantasia': '#trade_name',
-                            'tipo': '#type',
-                            'contato': '#contact',
-                            'id_matriz_portal': '#id_edit_portal',
-                            'address_email': '#email_edit_contract',
-                            'telefone': '#phone',
-                            'responsavel': '#responsible',
-                            'zip_code_cep': '#zip_code_edit',
-                            'cnpj_cpf': '#cnpj_cpf',
-                            'endereco': '#address',
-                            'complemento': '#complement',
-                            'bairro': '#neighborhood',
-                            'cidade': '#city',
-                            'estado': '#state',
-                            'fator_juros': '#interest_rate_factor',
-                            'dia_vencimento': '#last_day',
-                            'estado_contrato': '#current_state',
-                            'data_estado': '#state_date',
-                            'motivo_estado': '#reason',
-                        };
-
-                        for (const key in fieldMap) {
-                            if (contrato[key] !== null && contrato[key] !== undefined) {
-                                const val = (key.includes('data')) ? formatarData(contrato[key]) : contrato[key];
-                                $(fieldMap[key]).val(val);
-                            }
-                        }
-                    } else {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Contrato não encontrado',
-                            text: 'Verifique o número ou nome informado e tente novamente.',
-                            timer: 6000,
-                            timerProgressBar: true,
-                            showConfirmButton: true,
-                            toast: true,
-                            position: 'top-end'
-                        });
-                    }
-
-                    // Reabilita o campo após a resposta
-                    $input.prop('disabled', false);
-                },
-                error: function(xhr, status, error) {
-                    console.error("Erro:", status, error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erro ao buscar contrato',
-                        text: 'Ocorreu um problema na comunicação com o servidor. Tente novamente.',
-                        timer: 3000,
-                        showConfirmButton: false,
-                        toast: true,
-                        position: 'top-end'
-                    });
-
-                    // Reabilita o campo mesmo em caso de erro
-                    $input.prop('disabled', false);
-                }
-            });
-        }, 1000);
+  // Função principal de busca de contrato
+  function buscarContrato(termo) {
+    if (!termo) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo vazio',
+        text: 'Digite o número ou nome do contrato antes de buscar.',
+        toast: true,
+        position: 'top-end',
+        timer: 3000,
+        showConfirmButton: false
+      });
+      return;
     }
 
-    // Função para formatar data no padrão YYYY-MM-DD
-    function formatarData(data) {
-        const d = new Date(data);
-        return !isNaN(d) 
-            ? `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}` 
-            : '';
-    }
+    const $input = $('#fetch_contract');
+    const $spinner = $('#loadingContrato');
 
-    // Observa o campo de busca
-    $('#fetch_contract').on('input', function() {
-        buscarContrato($(this).val());
+    // Desabilita campo e mostra loading
+    $input.prop('disabled', true);
+    $spinner.removeClass('d-none');
+
+    $.ajax({
+      url: '/buscar_contrato',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ termo: termo }),
+      success: function(data) {
+        console.log("Dados recebidos:", data);
+
+        if (data.success) {
+          const contrato = data.contrato;
+          const fieldMap = {
+            'numero': '#contract_number',
+            'razao_social': '#company_name',
+            'nome_fantasia': '#trade_name',
+            'tipo': '#type',
+            'contato': '#contact',
+            'id_matriz_portal': '#id_edit_portal',
+            'address_email': '#email_edit_contract',
+            'telefone': '#phone',
+            'responsavel': '#responsible',
+            'zip_code_cep': '#zip_code_edit',
+            'cnpj_cpf': '#cnpj_cpf',
+            'endereco': '#address',
+            'complemento': '#complement',
+            'bairro': '#neighborhood',
+            'cidade': '#city',
+            'estado': '#state',
+            'fator_juros': '#interest_rate_factor',
+            'dia_vencimento': '#last_day',
+            'estado_contrato': '#current_state',
+            'data_estado': '#state_date',
+            'motivo_estado': '#reason',
+          };
+
+          for (const key in fieldMap) {
+            if (contrato[key] !== null && contrato[key] !== undefined) {
+              const val = key.includes('data') ? formatarData(contrato[key]) : contrato[key];
+              $(fieldMap[key]).val(val);
+            }
+          }
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Contrato não encontrado',
+            text: 'Verifique o número ou nome informado e tente novamente.',
+            timer: 5000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+          });
+        }
+      },
+      error: function(xhr, status, error) {
+        console.error("Erro:", status, error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao buscar contrato',
+          text: 'Ocorreu um problema na comunicação com o servidor.',
+          timer: 4000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      },
+      complete: function() {
+        // Reabilita e oculta loading
+        $input.prop('disabled', false);
+        $spinner.addClass('d-none');
+      }
     });
+  }
+
+  // Formatar data (padrão YYYY-MM-DD)
+  function formatarData(data) {
+    const d = new Date(data);
+    return !isNaN(d)
+      ? `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`
+      : '';
+  }
+
+  $('#btnBuscarContrato').on('click', function() {
+    buscarContrato($('#fetch_contract').val());
+  });
+
+  $('#fetch_contract').on('keypress', function(e) {
+    if (e.which === 13) { // tecla Enter
+      e.preventDefault();
+      buscarContrato($(this).val());
+    }
+  });
 });
+
 
 
 

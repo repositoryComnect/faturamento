@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, render_template, request, session, redirect, url_for, flash
 from application.models.models import db, Contrato, Cliente, Plano, Produto, Vendedor, Empresa
+from modules.utils.utils import formatar_cpf_cnpj
 from flask_login import login_required
 from sqlalchemy import text, extract, func
 from datetime import datetime

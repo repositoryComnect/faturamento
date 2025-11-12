@@ -80,7 +80,7 @@
             planosData.slice(start, end).forEach(plano => {
                 tbody.append(`
                     <tr>
-                        <td>${createLink(`/planos/${plano.codigo}`, plano.codigo)}</td>
+                        <td>${createLink(`/plano_render/${plano.codigo}`, plano.codigo)}</td>
                         <td>${plano.nome}</td>
                         <td>${formatCurrency(plano.valor)}</td>
                     </tr>
@@ -131,11 +131,12 @@
                 'atualizacao': '#atualizacao',
                 'cadastramento': '#cadastramento',
                 'tipo': '#tipo',
+                'tipo_pessoa': '#tipo_pessoa',
                 'contato': '#contato',
                 'id_matriz_portal': '#id_matriz_portal',
                 'email': '#email',
                 'telefone': '#telefone',
-                'code_residence': '#code_residence',
+                'cep': '#cep',
                 'cnpj_cpf': '#cnpjCPFContrato',
                 'revenda': '#revenda',
                 'vendedor': '#vendedor',
@@ -262,9 +263,7 @@
                         const fieldMap = {
                             'numero': '#contract_number',
                             'razao_social': '#company_name',
-                            //'registration': '#registration',
                             'nome_fantasia': '#trade_name',
-                            //'atualizacao': '#update',
                             'tipo': '#type',
                             'contato': '#contact',
                             'id_matriz_portal': '#id_matriz_portal',
@@ -386,7 +385,7 @@ function preencherCamposContrato(contrato) {
 
 
     // Endereço
-    document.getElementById("code_residence").value = contrato.cep || "";
+    document.getElementById("cep").value = contrato.cep || "";
     document.getElementById("endereco").value = contrato.endereco || "";
     document.getElementById("complemento").value = contrato.complemento || "";
     document.getElementById("bairro").value = contrato.bairro || "";
@@ -404,3 +403,6 @@ function preencherCamposContrato(contrato) {
     //  Se quiser limpar as tabelas vinculadas também:
     limparTabelasRelacionadas();
 }
+
+
+

@@ -19,9 +19,23 @@
                         </div>
                         <div class="card-body">
                             <label for="fetch_contract" class="form-label">Número ou Nome do Contrato:</label>
-                            <input type="text" class="form-control" id="fetch_contract" name="fetch_contract" placeholder="Digite o número ou nome do contrato...">
+                            <div class="input-group">
+                            <input type="text" class="form-control" id="fetch_contract" name="fetch_contract"
+                                    placeholder="Digite o número ou nome do contrato...">
+
+                            <!-- Botão de busca manual -->
+                            <button class="btn btn-secondary" type="button" id="btnBuscarContrato">
+                                <i class="bi bi-search"></i>
+                            </button>
+
+                            <!-- Spinner de carregamento -->
+                            <span id="loadingContrato" class="input-group-text d-none">
+                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                            </span>
+                            </div>
                         </div>
                     </div>
+
 
                     <!-- Informações Básicas -->
                     <div class="modal-section-header"><h5>Informações Básicas</h5></div>
@@ -55,7 +69,7 @@
                                 <option value="Manutenção">Manutenção</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label">Contato</label>
                             <input type="text" class="form-control" id="contact" name="contact">
                         </div>
@@ -63,17 +77,13 @@
                             <label class="form-label">ID Portal</label>
                             <input type="text" class="form-control" id="id_edit_portal" name="id_edit_portal">
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <label class="form-label">E-mail</label>
                             <input type="email" class="form-control" id="email_edit_contract" name="email_edit_contract">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Telefone</label>
                             <input type="tel" class="form-control" id="phone" name="phone">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Responsável</label>
-                            <input type="text" class="form-control" id="responsible" name="responsible">
                         </div>
                     </div>
 

@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, jsonify,
 from application.models.models import Contrato, db, Cliente, Produto, Plano, ContratoProduto, Revenda, cliente_contrato
 from datetime import datetime, date
 from sqlalchemy import text
-from modules.contratos.utils import formatar_telefone, safe_float, safe_date, parse_date
+from modules.utils.utils import formatar_telefone, safe_float, safe_date, parse_date, formatar_cep, formatar_cpf_cnpj
 import re
 
 contratos_bp = Blueprint('contratos_bp', __name__)
@@ -144,11 +144,11 @@ def buscar_contrato():
                 'nome_fantasia': contrato.nome_fantasia or None,
                 'contato': contrato.contato or None,
                 'address_email': contrato.email or None,
-                'telefone': contrato.telefone or None,
+                'telefone': formatar_telefone(contrato.telefone or None),
                 'tipo': contrato.tipo or None,
                 'id_matriz_portal': contrato.id_matriz_portal or None,
-                'zip_code_cep': contrato.cep or None,
-                'cnpj_cpf': contrato.cnpj_cpf or None,
+                'zip_code_cep': formatar_cep(contrato.cep or None),
+                'cnpj_cpf': formatar_cpf_cnpj(contrato.cnpj_cpf or None),
                 'endereco': contrato.endereco or None,
                 'complemento': contrato.complemento or None,
                 'bairro': contrato.bairro or None,
@@ -325,12 +325,13 @@ def buscar_contrato_por_numero(numero):
             'atualizacao': safe_date(contrato.atualizacao),
             'cadastramento': safe_date(contrato.cadastramento),
             'tipo': contrato.tipo or None,
+            'tipo_pessoa': contrato.tipo_pessoa or None,
             'contato': contrato.contato or None,
             'id_matriz_portal': contrato.id_matriz_portal or None,
             'email': contrato.email or None,
-            'telefone': contrato.telefone or None,
-            'cep': contrato.cep or None,
-            'cnpj_cpf': contrato.cnpj_cpf or None,
+            'telefone': formatar_telefone(contrato.telefone or None),
+            'cep': formatar_cep(contrato.cep or None),
+            'cnpj_cpf': formatar_cpf_cnpj(contrato.cnpj_cpf or None),
 
             'revenda': contrato.revenda if contrato.revenda not in (None, "", "null") else "Não possui revenda",
             'vendedor': contrato.vendedor if contrato.vendedor not in (None, "", "null") else "Não possui vendedor",
@@ -876,7 +877,7 @@ def contratos_ativos():
     contratos = Contrato.query.filter_by(empresa_id=empresa_id).order_by(Contrato.numero).all()
 
     resultado = [
-        {'id': c.id, 'numero': c.numero, 'razao_social': c.razao_social, 'cnpj_cpf': c.cnpj_cpf}
+        {'id': c.id, 'numero': c.numero, 'razao_social': c.razao_social, 'cnpj_cpf': formatar_cpf_cnpj(c.cnpj_cpf)}
         for c in contratos
     ]
     
@@ -896,19 +897,19 @@ def set_cliente_popup_contrato():
             'razao_social': request.form.get('cliente_nome_empresa', '').strip(),
             'nome_fantasia': request.form.get('cliente_nome_fantasia', '').strip(),
             'tipo': request.form.get('cliente_tipo'),
-            'cnpj_cpf': request.form.get('cliente_cnpj_cpf', '').strip(),
+            'cnpj_cpf': formatar_cpf_cnpj(request.form.get('cliente_cnpj_cpf', '').strip()),
             'ie': request.form.get('cliente_ie', '').strip(),
             'im': request.form.get('cliente_im', '').strip(),
             'contato_principal': request.form.get('cliente_contato', '').strip(),
             'email': request.form.get('cliente_email', '').strip(),
-            'telefone': request.form.get('cliente_telefone', '').strip(),
+            'telefone': formatar_telefone(request.form.get('cliente_telefone', '').strip()),
             'revenda_nome': request.form.get('revenda_selecionada_client', '').strip(),
             'vendedor_nome': request.form.get('vendedor_selecionado_client', '').strip(),
             'tipo_servico': request.form.get('cliente_tipo_servico'),
             'localidade': request.form.get('localidade', '').strip(),
             'regiao': request.form.get('regiao', '').strip(),
             'atividade': request.form.get('atividade', '').strip(),
-            'cep': request.form.get('cliente_cep', '').strip(),
+            'cep': formatar_cep(request.form.get('cliente_cep', '').strip()),
             'endereco': request.form.get('cliente_endereco', '').strip(),
             'complemento': request.form.get('cliente_complemento', '').strip(),
             'bairro': request.form.get('cliente_bairro', '').strip(),
@@ -980,7 +981,8 @@ def set_cliente_popup_contrato():
         db.session.rollback()
         flash("Ocorreu um erro ao criar o cliente. Por favor, tente novamente.", "error")
         return redirect(request.referrer or url_for('home_bp.render_contratos'))
-    
+
+# Redirecionamento template de contrato listar todos    
 @contratos_bp.route('/contratos/buscar-por-numero-listagem/<numero>', methods=['GET'])
 def buscar_contrato_listagem(numero):
     empresa_id = session.get('empresa')
@@ -1004,8 +1006,8 @@ def buscar_contrato_listagem(numero):
             'email': contrato.email or None,
             'telefone': formatar_telefone(contrato.telefone) or None,
             
-            'cep': contrato.cep or None,
-            'cnpj_cpf': contrato.cnpj_cpf or None,
+            'cep': formatar_cep(contrato.cep or None),
+            'cnpj_cpf': formatar_cpf_cnpj(contrato.cnpj_cpf or None),
 
             'revenda': contrato.revenda if contrato.revenda not in (None, "", "null") else "Não possui revenda",
             'vendedor': contrato.vendedor if contrato.vendedor not in (None, "", "null") else "Não possui vendedor",
@@ -1029,13 +1031,13 @@ def buscar_contrato_listagem(numero):
         if hasattr(contrato, 'clientes') and contrato.clientes:
             for c in contrato.clientes:
                 data['clientes'].append({
+                    'sequencia' : c.sequencia or None,
                     'nome_fantasia': c.nome_fantasia or None,
                     'razao_social': c.razao_social or None,
                     'cnpj_cpf': c.cnpj_cpf or None,
                     'atividade': c.atividade or None,
                     'cidade': c.cidade or None,
                     'estado_atual': c.estado_atual or None,
-                    'numero_contrato_cadastrado': c.numero_contrato or None
                 })
 
         # --- Planos associados ---
@@ -1077,6 +1079,117 @@ def buscar_contrato_listagem(numero):
         )
 
     except Exception as e:
-        print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
-        return jsonify({'error': 'Erro ao processar a requisição'}), 500
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
+# Redirecionamento template de relação de clientes vinculados
+@contratos_bp.route('/clientes/<sequencia>')
+def render_cliente(sequencia):
+    empresa_id = session.get('empresa')
+    cliente = Cliente.query.filter_by(sequencia=sequencia, empresa_id=empresa_id).first()
+    return render_template('clientes.html', cliente=cliente)
+
+
+# Redirecionamento template de relação de clientes vinculados
+@contratos_bp.route('/planos/<codigo>', methods=['GET'])
+def render_planos_codigo(codigo):
+    empresa_id = session.get('empresa')
+
+    # Pega o plano específico
+    plano_selecionado = Plano.query.filter_by(codigo=codigo, empresa_id=empresa_id).first()
+
+    # Pega todos os planos para listar na tabela
+    planos = Plano.query.filter_by(empresa_id=empresa_id).all()
+
+    return render_template(
+        'planos.html',
+        planos=planos,
+        plano_selecionado=plano_selecionado
+    )
+
+
+
+'''@contratos_bp.route('/render_clientes/buscar-por-numero/<sequencia>', methods=['GET'])
+def buscar_render_cliente_por_contrato(sequencia):
+    empresa_id = session.get('empresa')
+    try:
+        cliente = (
+            Cliente.query
+            .filter(
+                Cliente.sequencia == sequencia,
+                Cliente.empresa_id == empresa_id,
+                Cliente.estado_atual != 'Arquivado'
+            )
+            .first()
+        )
+
+        if not cliente:
+            return jsonify({'error': f'Cliente {sequencia} não encontrado'}), 404
+
+        # Função auxiliar para formatar datas
+        def format_date(date):
+            return date.strftime('%d/%m/%Y') if date else None
+
+        data = {
+            'sequencia': cliente.sequencia,
+            'cadastramento': cliente.cadastramento or None,
+            'atualizacao': cliente.atualizacao or None,
+            'razao_social': cliente.razao_social or None,
+            'nome_fantasia': cliente.nome_fantasia or None,
+            'contato': cliente.contato_principal or None,
+            'email': cliente.email or None,
+            'telefone': formatar_telefone(cliente.telefone or None),
+            'tipo': cliente.tipo or None,
+            'cnpj_cpf': formatar_cpf_cnpj(cliente.cnpj_cpf or None),
+            'im': cliente.im or None,
+            'ie': cliente.ie or None,
+            'revenda_nome': cliente.revenda_nome or None,
+            'vendedor_nome': cliente.vendedor_nome or None,
+            'tipo_servico': cliente.tipo_servico or None,
+            'localidade': cliente.localidade or None,
+            'regiao': cliente.regiao or None,
+            'atividade': cliente.atividade or None,
+            'cep': formatar_cep(cliente.cep or None),
+            'endereco': cliente.endereco or None,
+            'complemento': cliente.complemento or None,
+            'bairro': cliente.bairro or None,
+            'cidade': cliente.cidade or None,
+            'cep_cobranca': cliente.cep_cobranca or None,
+            'endereco_cobranca': cliente.endereco_cobranca or None,
+            'cidade_cobranca': cliente.cidade_cobranca or None,
+            'telefone_cobranca': cliente.telefone_cobranca or None,
+            'bairro_cobranca': cliente.bairro_cobranca or None,
+            'uf_cobranca': cliente.uf_cobranca or None,
+            'estado': cliente.estado or None,
+            'fator_juros': float(cliente.fator_juros) if cliente.fator_juros else None,
+            'plano_nome': cliente.plano_nome or None,
+            'observacao': cliente.observacao or None,
+            'data_estado': format_date(cliente.data_estado) or None,
+            'dia_vencimento': cliente.dia_vencimento or None,
+
+            # NOVO: Lista de instalações vinculadas ao cliente
+            'instalacoes': [
+                {
+                    'id': inst.id,
+                    'codigo_instalacao': inst.codigo_instalacao,
+                    'razao_social': inst.razao_social,
+                    'cep': inst.cep,
+                    'endereco': inst.endereco,
+                    'bairro': inst.bairro,
+                    'cidade': inst.cidade,
+                    'uf': inst.uf,
+                    'cadastramento': format_date(inst.cadastramento),
+                    'id_portal': inst.id_portal,
+                    'status': inst.status,
+                    'observacao': inst.observacao or '',
+                    'valor_plano': float(getattr(inst, 'valor_plano', 0.00))  # Proteção caso não exista
+                }
+                for inst in cliente.instalacoes
+            ]
+        }
+
+        return render_template('clientes.html', cliente=data)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500'''

@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, render_template, redirect, url_fo
 from application.models.models import db, Cliente, Contrato, cliente_contrato, Revenda, Instalacao
 from sqlalchemy import text
 from datetime import datetime
+from modules.utils.utils import formatar_cpf_cnpj, formatar_cep, formatar_telefone
 import re
 
 cliente_bp = Blueprint('cliente_bp', __name__)
@@ -35,9 +36,9 @@ def buscar_cliente_por_contrato(sequencia):
             'nome_fantasia': cliente.nome_fantasia or None,
             'contato': cliente.contato_principal or None,
             'email': cliente.email or None,
-            'telefone': cliente.telefone or None,
+            'telefone': formatar_telefone(cliente.telefone or None),
             'tipo': cliente.tipo or None,
-            'cnpj_cpf': cliente.cnpj_cpf or None,
+            'cnpj_cpf': formatar_cpf_cnpj(cliente.cnpj_cpf or None),
             'im': cliente.im or None,
             'ie': cliente.ie or None,
             'revenda_nome': cliente.revenda_nome or None,
@@ -46,7 +47,7 @@ def buscar_cliente_por_contrato(sequencia):
             'localidade': cliente.localidade or None,
             'regiao': cliente.regiao or None,
             'atividade': cliente.atividade or None,
-            'cep': cliente.cep or None,
+            'cep': formatar_cep(cliente.cep or None),
             'endereco': cliente.endereco or None,
             'complemento': cliente.complemento or None,
             'bairro': cliente.bairro or None,
@@ -613,6 +614,12 @@ def get_revendas_ativas():
     revendas = Revenda.query.filter_by(status='Ativo').order_by(Revenda.nome).all()
     resultado = [r.nome for r in revendas]
     return jsonify(resultado)
+
+@cliente_bp.route('/clientes/<sequencia>')
+def render_cliente(sequencia):
+    empresa_id = session.get('empresa')
+    cliente = Cliente.query.filter_by(sequencia=sequencia, empresa_id=empresa_id).first()
+    return render_template('clientes.html', cliente=cliente)
 
 @cliente_bp.route('/insert/instalacoes/cliente', methods=['POST'])
 def insert_instalacoes_cliente():

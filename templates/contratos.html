@@ -62,7 +62,7 @@
                     <div class="card-body">
                         <div class="row g-3">
                             <div class="col-md-2">
-                                <label class="form-label">Nº Contrato:</label>
+                                <label class="form-label">Código Contrato:</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" id="numeroContrato"
                                         value="{{ contrato.numero if contrato else '' }}" 
@@ -122,7 +122,7 @@
                                 <input type="text" class="form-control" id="email" name="email" value="{{ contrato.email }}" readonly>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Fone:</label>
+                                <label class="form-label">Telefone:</label>
                                 <input type="text" class="form-control" id="telefone" name="telefone" value="{{ contrato.telefone }}" readonly>
                             </div>
                             <div class="col-md-2">
@@ -220,9 +220,8 @@
                             {% if clientes %}
                                 {% for cliente in clientes %}
                                 <tr>
-                                <td>{{ loop.index }}</td>  <!-- Número automático -->
                                 <td>
-                                    <a href="">
+                                    <a href="{{ url_for('cliente_bp.render_cliente', sequencia=cliente.sequencia) }}">
                                         {{ cliente.sequencia }}
                                     </a>
                                 </td>
@@ -231,7 +230,7 @@
                                 <td>{{ cliente.razao_social }}</td>
                                 <td>{{ cliente.atividade }}</td>
                                 <td>{{ cliente.cidade }}</td>
-                                <td>
+                                <td class="text-center">
                                     <span class="status-badge 
                                     {% if cliente.estado_atual and cliente.estado_atual|upper == 'ATIVO' %}
                                         status-ativo
@@ -366,7 +365,6 @@
                     {% if contrato.planos and contrato.planos|length > 0 %}
                         {% for plano in contrato.planos %}
                         <tr>
-                        <td>{{ plano.id }}</td>
                         <td>{{ plano.codigo }}</td>
                         <td>{{ plano.nome }}</td>
                         <td>R$ {{ "%.2f"|format(plano.valor) }}</td>
