@@ -444,7 +444,7 @@ def buscar_contrato_por_numero(numero):
             'motivo_estado': contrato.motivo_estado or None,
         }
 
-        # 🔵 Cliente principal do contrato (via join) — sempre como lista
+        # Cliente principal do contrato 
         clientes = []
         if contrato.cliente:
             clientes.append({
@@ -452,14 +452,14 @@ def buscar_contrato_por_numero(numero):
                 'sequencia': contrato.cliente.sequencia,
                 'razao_social': contrato.cliente.razao_social,
                 'nome_fantasia': contrato.cliente.nome_fantasia,
-                'cnpj_cpf': contrato.cliente.cnpj_cpf,
-                'atividade': contrato.cliente.atividade,
+                'cnpj_cpf': formatar_cpf_cnpj(contrato.cliente.cnpj_cpf),
+                'tipo_serviço': contrato.cliente.tipo_servico,
                 'cidade': contrato.cliente.cidade,
                 'estado_atual': contrato.cliente.estado_atual,
             })
-        data['clientes'] = clientes  # ⚡ chave 'clientes' para Jinja
+        data['clientes'] = clientes 
 
-        # 🔵 Planos
+        # Planos
         data['planos'] = []
         if hasattr(contrato, 'planos') and contrato.planos:
             for p in contrato.planos:
@@ -470,7 +470,7 @@ def buscar_contrato_por_numero(numero):
                     'valor': safe_float(p.valor, 0.00)
                 })
 
-        # 🔵 Produtos
+        # Produtos
         data['produtos'] = []
         associacoes = ContratoProduto.query.filter_by(contrato_id=contrato.id).all()
         for assoc in associacoes:

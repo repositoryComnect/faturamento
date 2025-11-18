@@ -46,7 +46,7 @@
                         <td>${createLink(`/clientes/${cliente.sequencia}`, cliente.sequencia)}</td>
                         <td>${cliente.nome_fantasia || ''}</td>
                         <td>${cliente.razao_social || ''}</td>
-                        <td>${cliente.atividade || ''}</td>
+                        <td>${cliente.cnpj_cpf || ''}</td>
                         <td>${cliente.cidade || ''}</td>
                         <td>
                             <span class="status-badge ${cliente.estado_atual === 'Ativo' ? 'status-ativo' : 'status-inativo'}">
