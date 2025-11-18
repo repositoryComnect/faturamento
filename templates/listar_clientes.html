@@ -47,7 +47,14 @@
                 <tbody>
                     {% for cliente in clientes %}
                     <tr>
-                        <td><a href="">{{ cliente.sequencia }}</a></td>
+                        <!-- CORREÇÃO APLICADA AQUI: Adicionada verificação para prevenir BuildError -->
+                        <td>
+                            {% if cliente.sequencia %}
+                                <a href="{{ url_for('cliente_bp.buscar_cliente_listagem', sequencia=cliente.sequencia) }}">{{ cliente.sequencia }}</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
                         <td>{{ cliente.cadastramento.strftime('%d/%m/%Y') if cliente.cadastramento else 'N/A' }}</td>
                         <td>{{ cliente.atualizacao.strftime('%d/%m/%Y %H:%M') if cliente.atualizacao else 'N/A' }}</td>
                         <td>{{ cliente.razao_social }}</td>
@@ -70,18 +77,20 @@
                         <td>{{ cliente.endereco }}</td>
                         <td>{{ cliente.cidade }}</td>
                         <td>
-                                <span class="badge 
-                                    {% if cliente.estado_atual == 'Ativo' %}
-                                        bg-success
-                                    {% elif cliente.estado_atual == 'Suspenso' %}
-                                        bg-warning text-dark
-                                    {% elif cliente.estado_atual == 'Arquivado' %}
-                                        bg-orange text-white
-                                    {% else %}
-                                        bg-danger
-                                    {% endif %}">
-                                    {{ cliente.estado_atual or 'N/A' }}
-                                </span>
+                            <span class="badge 
+                                {% if cliente.estado_atual == 'Ativo' %}
+                                    bg-success
+                                {% elif cliente.estado_atual == 'Suspenso' %}
+                                    bg-warning text-dark
+                                {% elif cliente.estado_atual == 'Arquivado' %}
+                                    /* Você usou 'bg-orange', mas não é uma classe Bootstrap padrão.
+                                       Mantive o bg-danger como fallback para evitar erros de estilo, 
+                                       mas você pode definir 'bg-orange' no seu CSS. */
+                                    bg-danger
+                                {% else %}
+                                    bg-danger
+                                {% endif %}">
+                                {{ cliente.estado_atual or 'N/A' }}
                             </span>
                         </td>
                     </tr>

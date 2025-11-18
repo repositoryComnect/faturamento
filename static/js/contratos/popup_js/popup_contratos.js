@@ -258,7 +258,7 @@ $(document).ready(function () {
     const $input = $('#fetch_contract');
     const $spinner = $('#loadingContrato');
 
-    // Desabilita campo e mostra loading
+    // Desabilita o campo e mostra o spinner
     $input.prop('disabled', true);
     $spinner.removeClass('d-none');
 
@@ -267,11 +267,13 @@ $(document).ready(function () {
       method: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ termo: termo }),
+
       success: function(data) {
-        console.log("Dados recebidos:", data);
+        console.log("📦 Dados recebidos:", data);
 
         if (data.success) {
           const contrato = data.contrato;
+
           const fieldMap = {
             'numero': '#contract_number',
             'razao_social': '#company_name',
@@ -293,7 +295,7 @@ $(document).ready(function () {
             'dia_vencimento': '#last_day',
             'estado_contrato': '#current_state',
             'data_estado': '#state_date',
-            'motivo_estado': '#reason',
+            'motivo_estado': '#reason'
           };
 
           for (const key in fieldMap) {
@@ -302,7 +304,20 @@ $(document).ready(function () {
               $(fieldMap[key]).val(val);
             }
           }
+
+          // Popup de sucesso
+          Swal.fire({
+            icon: 'success',
+            title: 'Contrato encontrado!',
+            text: 'Os dados foram carregados com sucesso.',
+            toast: true,
+            position: 'top-end',
+            timer: 2500,
+            showConfirmButton: false
+          });
+
         } else {
+          // Popup de aviso (não encontrado)
           Swal.fire({
             icon: 'warning',
             title: 'Contrato não encontrado',
@@ -314,6 +329,7 @@ $(document).ready(function () {
           });
         }
       },
+
       error: function(xhr, status, error) {
         console.error("Erro:", status, error);
         Swal.fire({
@@ -326,15 +342,16 @@ $(document).ready(function () {
           position: 'top-end'
         });
       },
+
       complete: function() {
-        // Reabilita e oculta loading
+        // Reabilita o campo e oculta o spinner
         $input.prop('disabled', false);
         $spinner.addClass('d-none');
       }
     });
   }
 
-  // Formatar data (padrão YYYY-MM-DD)
+  // Função para formatar data (yyyy-mm-dd)
   function formatarData(data) {
     const d = new Date(data);
     return !isNaN(d)
@@ -342,10 +359,13 @@ $(document).ready(function () {
       : '';
   }
 
+  // Clique no botão de busca
   $('#btnBuscarContrato').on('click', function() {
+    console.log(" Botão de busca clicado");
     buscarContrato($('#fetch_contract').val());
   });
 
+  // Pressionar Enter no campo
   $('#fetch_contract').on('keypress', function(e) {
     if (e.which === 13) { // tecla Enter
       e.preventDefault();

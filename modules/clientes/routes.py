@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, render_template, redirect, url_fo
 from application.models.models import db, Cliente, Contrato, cliente_contrato, Revenda, Instalacao
 from sqlalchemy import text
 from datetime import datetime
+from modules.clientes.utils import parse_date, format_date
 from modules.utils.utils import formatar_cpf_cnpj, formatar_cep, formatar_telefone
 import re
 
@@ -23,10 +24,6 @@ def buscar_cliente_por_contrato(sequencia):
 
         if not cliente:
             return jsonify({'error': f'Cliente {sequencia} não encontrado'}), 404
-
-        # Função auxiliar para formatar datas
-        def format_date(date):
-            return date.strftime('%d/%m/%Y') if date else None
 
         data = {
             'sequencia': cliente.sequencia,
@@ -65,7 +62,7 @@ def buscar_cliente_por_contrato(sequencia):
             'data_estado': format_date(cliente.data_estado) or None,
             'dia_vencimento': cliente.dia_vencimento or None,
 
-            # NOVO: Lista de instalações vinculadas ao cliente
+            # Lista de instalações vinculadas ao cliente
             'instalacoes': [
                 {
                     'id': inst.id,
@@ -80,9 +77,31 @@ def buscar_cliente_por_contrato(sequencia):
                     'id_portal': inst.id_portal,
                     'status': inst.status,
                     'observacao': inst.observacao or '',
-                    'valor_plano': float(getattr(inst, 'valor_plano', 0.00))  # Proteção caso não exista
+                    'valor_plano': float(getattr(inst, 'valor_plano', 0.00))
                 }
                 for inst in cliente.instalacoes
+            ],
+
+            # 🔥 Lista de contratos vinculados ao cliente
+            'contratos': [
+                {
+                    'id': c.id,
+                    'numero': c.numero,
+                    'razao_social': c.razao_social,
+                    'nome_fantasia': c.nome_fantasia,
+                    'contato': c.contato,
+                    'email': c.email,
+                    'telefone': c.telefone,
+                    'tipo': c.tipo,
+                    'estado_contrato': c.estado_contrato,
+                    'dia_vencimento': c.dia_vencimento,
+                    'fator_juros': float(c.fator_juros) if c.fator_juros else None,
+                    'data_estado': format_date(c.data_estado),
+                    'revenda': c.revenda,
+                    'vendedor': c.vendedor,
+                    'produto_id': c.produto_id
+                }
+                for c in cliente.contratos
             ]
         }
 
@@ -269,26 +288,12 @@ def get_numeros_contrato():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@cliente_bp.route('/set/cliente', methods=['POST'])
+"""@cliente_bp.route('/set/cliente', methods=['POST'])
 def set_cliente():
-    def parse_date(date_str):
-            if not date_str:
-                return None
-            try:
-                for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
-                    try:
-                        return datetime.strptime(date_str, fmt).date()
-                    except ValueError:
-                        continue
-                return None
-            except Exception:
-                return None
-
     try:
-        # Iniciar transação (equivalente ao BEGIN TRANSACTION)
         db.session.begin()
 
-        # 1. Inserir o novo cliente (equivalente ao primeiro INSERT)
+        # 1. Inserir o novo cliente
         cliente_data = {
             'numero_contrato': request.form.get('contract_number'),
             'sequencia': request.form.get('sequencia_cliente'),
@@ -297,32 +302,32 @@ def set_cliente():
             'razao_social': request.form.get('company_name', '').strip(),
             'nome_fantasia': request.form.get('trade_name', '').strip(),
             'tipo': request.form.get('type'),
-            'cnpj_cpf': request.form.get('cnpj_cpf', '').strip(),
+            'cnpj_cpf': request.form.get('cnpj_cpf_cliente', '').strip(),
             'ie': request.form.get('ie', '').strip(),
             'im': request.form.get('im', '').strip(),
             'contato_principal': request.form.get('contact', '').strip(),
             'email': request.form.get('address_email', '').strip(),
             'telefone': request.form.get('phone', '').strip(),
+            'estado_atual': request.form.get('estado_atual', 'Ativo'),
             'revenda_nome': request.form.get('revenda_selecionada_client', '').strip(),
             'vendedor_nome': request.form.get('vendedor_selecionado_client', '').strip(),
             'tipo_servico': request.form.get('tipo_servico'),
             'localidade': request.form.get('localidade', '').strip(),
             'regiao': request.form.get('regiao', '').strip(),
             'atividade': request.form.get('atividade', '').strip(),
-            'cep': request.form.get('zip_code', '').strip(),
+            'cep': request.form.get('zip_code_cep', '').strip(),
             'endereco': request.form.get('address', '').strip(),
             'complemento': request.form.get('complement', '').strip(),
             'bairro': request.form.get('neighborhood', '').strip(),
             'cidade': request.form.get('city', '').strip(),
+            'estado': request.form.get('state'),
             'cep_cobranca': request.form.get('cep_cobranca'),
             'endereco_cobranca': request.form.get('endereco_cobranca'),
             'cidade_cobranca': request.form.get('cidade_cobranca'),
             'telefone_cobranca': request.form.get('telefone_cobranca'),
             'bairro_cobranca': request.form.get('bairro_cobranca'),
             'uf_cobranca': request.form.get('uf_cobranca'),
-            'estado': request.form.get('state'),
             'fator_juros': float(request.form.get('fator_juros', 0)),
-            'estado_atual': request.form.get('estado_atual', 'Ativo'),
             'data_estado': parse_date(request.form.get('date_estate')),
             'dia_vencimento': int(request.form.get('dia_vencimento', 10)),
             'plano_nome': request.form.get('plano', '').strip(),
@@ -331,53 +336,37 @@ def set_cliente():
             'empresa_id': session.get('empresa')
         }
 
-        # Validação mínima dos campos obrigatórios
-        if not cliente_data['razao_social']:
-            raise ValueError("Razão Social é obrigatória")
-        
-        if not cliente_data['cnpj_cpf']:
-            raise ValueError("CNPJ/CPF é obrigatório")
-
         novo_cliente = Cliente(**cliente_data)
         db.session.add(novo_cliente)
-        db.session.flush()  # Força o INSERT para obter o ID (equivalente ao seu SELECT do ID)
+        db.session.flush()  # Força o INSERT para obter o ID
 
-        # 2. Obter o ID do cliente (já temos em novo_cliente.id)
-
-        # 3. Processar associação com contratos
+        # 2. Processar associação com contratos usando ORM
         numeros_contratos = request.form.getlist('contratos_associados')
         contratos_nao_encontrados = []
 
         for numero_contrato in numeros_contratos:
-            # Buscar contrato pelo número (equivalente ao seu terceiro bloco SQL)
             contrato = Contrato.query.filter_by(numero=numero_contrato).first()
-            
             if contrato:
-                # 4. Associar cliente ao contrato (equivalente ao quarto INSERT)
-                stmt = cliente_contrato.insert().values(
-                    cliente_id=novo_cliente.id,
-                    contrato_id=contrato.id
-                )
-                db.session.execute(stmt)
+                if novo_cliente not in contrato.clientes:
+                    contrato.clientes.append(novo_cliente)
             else:
                 contratos_nao_encontrados.append(numero_contrato)
 
-        # Se algum contrato não foi encontrado, cancelar a operação
         if contratos_nao_encontrados:
             raise ValueError(f"Contratos não encontrados: {', '.join(contratos_nao_encontrados)}")
 
-        # Commit da transação (equivalente ao COMMIT)
+        # Commit da transação
         db.session.commit()
 
-        # Tentativa de ajuste do autoincrement (mantendo sua lógica original)
+        # Ajuste opcional do AUTO_INCREMENT
         try:
             db.session.execute(
                 text("ALTER TABLE clientes AUTO_INCREMENT = :id"),
                 {'id': novo_cliente.id + 1}
             )
             db.session.commit()
-        except Exception as e:
-            print("Não foi possível realizar o autoincrement")
+        except Exception:
+            print("Não foi possível realizar o ajuste do AUTO_INCREMENT")
 
         return redirect(url_for('home_bp.render_clientes'))
 
@@ -389,60 +378,147 @@ def set_cliente():
     except Exception as e:
         db.session.rollback()
         flash("Ocorreu um erro ao criar o cliente. Por favor, tente novamente.", "error")
+        print(f"Erro: {e}")
+        return redirect(request.referrer or url_for('home_bp.render_clientes'))"""
+
+@cliente_bp.route('/set/cliente', methods=['POST'])
+def set_cliente():
+    try:
+        db.session.begin()
+
+        # 1. Inserir o novo cliente
+        cliente_data = {
+            'numero_contrato': request.form.get('contract_number'),
+            'sequencia': request.form.get('sequencia_cliente'),
+            'cadastramento': parse_date(request.form.get('registration')),
+            'atualizacao': parse_date(request.form.get('update')),
+            'razao_social': request.form.get('company_name', '').strip(),
+            'nome_fantasia': request.form.get('trade_name', '').strip(),
+            'tipo': request.form.get('type'),
+            'cnpj_cpf': request.form.get('cnpj_cpf_cliente', '').strip(),
+            'ie': request.form.get('ie', '').strip(),
+            'im': request.form.get('im', '').strip(),
+            'contato_principal': request.form.get('contact', '').strip(),
+            'email': request.form.get('address_email', '').strip(),
+            'telefone': request.form.get('phone', '').strip(),
+            'estado_atual': request.form.get('estado_atual', 'Ativo'),
+            'revenda_nome': request.form.get('revenda_selecionada_client', '').strip(),
+            'vendedor_nome': request.form.get('vendedor_selecionado_client', '').strip(),
+            'tipo_servico': request.form.get('tipo_servico'),
+            'localidade': request.form.get('localidade', '').strip(),
+            'regiao': request.form.get('regiao', '').strip(),
+            'atividade': request.form.get('atividade', '').strip(),
+            'cep': request.form.get('zip_code_cep', '').strip(),
+            'endereco': request.form.get('address', '').strip(),
+            'complemento': request.form.get('complement', '').strip(),
+            'bairro': request.form.get('neighborhood', '').strip(),
+            'cidade': request.form.get('city', '').strip(),
+            'estado': request.form.get('state'),
+            'cep_cobranca': request.form.get('cep_cobranca'),
+            'endereco_cobranca': request.form.get('endereco_cobranca'),
+            'cidade_cobranca': request.form.get('cidade_cobranca'),
+            'telefone_cobranca': request.form.get('telefone_cobranca'),
+            'bairro_cobranca': request.form.get('bairro_cobranca'),
+            'uf_cobranca': request.form.get('uf_cobranca'),
+            'fator_juros': float(request.form.get('fator_juros', 0)),
+            'data_estado': parse_date(request.form.get('date_estate')),
+            'dia_vencimento': int(request.form.get('dia_vencimento', 10)),
+            'plano_nome': request.form.get('plano', '').strip(),
+            'motivo_estado': request.form.get('motivo_estado', '').strip(),
+            'observacao': request.form.get('observacao', '').strip(),
+            'empresa_id': session.get('empresa')
+        }
+
+        novo_cliente = Cliente(**cliente_data)
+        db.session.add(novo_cliente)
+        db.session.flush() 
+
+        # 2. Associar contratos selecionados ao novo cliente
+        numeros_contratos = request.form.getlist('contratos_associados')
+        contratos_nao_encontrados = []
+
+        for numero_contrato in numeros_contratos:
+            contrato = Contrato.query.filter_by(numero=numero_contrato).first()
+
+            if contrato.cliente_id is None:
+                # Atualiza FK: 1 cliente → N contratos
+                contrato.cliente_id = novo_cliente.id
+            else:
+                contratos_nao_encontrados.append(numero_contrato)
+
+        if contratos_nao_encontrados:
+            raise ValueError(f"Contrato já possui cliente vinculado: {', '.join(contratos_nao_encontrados)}")
+
+        # Commit final
+        db.session.commit()
+
+        # Ajuste do AUTO_INCREMENT
+        try:
+            db.session.execute(
+                text("ALTER TABLE clientes AUTO_INCREMENT = :id"),
+                {'id': novo_cliente.id + 1}
+            )
+            db.session.commit()
+        except Exception:
+            print("Não foi possível realizar o ajuste do AUTO_INCREMENT")
+
+        return redirect(url_for('home_bp.render_clientes'))
+
+    except ValueError as ve:
+        db.session.rollback()
+        flash(f"Erro de validação: {str(ve)}", "error")
         return redirect(request.referrer or url_for('home_bp.render_clientes'))
-    
+
+    except Exception as e:
+        db.session.rollback()
+        flash("Ocorreu um erro ao criar o cliente. Por favor, tente novamente.", "error")
+        print(f"Erro: {e}")
+        return redirect(request.referrer or url_for('home_bp.render_clientes'))
+
 @cliente_bp.route('/update/cliente', methods=['POST'])
 def update_cliente():
-    def parse_date(date_str):
-        try:
-            return datetime.strptime(date_str, '%Y-%m-%d').date()
-        except Exception:
-            return None
-
     try:
-
         db.session.execute(
-        text("""
-        UPDATE clientes SET
-            
-            cadastramento = :cadastramento,
-            atualizacao = :atualizacao,
-            razao_social = :razao_social,
-            nome_fantasia = :nome_fantasia,
-            tipo = :tipo,
-            cnpj = :cnpj,
-            ie = :ie,
-            im = :im,
-            email = :email,
-            telefone = :telefone,
-            cep = :cep,
-            endereco = :endereco,
-            complemento = :complemento,
-            bairro = :bairro,
-            cidade = :cidade,
-            estado = :estado,
-            fator_juros = :fator_juros,
-            estado_atual = :estado_atual,
-            data_estado = :data_estado,
-            dia_vencimento = :dia_vencimento,
-            plano_nome = :plano_nome,
-            observacao = :observacao,
-            atualizacao = CURRENT_TIMESTAMP
+            text("""
+            UPDATE clientes SET
+                cadastramento = :cadastramento,
+                atualizacao = :atualizacao,
+                razao_social = :razao_social,
+                nome_fantasia = :nome_fantasia,
+                tipo = :tipo,
+                cnpj_cpf = :cnpj_cpf,
+                ie = :ie,
+                im = :im,
+                email = :email,
+                telefone = :telefone,
+                cep = :cep,
+                endereco = :endereco,
+                complemento = :complemento,
+                bairro = :bairro,
+                cidade = :cidade,
+                estado = :estado,
+                fator_juros = :fator_juros,
+                estado_atual = :estado_atual,
+                data_estado = :data_estado,
+                dia_vencimento = :dia_vencimento,
+                plano_nome = :plano_nome,
+                observacao = :observacao,
+                atualizacao = CURRENT_TIMESTAMP
             WHERE sequencia = :sequencia
             """),
             {
                 'sequencia': request.form.get('sequel'),
                 'cadastramento': parse_date(request.form.get('registry')),
                 'atualizacao': parse_date(request.form.get('registry_update')),
-                'razao_social': request.form.get('corporate_name'),
+                'razao_social': request.form.get('razao_social_editar_popup'),
                 'nome_fantasia': request.form.get('second_name'),
                 'tipo': request.form.get('type'),
-                'cnpj': request.form.get('cpf_cnpj'),
+                'cnpj_cpf': request.form.get('cnpj_cpf_editar_popup'),
                 'ie': request.form.get('state_registration'),
                 'im': request.form.get('municipal_registration'),
                 'email': request.form.get('email_address'),
                 'telefone': request.form.get('phone_number'),
-                'cep': request.form.get('postal_code'),
+                'cep': request.form.get('postal_code'),  # se for o endereço principal
                 'endereco': request.form.get('street'),
                 'complemento': request.form.get('comp'),
                 'bairro': request.form.get('neighbor'),
@@ -457,7 +533,7 @@ def update_cliente():
             }
         )
         db.session.commit()
-        return redirect(url_for(('home_bp.render_clientes')))
+        return redirect(url_for('home_bp.render_clientes'))
 
     except Exception as e:
         db.session.rollback()
@@ -471,10 +547,6 @@ def buscar_cliente():
     data = request.get_json()
     termo = data.get('termo', '')
     empresa_id = session.get('empresa')
-
-    def format_date(date):
-            return date.strftime('%d/%m/%Y') if date else None
-
     if not termo:
         return jsonify({'success': False, 'error': 'Nenhum termo enviado'})
 
@@ -484,7 +556,7 @@ def buscar_cliente():
         (Cliente.sequencia.ilike(f"%{termo}%")) |
         (Cliente.razao_social.ilike(f"%{termo}%")) |
         (Cliente.nome_fantasia.ilike(f"%{termo}%")) |
-        (Cliente.cnpj.ilike(f"%{termo}%"))
+        (Cliente.cnpj_cpf.ilike(f"%{termo}%"))
     )).first()
 
     if cliente:
@@ -498,9 +570,9 @@ def buscar_cliente():
                 'second_name': cliente.nome_fantasia or None,
                 'contato': cliente.contato_principal or None,
                 'email_address': cliente.email or None,
-                'phone_number': cliente.telefone or None,
+                'phone_number': formatar_telefone(cliente.telefone or None),
                 'tipo': cliente.tipo or None,
-                'cpf_cnpj': cliente.cnpj or None,
+                'cnpj_cpf': formatar_cpf_cnpj(cliente.cnpj_cpf or None),
                 'im': cliente.im or None,
                 'ie': cliente.ie or None,
                 'revenda_nome': cliente.revenda_nome or None,
@@ -509,7 +581,7 @@ def buscar_cliente():
                 'localidade': cliente.localidade or None,
                 'regiao': cliente.regiao or None,
                 'atividade': cliente.atividade or None,
-                'cep': cliente.cep or None,
+                'cep': formatar_cep(cliente.cep or None),
                 'street': cliente.endereco or None,
                 'comp': cliente.complemento or None,
                 'neighbor': cliente.bairro or None,
@@ -528,24 +600,47 @@ def buscar_cliente():
 @cliente_bp.route('/listar/clientes')
 def listar_clientes():
     empresa_id = session.get('empresa')
+    # Garante que, mesmo em caso de exceção, estas variáveis existam para o Jinja.
+    clientes = []
+    page = request.args.get('page', 1, type=int)
+    per_page = 10 
+    total = 0
+    error = None 
+
     try:
-        page = request.args.get('page', 1, type=int)
-        per_page = 10  # Itens por página
-        
+        if not empresa_id:
+            raise ValueError("ID da empresa não encontrado na sessão.")
+            
         offset = (page - 1) * per_page
+        
+        # Busca clientes limitados para a página atual
         resultado = db.session.execute(
             text("SELECT * FROM clientes WHERE empresa_id = :empresa_id ORDER BY razao_social LIMIT :limit OFFSET :offset"),
-            {'empresa_id': empresa_id,'limit': per_page, 'offset': offset}
+            {'empresa_id': empresa_id, 'limit': per_page, 'offset': offset}
         )
-        
         clientes = [dict(row._mapping) for row in resultado]
-        total = db.session.execute(text(f"SELECT COUNT(*) FROM clientes WHERE empresa_id = {empresa_id}")).scalar()
         
-        return render_template('listar_clientes.html', clientes=clientes, page=page, per_page=per_page, total=total)
+        # Busca do total de registros (Total de páginas)
+        total_resultado = db.session.execute(
+            text("SELECT COUNT(*) FROM clientes WHERE empresa_id = :empresa_id"),
+            {'empresa_id': empresa_id}
+        ).scalar()
+        
+        # O total pode ser None, garantimos que seja um inteiro (0)
+        total = total_resultado if total_resultado is not None else 0
         
     except Exception as e:
+        # Define a mensagem de erro. As outras variáveis mantêm seus valores padrão (listas/números vazios).
         print(f"Erro ao listar clientes: {str(e)}")
-        return render_template('listar_clientes.html', error="Não foi possível carregar os clientes")
+        error = "Não foi possível carregar os clientes. Por favor, tente novamente mais tarde."
+
+    # Todas as variáveis esperadas pelo template são passadas, garantindo que 'total' sempre exista.
+    return render_template('listar_clientes.html', 
+                           clientes=clientes, 
+                           page=page, 
+                           per_page=per_page, 
+                           total=total,
+                           error=error)
 
 @cliente_bp.route('/proxima_sequencia_cliente', methods=['GET'])
 def proxima_sequencia_cliente():
@@ -578,9 +673,9 @@ def get_id_cliente():
         base_query = """
             FROM clientes
             WHERE razao_social LIKE :term 
-               OR numero_contrato LIKE :term 
+               OR sequencia LIKE :term 
                OR nome_fantasia LIKE :term
-               OR cnpj LIKE :term
+               OR cnpj_cpf LIKE :term
         """
 
         params = {'term': f'%{search_term}%', 'limit': per_page, 'offset': offset}
@@ -624,17 +719,6 @@ def render_cliente(sequencia):
 @cliente_bp.route('/insert/instalacoes/cliente', methods=['POST'])
 def insert_instalacoes_cliente():
     form_data = request.form.to_dict()
-
-    def parse_date(date_str):
-        if not date_str:
-            return None
-        for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
-            try:
-                return datetime.strptime(date_str, fmt).date()
-            except ValueError:
-                continue
-        return None
-
     cliente_id = form_data.get('cliente_selecionado')
     if not cliente_id:
         return jsonify({
@@ -669,3 +753,86 @@ def insert_instalacoes_cliente():
     db.session.commit()
 
     return redirect(url_for('home_bp.render_clientes'))
+
+@cliente_bp.route('/clientes/buscar-por-numero-listagem/<sequencia>', methods=['GET'])
+def buscar_cliente_listagem(sequencia):
+    empresa_id = session.get('empresa')
+    try:
+        cliente = (
+            Cliente.query
+            .filter(
+                Cliente.sequencia == sequencia,
+                Cliente.empresa_id == empresa_id,
+                #Cliente.estado_atual != 'Arquivado'
+            )
+            .first()
+        )
+
+        if not cliente:
+            return jsonify({'error': f'Cliente {sequencia} não encontrado'}), 404
+
+        data = {
+            'sequencia': cliente.sequencia,
+            'cadastramento': cliente.cadastramento,
+            'atualizacao': cliente.atualizacao,
+            'razao_social': cliente.razao_social or None,
+            'nome_fantasia': cliente.nome_fantasia or None,
+            'contato': cliente.contato_principal or None,
+            'email': cliente.email or None,
+            'telefone': formatar_telefone(cliente.telefone or None),
+            'tipo': cliente.tipo or None,
+            'cnpj_cpf': formatar_cpf_cnpj(cliente.cnpj_cpf or None),
+            'im': cliente.im or None,
+            'ie': cliente.ie or None,
+            'revenda_nome': cliente.revenda_nome or None,
+            'vendedor_nome': cliente.vendedor_nome or None,
+            'tipo_servico': cliente.tipo_servico or None,
+            'localidade': cliente.localidade or None,
+            'regiao': cliente.regiao or None,
+            'atividade': cliente.atividade or None,
+            'cep': formatar_cep(cliente.cep or None),
+            'endereco': cliente.endereco or None,
+            'complemento': cliente.complemento or None,
+            'bairro': cliente.bairro or None,
+            'cidade': cliente.cidade or None,
+            'cep_cobranca': cliente.cep_cobranca or None,
+            'endereco_cobranca': cliente.endereco_cobranca or None,
+            'cidade_cobranca': cliente.cidade_cobranca or None,
+            'telefone_cobranca': cliente.telefone_cobranca or None,
+            'bairro_cobranca': cliente.bairro_cobranca or None,
+            'uf_cobranca': cliente.uf_cobranca or None,
+            'estado': cliente.estado or None,
+            'fator_juros': float(cliente.fator_juros) if cliente.fator_juros else None,
+            'plano_nome': cliente.plano_nome or None,
+            'observacao': cliente.observacao or None,
+            'data_estado': format_date(cliente.data_estado) or None,
+            'dia_vencimento': cliente.dia_vencimento or None,
+
+            # NOVO: Lista de instalações vinculadas ao cliente
+            'instalacoes': [
+                {
+                    'id': inst.id,
+                    'codigo_instalacao': inst.codigo_instalacao,
+                    'razao_social': inst.razao_social,
+                    'cep': inst.cep,
+                    'endereco': inst.endereco,
+                    'bairro': inst.bairro,
+                    'cidade': inst.cidade,
+                    'uf': inst.uf,
+                    'cadastramento': format_date(inst.cadastramento),
+                    'id_portal': inst.id_portal,
+                    'status': inst.status,
+                    'observacao': inst.observacao or '',
+                    'valor_plano': float(getattr(inst, 'valor_plano', 0.00))  # Proteção caso não exista
+                }
+                for inst in cliente.instalacoes
+            ]
+        }
+
+        return render_template('clientes.html',
+                               cliente = data,
+                               instalacoes = data['instalacoes']
+                               )
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

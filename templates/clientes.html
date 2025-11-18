@@ -25,7 +25,7 @@
             <h2>Clientes</h2>
             <div class="d-flex gap-2"> <!-- Adicionei a classe gap-2 para espaçamento uniforme -->
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClientModal">
-                    <i class="bi bi-plus-circle me-2"></i>Criar Novo Cliente
+                    <i class="bi bi-plus-circle me-2"></i>Criar Cliente
                 </button>
                 <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateClientModal">
                     <i class="bi bi-gear-wide-connected me-2"></i>Editar Cliente
@@ -84,11 +84,11 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label">Razão Social:</label>
                             <input type="text" class="form-control" value="{{ cliente.razao_social }}" id="razao_social" readonly>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label class="form-label">Nome Fantasia:</label>
                             <input type="text" class="form-control" value="{{ cliente.nome_fantasia }}" id="nome_fantasia" readonly>
                         </div>
@@ -112,11 +112,11 @@
                             <label class="form-label">CNPJ/CPF:</label>
                             <input type="text" class="form-control" value="{{ cliente.cnpj_cpf }}" id="cnpj_cpf" readonly>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <label class="form-label">IE:</label>
                             <input type="text" class="form-control" value="{{ cliente.ie }}" id="ie" readonly>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-1">
                             <label class="form-label">IM:</label>
                             <input type="text" class="form-control" value="{{ cliente.im }}" id="im" readonly>
                         </div>
@@ -208,19 +208,18 @@
         
                 <!-- Seção de Planos Associadas -->
         <div class="card mb-2">
-            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#planosCollapse">
-                <h5 class="mb-0">Planos Associadas ao Cliente</h5>
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#contratosCollapse">
+                <h5 class="mb-0">Contratos Associadas ao Cliente</h5>
             </div>
-            <div class="collapse" id="planosCollapse">
+            <div class="collapse" id="contratosCollapse">
                 <div class="card-body">
                     <div class="row g-2">
                         <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
-                            <table class="plano-table table table-striped table-bordered">
+                            <table class="contrato-table table table-striped table-bordered">
                                 <thead>
                                     <tr class="text-center">
-                                        <th>ID</th>
                                         <th>Código</th>
-                                        <th>Nome do Plano</th>
+                                        <th>Nome do Contrato</th>
                                         <th>Valor</th>
                                     </tr>
                                 </thead>
@@ -240,20 +239,20 @@
                             <div class="container mt-5 mb-4">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularPlanoModal">
-                                            <i class="bi bi-diagram-2"></i> Vincular Plano
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularContratoModal">
+                                            <i class="bi bi-diagram-2"></i> Vincular Contrato
                                         </button>
                                     </div>
 
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPlanoModal">
-                                            <i class="bi bi-plus-circle me-2"></i> Criar Plano
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createContratoModal">
+                                            <i class="bi bi-plus-circle me-2"></i> Criar Contrato
                                         </button>
                                     </div>
 
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularPlanoModal">
-                                            <i class="bi bi-trash me-2"></i> Desvincular Plano
+                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularContratoModal">
+                                            <i class="bi bi-trash me-2"></i> Desvincular Contrato
                                         </button>
                                     </div>
                                 </div>
@@ -278,7 +277,6 @@
                             <table class="instalacao-table table table-striped table-bordered">
                                 <thead>
                                     <tr class="text-center">
-                                        <th>ID</th>
                                         <th>Código</th>
                                         <th>Endereço</th>
                                         <th>Bairro</th>
@@ -325,72 +323,10 @@
                 </div>
             </div>
         </div>
-
-
-                <!-- Seção de Planos Associadas -->
-        <div class="card mb-2">
-            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#produtosCollapse">
-                <h5 class="mb-0">Produtos Associadas ao Cliente</h5>
-            </div>
-            <div class="collapse" id="produtosCollapse">
-                <div class="card-body">
-                    <div class="row g-2">
-                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
-                            <table class="produto-table table table-striped table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Nome do Produto</th>
-                                        <th>Descrição</th>
-                                        <th>Quantidade</th>
-                                        <th>Preço Unitário</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- O JS preencherá esta parte -->
-                                </tbody>
-                            </table>
-
-                            <!-- Paginação para instalações -->
-                            <div id="produto-pagination" class="d-flex justify-content-center mt-3">
-                                <button id="produto-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
-                                <span id="produto-pageInfo" class="align-self-center"></span>
-                                <button id="produto-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
-                            </div>
-
-                            <!-- Botões de ação -->
-                            <div class="container mt-5 mb-4">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularProdutoModal">
-                                            <i class="bi bi-diagram-2"></i> Vincular Produto
-                                        </button>
-                                    </div>
-
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProdutoModal">
-                                            <i class="bi bi-plus-circle me-2"></i> Criar Produto
-                                        </button>
-                                    </div>
-
-                                    <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularProdutoModal">
-                                            <i class="bi bi-trash me-2"></i> Desvincular Produto
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         
         <!-- Other Details Section -->
         <div class="card">
-            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#otherDetailsCollapse" aria-expanded="true" aria-controls="otherDetailsCollapse">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#otherDetailsCollapse" aria-expanded="false" aria-controls="otherDetailsCollapse">
                 <h5 class="mb-0">Outros Detalhes do Cliente</h5>
             </div>
             <div class="collapse show" id="otherDetailsCollapse">

@@ -1,0 +1,115 @@
+<!-- MODAL DE PLANOS (ESTILO PADRÃO) -->
+<div class="modal fade" id="createPlanoModal" tabindex="-1" aria-labelledby="createPlanoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="createPlanoModalLabel">Novo Plano</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('planos_bp.insert_planos') }}" id="createPlanoForm">
+
+                    <!-- Informações Básicas -->
+                    <div class="modal-section-header">Informações Básicas</div>
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-md-2">
+                            <label class="form-label">Código:</label>
+                            <input type="text" id="codigo" name="codigo" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-5">
+                            <label class="form-label">Nome do Plano:</label>
+                            <input type="text" id="nome" name="nome" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-1">
+                            <label class="form-label">Valor:</label>
+                            <input type="text" id="valor" name="valor" class="form-control" placeholder="0.00">
+                        </div>
+
+                        <div class="col-md-1">
+                            <label class="form-label">Id Portal:</label>
+                            <input type="text" id="id_produto" name="id_produto" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Vincular a Contrato:</label>
+                            <select id="contrato_id" name="contrato_id" class="form-select">
+                                <option value="">Carregando contratos...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Vincular ao Cliente:</label>
+                            <select id="cliente_id" name="cliente_id" class="form-select">
+                                <option value="">Carregando clientes...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Vincular Produto:</label>
+                            <select id="produto_id" name="produto_id" class="form-select">
+                                <option value="">Carregando produtos...</option>
+                                {% for produto in produtos %}
+                                    <option value="{{ produto.id }}" data-preco="{{ produto.preco_base }}">
+                                        {{ produto.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label">Qtd Produto:</label>
+                            <input type="number" id="qtd_produto" name="qtd_produto" class="form-control" placeholder="0">
+                        </div>
+
+                    </div>
+
+                    <!-- Informações Fiscais -->
+                    <div class="modal-section-header">Informações Fiscais</div>
+
+                    <div class="row g-3 mb-4">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Descrição Boleto:</label>
+                            <input type="text" id="desc_boleto_licenca" name="desc_boleto_licenca" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Alíquota:</label>
+                            <input type="text" id="aliquota_sp_licenca" name="aliquota_sp_licenca" class="form-control" placeholder="0.00">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label">Código Serviço:</label>
+                            <input type="text" id="cod_servico_sp_licenca" name="cod_servico_sp_licenca" class="form-control" placeholder="000">
+                        </div>
+
+                        <div class="col-md-12">
+                            <label class="form-label">Descrição para NF:</label>
+                            <textarea name="desc_nf_licenca" id="desc_nf_licenca" class="form-control"></textarea>
+                        </div>
+
+                    </div>
+
+                    <!-- Ações -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup_contratos.css')}}">
+<script src="{{ url_for('static', filename='js/planos/planos.js') }}"></script>

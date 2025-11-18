@@ -24,7 +24,7 @@
             <h2>Contratos</h2>
             <div class="d-flex gap-2"> <!-- Mesma classe gap-2 dos clientes -->
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createContractModal">
-                    <i class="bi bi-plus-circle me-2"></i>Criar Novo Contrato
+                    <i class="bi bi-plus-circle me-2"></i>Criar Contrato
                 </button>
                 <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateContractModal">
                     <i class="bi bi-gear-wide-connected me-2"></i>Editar Contrato
@@ -400,7 +400,7 @@
 
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-primary me-2 btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#createPlanosModal">
+                                data-bs-toggle="modal" data-bs-target="#createPlanoModal">
                         <i class="bi bi-plus-circle me-2"></i> Criar Plano
                         </button>
                     </div>
@@ -520,7 +520,7 @@
     {% include 'popup/produto/popup_produto.html' %}
 
     <!--Popus planos-->
-    {% include 'popup/planos/popup_planos.html' %}
+    {% include 'popup/contratos/popup_contratos_planos.html' %}
 
      <!--Popus vinculos-->
     {% include 'popup/contratos/popup_vincular_produto.html' %}

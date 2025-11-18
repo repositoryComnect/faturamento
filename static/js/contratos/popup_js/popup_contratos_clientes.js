@@ -110,10 +110,20 @@
                 : '';
         }
 
+        // Função principal de busca de contrato
         function buscarContrato(termo) {
-            if (!termo) return;
-            $('#loadingContrato').removeClass('d-none');
-            clearTimeout(timeoutBuscaContrato);
+            if (!termo) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo vazio',
+                text: 'Digite o número ou nome do contrato antes de buscar.',
+                toast: true,
+                position: 'top-end',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            return;
+            }
 
             timeoutBuscaContrato = setTimeout(() => {
                 $.ajax({
@@ -174,3 +184,6 @@
     })();
 
 })();
+
+
+

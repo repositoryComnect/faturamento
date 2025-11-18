@@ -14,17 +14,26 @@
                 <div class="modal-body">
                     <form id="contractForm" action="{{ url_for('cliente_bp.update_cliente') }}" method="POST">
 
-                        <!-- New Section: Search Clients -->
-                        <div class="card mb-2">
+                        <!-- Seção de Busca -->
+                        <div class="card mb-3">
                             <div class="card-header bg-light">
                                 <h5 class="mb-0">Procurar Clientes</h5>
                             </div>
                             <div class="card-body">
-                                <div class="row g-3">
-                                    <div class="col-md-12">
-                                        <label for="search_client" class="form-label">Insira a Sequência, CNPJ ou Razão Social do Cliente:</label>
-                                        <input type="text" class="form-control" id="search_edit_client" name="search_edit_client" placeholder="Search clients...">
-                                    </div>
+                                <label for="search_edit_client" class="form-label">Insira a Sequência, CNPJ ou Razão Social do Cliente</label>
+                                <div class="input-group">
+                                <input type="text" class="form-control" id="search_edit_client" name="search_edit_client"
+                                        placeholder="Digite o número ou nome do cliente...">
+
+                                <!-- Botão de busca manual -->
+                                <button class="btn btn-secondary" type="button" id="btnBuscarCliente">
+                                    <i class="bi bi-search"></i>
+                                </button>
+
+                                <!-- Spinner de carregamento -->
+                                <span id="loadingCliente" class="input-group-text d-none">
+                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                </span>
                                 </div>
                             </div>
                         </div>
@@ -39,14 +48,14 @@
                                 <div class="card-body">
                                     <div class="row g-3">
                                         <div class="col-md-2">
-                                            <label class="form-label">Id Cliente:</label>
+                                            <label class="form-label">Código Cliente:</label>
                                             <input type="text" class="form-control" value="" id="sequel" name="sequel" readonly>
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label class="form-label">Razão Social:</label>
-                                            <input type="text" class="form-control" value="" id="corporate_name" name="corporate_name">
+                                            <input type="text" class="form-control" value="" id="razao_social_editar_popup" name="razao_social_editar_popup">
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-4">
                                             <label class="form-label">Nome Fantasia:</label>
                                             <input type="text" class="form-control" value="" id="second_name" name="second_name">
                                         </div>
@@ -66,9 +75,9 @@
                                                 <option value="Pessoa Física">Pessoa Física</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label">CNPJ:</label>
-                                            <input type="text" class="form-control" value="" id="cpf_cnpj" name="cpf_cnpj">
+                                        <div class="col-md-4">
+                                            <label class="form-label">CNPJ/CPF:</label>
+                                            <input type="text" class="form-control" value="" id="cnpj_cpf_editar_popup" name="cnpj_cpf_editar_popup">
                                         </div>
                                         <div class="col-md-2">
                                             <label class="form-label">IE:</label>
@@ -103,7 +112,7 @@
                                             <label class="form-label">CEP:</label>
                                             <input type="text" class="form-control" value="" id="postal_code" name="postal_code">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Endereço:</label>
                                             <input type="text" class="form-control" value="" id="street" name="street">
                                         </div>
@@ -144,7 +153,7 @@
                                             <label class="form-label">CEP:</label>
                                             <input type="text" class="form-control" value="" id="postal_code" name="postal_code">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Endereço:</label>
                                             <input type="text" class="form-control" value="" id="street" name="street">
                                         </div>
@@ -214,7 +223,7 @@
                             </div>
                         </div>-->
 
-                        <div class="card mb-2">
+                        <!--<div class="card mb-2">
                             <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#addressInstalacoesEditCollapse" role="button">
                                 <h5 class="mb-0">Instalações</h5>
                             </div>
@@ -225,7 +234,7 @@
                                             <label class="form-label">CEP:</label>
                                             <input type="text" class="form-control" value="" id="postal_code" name="postal_code">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Endereço:</label>
                                             <input type="text" class="form-control" value="" id="street" name="street">
                                         </div>
@@ -253,7 +262,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>-->
 
                         <!-- Other Details Section -->
                         <div class="card">

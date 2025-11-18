@@ -82,20 +82,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 //  Busca o próximo código de plano
+function carregarCodigoPlano(modalEl) {
+    const campo = modalEl.querySelector('#codigo');
+    if (!campo) return;
+
+    fetch('/proximo_codigo_plano')
+        .then(response => response.json())
+        .then(data => {
+            if (data.proximo_codigo) {
+                campo.value = data.proximo_codigo;
+            } else {
+                console.warn("Código de plano não retornado pela API.");
+            }
+        })
+        .catch(error => {
+            console.error("Erro ao buscar código de plano:", error);
+        });
+}
+
+//  Se o campo existir na página normal
 document.addEventListener("DOMContentLoaded", function () {
-        fetch('/proximo_codigo_plano')
-            .then(response => response.json())
-            .then(data => {
-                if (data.proximo_codigo) {
-                    document.getElementById('codigo').value = data.proximo_codigo;
-                } else {
-                    console.warn("Código de plano não retornado pela API.");
-                }
-            })
-            .catch(error => {
-                console.error("Erro ao buscar código de plano:", error);
-            });
-    });
+    const campoPagina = document.querySelector('#codigo');
+    if (campoPagina) {
+        carregarCodigoPlano(document);
+    }
+});
+
+//  Quando o modal abrir
+document.addEventListener('shown.bs.modal', function (event) {
+    if (event.target.id === "createPlanoModal") {
+        carregarCodigoPlano(event.target);
+    }
+});
+
+
 
 
 
@@ -128,3 +148,40 @@ document.addEventListener("DOMContentLoaded", function () {
                 select.innerHTML = '<option value="">Erro ao carregar produtos</option>';
             });
     });
+
+
+    // Script regras campos de valor
+
+    document.addEventListener("DOMContentLoaded", () => {
+    const valorInput = document.getElementById("valor");
+    const qtdProdutoInput = document.getElementById("qtd_produto");
+    const produtoSelect = document.getElementById("produto_id");
+
+    function atualizarEstadoQuantidade() {
+
+        const valorInformado = valorInput.value.trim() !== "";
+        const produtoVinculado = produtoSelect.value !== "";
+
+        // Se o VALOR for informado → desabilita quantidade
+        if (valorInformado) {
+            qtdProdutoInput.disabled = true;
+            return;
+        }
+
+        // Se existir produto vinculado → habilita quantidade
+        if (produtoVinculado) {
+            qtdProdutoInput.disabled = false;
+            return;
+        }
+
+        // Caso contrário deixa habilitado
+        qtdProdutoInput.disabled = false;
+    }
+
+    // Eventos
+    valorInput.addEventListener("input", atualizarEstadoQuantidade);
+    produtoSelect.addEventListener("change", atualizarEstadoQuantidade);
+
+    // Garantir estado correto quando o modal abrir
+    document.addEventListener('shown.bs.modal', atualizarEstadoQuantidade);
+});

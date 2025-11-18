@@ -289,36 +289,61 @@
     });
 
 
-//<!-- Bloco de buscar os dados do meu cliente PopUp Edit Cliente-->
+// 🔹 Buscar cliente manualmente (clique ou Enter)
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("✅ DOM totalmente carregado — script ativo.");
 
-(function() {
-    var timeoutSeguenceEditId;
+    let timeoutSeguenceEditId;
 
+    // Função de formatação de data
+    function formatarData(data) {
+        const date = new Date(data);
+        if (isNaN(date)) return '';
+        return date.toISOString().split('T')[0]; // yyyy-mm-dd
+    }
+
+    // Função principal de busca
     function buscarCliente(termo) {
-        if (!termo) return;
+        console.log("🔎 Função buscarCliente chamada com termo:", termo);
+
+        if (!termo) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo vazio',
+                text: 'Digite o nome, razão social ou CNPJ antes de buscar.',
+                toast: true,
+                position: 'top-end',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            return;
+        }
 
         $('#loadingCliente').removeClass('d-none');
         clearTimeout(timeoutSeguenceEditId);
 
         timeoutSeguenceEditId = setTimeout(() => {
+            console.log("📡 Enviando requisição AJAX para /buscar_cliente ...");
+
             $.ajax({
                 url: '/buscar_cliente',
                 method: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ termo: termo }),
-                
-                success: function(data) {
-                    console.log("Dados recebidos:", data);
+                data: JSON.stringify({ termo }),
+
+                success: function (data) {
+                    console.log("✅ Dados recebidos do servidor:", data);
+
                     if (data.success) {
                         const cliente = data.cliente;
                         const fieldMap = {
                             'sequel': '#sequel',
-                            'corporate_name': '#corporate_name',
+                            'corporate_name': '#razao_social_editar_popup',
                             'second_name': '#second_name',
                             'cadastramento': '#registration',
                             'atualizacao': '#update',
                             'tipo': '#type',
-                            'cpf_cnpj': '#cpf_cnpj',
+                            'cnpj_cpf': '#cnpj_cpf_editar_popup',
                             'ie': '#state_registration',
                             'im': '#municipal_registration',
                             'email_address': '#email_address',
@@ -348,32 +373,42 @@
                                 }
                             }
                         }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Cliente encontrado!',
+                            text: 'Os dados foram carregados com sucesso.',
+                            toast: true,
+                            timer: 2500,
+                            position: 'top-end',
+                            showConfirmButton: false
+                        });
+
                     } else {
                         Swal.fire({
                             icon: 'warning',
                             title: 'Cliente não encontrado',
                             text: 'Verifique o nome, razão social ou CNPJ informado.',
-                            timer: 6000,
-                            timerProgressBar: true,
-                            showConfirmButton: true,
+                            timer: 5000,
                             toast: true,
-                            position: 'top-end'
+                            position: 'top-end',
+                            showConfirmButton: false
                         });
                     }
 
                     $('#loadingCliente').addClass('d-none');
                 },
-                error: function(xhr, status, error) {
-                    console.error("Erro na requisição:", status, error);
+
+                error: function (xhr, status, error) {
+                    console.error("❌ Erro na requisição:", status, error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro ao buscar cliente',
-                        text: 'Ocorreu um problema na comunicação com o servidor. Verifique o console para mais detalhes.',
-                        timer: 6000,
-                        timerProgressBar: true,
-                        showConfirmButton: true,
+                        text: 'Ocorreu um problema na comunicação com o servidor.',
+                        timer: 4000,
                         toast: true,
-                        position: 'top-end'
+                        position: 'top-end',
+                        showConfirmButton: false
                     });
                     $('#loadingCliente').addClass('d-none');
                 }
@@ -381,17 +416,23 @@
         }, 500);
     }
 
-    function formatarData(data) {
-        const date = new Date(data);
-        if (isNaN(date)) return '';
-        return date.toISOString().split('T')[0]; // yyyy-mm-dd
-    }
-
-    $('#search_edit_client').on('input', function() {
-        const termo = $(this).val();
-        buscarCliente(termo);
+    // 🔹 Clique do botão
+    $('#btnBuscarCliente').on('click', function () {
+        console.log("🖱️ Botão de busca clicado!");
+        buscarCliente($('#search_edit_client').val());
     });
-})();
+
+    // 🔹 Pressionar Enter no campo
+    $('#search_edit_client').on('keypress', function (e) {
+        if (e.which === 13) {
+            console.log("⌨️ Enter pressionado!");
+            e.preventDefault();
+            buscarCliente($(this).val());
+        }
+    });
+});
+
+
 
 
 
@@ -447,9 +488,35 @@
 
 // Bloco buscar contrato set cliente -->
 
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("✅ Script buscarContrato ativo");
+
     let timeoutId;
+
+    // Função para formatar datas
+    function formatarData(data) {
+        const d = new Date(data);
+        if (isNaN(d)) return '';
+        return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
+    }
+
+    // Função principal de busca
     function buscarContrato(termo) {
-        if (!termo) return;
+        console.log("🔎 Buscando contrato com termo:", termo);
+
+        if (!termo) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo vazio',
+                text: 'Digite o número do contrato ou nome antes de buscar.',
+                toast: true,
+                position: 'top-end',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            return;
+        }
+
         $('#loadingContrato').removeClass('d-none');
         clearTimeout(timeoutId);
 
@@ -459,24 +526,24 @@
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ termo: termo }),
-                success: function(data) {
-                    console.log("Dados recebidos:", data);
+                success: function (data) {
+                    console.log("📦 Dados recebidos:", data);
+
                     if (data.success) {
                         const contrato = data.contrato;
+
                         const fieldMap = {
                             'numero': '#contract_number',
                             'razao_social': '#company_name',
-                            //'registration': '#registration',
                             'nome_fantasia': '#trade_name',
-                            //'atualizacao': '#update',
-                            'tipo': '#type',
+                            'tipo': '#tipo_cliente',
                             'contato': '#contact',
                             'id_matriz_portal': '#id_matriz_portal',
                             'address_email': '#address_email',
                             'telefone': '#phone',
                             'responsavel': '#responsible',
                             'zip_code_cep': '#zip_code_cep',
-                            'cnpj_cpf': '#cnpj_cpf',
+                            'cnpj_cpf': '#cnpj_cpf_cliente',
                             'endereco': '#address',
                             'complemento': '#complement',
                             'bairro': '#neighborhood',
@@ -486,34 +553,72 @@
                             'dia_vencimento': '#last_day',
                             'estado_contrato': '#current_state',
                             'data_estado': '#state_date',
-                            'motivo_estado': '#reason',
-                            'estado_contrato': '#current_state',
+                            'motivo_estado': '#reason'
                         };
 
                         for (const key in fieldMap) {
+                            const fieldSelector = fieldMap[key];
                             if (contrato[key] !== null && contrato[key] !== undefined) {
-                                const val = (key.includes('data')) ? formatarData(contrato[key]) : contrato[key];
-                                $(fieldMap[key]).val(val);
+                                const val = key.includes('data') ? formatarData(contrato[key]) : contrato[key];
+                                $(fieldSelector).val(val);
                             }
                         }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Contrato encontrado!',
+                            text: 'Os dados foram carregados com sucesso.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 2500,
+                            showConfirmButton: false
+                        });
+
                     } else {
-                        alert('Contrato não encontrado!');
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Contrato não encontrado',
+                            text: 'Verifique o número ou nome informado.',
+                            toast: true,
+                            position: 'top-end',
+                            timer: 4000,
+                            showConfirmButton: false
+                        });
                     }
+
                     $('#loadingContrato').addClass('d-none');
                 },
-                error: function(xhr, status, error) {
-                    console.error("Erro:", status, error);
-                    alert('Erro ao buscar contrato.');
+                error: function (xhr, status, error) {
+                    console.error("❌ Erro ao buscar contrato:", status, error);
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Erro ao buscar contrato',
+                        text: 'Ocorreu um problema na comunicação com o servidor.',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 4000,
+                        showConfirmButton: false
+                    });
+
                     $('#loadingContrato').addClass('d-none');
                 }
             });
-        }, 1000);
-    }
-    function formatarData(data) {
-        const d = new Date(data);
-        return !isNaN(d) ? `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}` : '';
+        }, 600);
     }
 
-    $('#search_contract').on('input', function() {
-        buscarContrato($(this).val());
+    // Clique no botão de busca
+    $('#btnBuscarContrato').on('click', function () {
+        console.log("🖱️ Clique no botão de busca de contrato");
+        buscarContrato($('#search_contract').val());
     });
+
+    // Pressionar Enter no campo
+    $('#search_contract').on('keypress', function (e) {
+        if (e.which === 13) {
+            console.log("⌨️ Enter pressionado no campo de busca de contrato");
+            e.preventDefault();
+            buscarContrato($(this).val());
+        }
+    });
+});
