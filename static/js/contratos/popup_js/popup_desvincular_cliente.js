@@ -36,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
               data.forEach(cliente => {
                 const option = document.createElement("option");
                 option.value = cliente.id;
-                option.text = cliente.razao_social;
+                option.text = `${cliente.codigo} - ${cliente.razao_social}`;
                 clienteSelect.appendChild(option);
               });
             }

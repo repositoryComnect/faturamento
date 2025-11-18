@@ -398,7 +398,6 @@ def buscar_contrato_por_numero(numero):
         print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
         return jsonify({'error': 'Erro ao processar a requisição'}), 500"""
 
-
 @contratos_bp.route('/contratos/buscar-por-numero/<numero>', methods=['GET'])
 def buscar_contrato_por_numero(numero):
     empresa_id = session.get('empresa')
@@ -491,11 +490,6 @@ def buscar_contrato_por_numero(numero):
     except Exception as e:
         print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
         return jsonify({'error': 'Erro ao processar a requisição'}), 500
-
-
-
-
-
 
 @contratos_bp.route('/set_contrato', methods=['POST'])
 def set_contrato():
@@ -739,10 +733,11 @@ def vincular_clientes():
             raise ValueError("Contrato não encontrado.")
 
         # 2. Obter lista de IDs dos clientes a serem associados
-        cliente_ids = request.form.getlist('cliente_ids')
+        cliente_ids = request.form.get('cliente_ids')
         clientes_nao_encontrados = []
 
-        for cliente_id in cliente_ids:
+        # Loop antigo de N:N
+        """for cliente_id in cliente_ids:
             cliente = Cliente.query.get(cliente_id)
             if cliente:
                 # Verifica se já está associado
@@ -750,6 +745,8 @@ def vincular_clientes():
                     contrato.clientes.append(cliente)
             else:
                 clientes_nao_encontrados.append(cliente_id)
+        """
+        contrato.cliente_id = cliente_ids
 
         if clientes_nao_encontrados:
             raise ValueError(f"Clientes não encontrados: {', '.join(map(str, clientes_nao_encontrados))}")
@@ -774,9 +771,16 @@ def clientes_por_contrato(contrato_id):
     contrato = Contrato.query.get(contrato_id)
     if not contrato:
         return jsonify([]), 404
-
-    clientes = contrato.clientes
-    return jsonify([{'id': c.id, 'razao_social': c.razao_social} for c in clientes])
+    
+    cliente = Cliente.query.get(contrato.cliente_id)
+    if not cliente:
+        return jsonify([]), 404
+    
+    return jsonify([{
+        'id': cliente.id,
+        'razao_social': cliente.razao_social,
+        'codigo': cliente.sequencia
+    }])
 
 @contratos_bp.route('/desvincular-clientes', methods=['POST'])
 def desvincular_clientes():
@@ -787,11 +791,14 @@ def desvincular_clientes():
         contrato = Contrato.query.get(contrato_id)
         if not contrato:
             raise ValueError("Contrato não encontrado.")
+        
+        contrato.cliente_id = None
 
-        for cliente_id in cliente_ids:
+        # Loop utilizado para realizar o N:N, no momento não utilizado 
+        """for cliente_id in cliente_ids:
             cliente = Cliente.query.get(cliente_id)
             if cliente and cliente in contrato.clientes:
-                contrato.clientes.remove(cliente)
+                contrato.clientes.remove(cliente)"""
 
         db.session.commit()
         flash("Clientes desvinculados com sucesso.", "success")
@@ -1190,7 +1197,6 @@ def render_cliente(sequencia):
     cliente = Cliente.query.filter_by(sequencia=sequencia, empresa_id=empresa_id).first()
     return render_template('clientes.html', cliente=cliente)
 
-
 # Redirecionamento template de relação de clientes vinculados
 @contratos_bp.route('/planos/<codigo>', methods=['GET'])
 def render_planos_codigo(codigo):
@@ -1207,8 +1213,6 @@ def render_planos_codigo(codigo):
         planos=planos,
         plano_selecionado=plano_selecionado
     )
-
-
 
 '''@contratos_bp.route('/render_clientes/buscar-por-numero/<sequencia>', methods=['GET'])
 def buscar_render_cliente_por_contrato(sequencia):
