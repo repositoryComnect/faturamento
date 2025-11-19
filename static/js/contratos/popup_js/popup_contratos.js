@@ -189,50 +189,62 @@
 //<!-- Bloco que me tras os vendedores cadastrados -->
 
     document.addEventListener('DOMContentLoaded', function () {
-        fetch('/api/vendedores')
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('vendedor_selecionado');
-                select.innerHTML = '<option value="">Selecione um vendedor</option>';
+    fetch('/api/vendedores')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('vendedor_selecionado');
+            select.innerHTML = '<option value="">Selecione um distribuidor</option>';
 
-                data.forEach(vendedor => {
-                    // Criação de um novo <option> para cada vendedor
-                    const option = document.createElement('option');
-                    option.value = vendedor.id;  // Usando 'id' para associar o vendedor
-                    option.textContent = vendedor.nome;  // Exibindo o 'nome' do vendedor
-                    select.appendChild(option);  // Adiciona a opção ao select
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao buscar vendedores:', error);
-                const select = document.getElementById('vendedor_selecionado');
-                select.innerHTML = '<option value="">Erro ao carregar vendedores</option>';
+            data.forEach(vendedor => {
+                
+                const codigo = vendedor.codigo ?? "Sem código";
+                const nome = vendedor.nome;
+
+                const option = document.createElement('option');
+                option.value = codigo;
+                option.textContent = `${codigo} - ${nome}`; // CONCATENA ID + NOME
+
+                select.appendChild(option);
             });
-    });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar vendedores:', error);
+            const select = document.getElementById('vendedor_selecionado');
+            select.innerHTML = '<option value="">Erro ao carregar vendedores</option>';
+        });
+});
 
 
 //<!-- Bloco que me tras as revendas cadastradas -->
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/revendas_ativas')
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('revenda_selecionada');
-                select.innerHTML = '<option value="">Selecione uma revenda</option>';
+  document.addEventListener('DOMContentLoaded', function () {
+    fetch('/revendas_ativas')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('revenda_selecionada');
 
-                data.forEach(nome => {
-                    const option = document.createElement('option');
-                    option.value = nome;       // Usando o nome como valor
-                    option.textContent = nome; // Mostrando o nome
-                    select.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao buscar revendas:', error);
-                const select = document.getElementById('revenda_selecionada');
-                select.innerHTML = '<option value="">Erro ao carregar revendas</option>';
+            select.innerHTML = '<option value="">Selecione uma revenda</option>';
+
+            data.forEach(revenda => {
+
+                const codigo = revenda.codigo ?? "SEM CÓDIGO";
+                const nome = revenda.nome;
+
+                const option = document.createElement('option');
+
+                option.value = codigo;  
+                option.textContent = `${codigo} - ${nome}`;
+
+                select.appendChild(option);
             });
-    });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar revendas:', error);
+            const select = document.getElementById('revenda_selecionada');
+            select.innerHTML = '<option value="">Erro ao carregar revendas</option>';
+        });
+});
+
 
 
 
@@ -374,36 +386,37 @@ $(document).ready(function () {
   });
 });
 
-
-
-
-
-
 //<!-- Bloco que traz os clientes cadastrados -->
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/get/list/clientes')
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('cliente_selecionado');
-                select.innerHTML = '<option value="">Vincule um cliente</option>';
-    
-                data.forEach(cliente => {
-                    const option = document.createElement('option');
-                    option.value = cliente.id;                    // Enviado para o backend
-                    option.textContent = cliente.razao_social;    // Exibido no frontend
-                    select.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao buscar clientes:', error);
-                const select = document.getElementById('cliente_selecionado');
-                select.innerHTML = '<option value="">Erro ao carregar clientes</option>';
-            });
-    });
-    
-    
+   document.addEventListener('DOMContentLoaded', function () {
+    fetch('/get/list/clientes')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('cliente_selecionado');
+            select.innerHTML = '<option value="">Vincule um cliente</option>';
 
+            data.forEach(cliente => {
+
+                const codigo = cliente.codigo ?? "SEM-CODIGO";
+                const nome = cliente.razao_social;
+                const documento = cliente.cnpj_cpf ?? "";
+
+                const option = document.createElement('option');
+                option.value = cliente.id; // backend recebe ID
+
+                // TEXTO EXIBIDO CONCATENADO
+                option.textContent = `${codigo} - ${nome} (${documento})`;
+
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar clientes:', error);
+            const select = document.getElementById('cliente_selecionado');
+            select.innerHTML = '<option value="">Erro ao carregar clientes</option>';
+        });
+});
+    
 //<!-- Bloco do popup de Delete contratos -->
 
     document.addEventListener('DOMContentLoaded', function () {

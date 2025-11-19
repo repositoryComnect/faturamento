@@ -208,7 +208,7 @@ def delete_planos():
             return redirect(url_for('home_bp.render_planos'))
 
         plano_id = plano_id_result[0]
-        print(f"✅ Plano encontrado com ID: {plano_id}")
+        print(f" Plano encontrado com ID: {plano_id}")
 
         # 2. Deletar vínculos na tabela contrato_plano
         deleted_links = db.session.execute(
@@ -222,14 +222,14 @@ def delete_planos():
             text("DELETE FROM planos WHERE id = :plano_id"),
             {'plano_id': plano_id}
         )
-        print(f"🗑️ Plano deletado? {deleted_plan.rowcount > 0}")
+        print(f" Plano deletado? {deleted_plan.rowcount > 0}")
 
         db.session.commit()
         flash('Plano excluído com sucesso', 'success')
 
     except Exception as e:
         db.session.rollback()
-        print(f"🚨 Erro ao excluir plano: {str(e)}")
+        print(f" Erro ao excluir plano: {str(e)}")
         flash('Erro ao tentar excluir o plano.', 'error')
 
     return redirect(url_for('home_bp.render_planos'))

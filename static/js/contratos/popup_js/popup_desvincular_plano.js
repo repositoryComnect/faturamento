@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
               data.forEach(plano => {
                 const option = document.createElement("option");
                 option.value = plano.id;
-                option.text = `${plano.nome} - R$ ${plano.valor}`;
+                option.text = `${plano.codigo} - ${plano.nome} - R$ ${plano.valor}`;
                 planoSelect.appendChild(option);
               });
             }

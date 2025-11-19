@@ -4,6 +4,7 @@ from datetime import datetime, date
 from sqlalchemy.orm import joinedload
 from sqlalchemy import text
 from modules.utils.utils import formatar_telefone, safe_float, safe_date, parse_date, formatar_cep, formatar_cpf_cnpj
+from modules.contratos.utils import parse_date, parse_int, parse_float, parse_bool
 import re
 
 contratos_bp = Blueprint('contratos_bp', __name__)
@@ -43,7 +44,7 @@ def produtos_ativos():
 def planos_ativos():
     empresa_id = session.get('empresa')
     planos = Plano.query.filter_by(empresa_id=empresa_id).order_by(Plano.nome).all()
-    resultado = [{'id': p.id, 'nome': p.nome, 'valor': str(p.valor)} for p in planos]
+    resultado = [{'id': p.id, 'codigo': p.codigo, 'nome': p.nome, 'valor': str(p.valor)} for p in planos]
     return jsonify(resultado)
 
 @contratos_bp.route('/contratos/delete', methods=['POST'])
@@ -504,33 +505,6 @@ def set_contrato():
         db.session.rollback()
         form_data = request.form.to_dict()
 
-        def parse_date(date_str):
-            if not date_str:
-                return None
-            for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
-                try:
-                    return datetime.strptime(date_str, fmt).date()
-                except ValueError:
-                    continue
-            return None
-
-        def parse_int(value):
-            try:
-                return int(value) if value else None
-            except (ValueError, TypeError):
-                return None
-
-        def parse_float(value):
-            try:
-                return float(value) if value else None
-            except (ValueError, TypeError):
-                return None
-
-        def parse_bool(value):
-            if isinstance(value, str):
-                return value.lower() in ('true', '1', 'yes', 'y', 't')
-            return bool(value)
-
         # Dados principais do contrato
         contrato_data = {
             'numero': form_data.get('numero_contrato'),
@@ -538,7 +512,7 @@ def set_contrato():
             'atualizacao': parse_date(form_data.get('update_datetime')),
             'tipo': form_data.get('tipo_contrato'),
             'id_matriz_portal': form_data.get('portal_id'),
-            'cnpj_cpf': form_data.get('cnpj'),
+            'cnpj_cpf': formatar_cpf_cnpj(form_data.get('cnpj')),
             'tipo_pessoa': form_data.get('people_type'),
             'revenda': form_data.get('revenda_selecionada'),
             'vendedor': form_data.get('vendedor_selecionado'),
@@ -546,8 +520,8 @@ def set_contrato():
             'nome_fantasia': form_data.get('nome_fantasia'),
             'contato': form_data.get('contato'),
             'email': form_data.get('email'),
-            'telefone': form_data.get('telefone'),
-            'cep': form_data.get('cep'),
+            'telefone': formatar_telefone(form_data.get('telefone')),
+            'cep': formatar_cep(form_data.get('cep')),
             'endereco': form_data.get('endereco'),
             'complemento': form_data.get('complemento'),
             'bairro': form_data.get('bairro'),
@@ -560,6 +534,7 @@ def set_contrato():
             'estado_contrato': form_data.get('estado_contrato'),
             'data_estado': parse_date(form_data.get('date_status')),
             'motivo_estado': form_data.get('motivo_estado'),
+            'cliente_id' : form_data.get('cliente_selecionado'),
             'empresa_id': session.get('empresa') 
         }
 
@@ -596,22 +571,6 @@ def set_contrato():
             if plano:
                 novo_contrato.planos.append(plano)
                 db.session.commit()
-
-            cliente_id = request.form.get('cliente_selecionado')
-
-        # Se um cliente foi selecionado, associar
-        if cliente_id:
-            try:
-                cliente_id_int = int(cliente_id)
-                stmt = cliente_contrato.insert().values(
-                    cliente_id=cliente_id_int,
-                    contrato_id=novo_contrato.id
-                )
-                db.session.execute(stmt)
-                db.session.commit()
-            except ValueError:
-                # Cliente ID inválido (ex: string não numérica)
-                print(f"ID de cliente inválido: {cliente_id}")
 
         # Ajusta auto_increment (opcional)
         try:
@@ -700,9 +659,21 @@ def get_id_contratos():
 
 @contratos_bp.route('/revendas_ativas', methods=['GET'])
 def get_revendas_ativas():
-    revendas = Revenda.query.filter_by(status='Ativo').order_by(Revenda.nome).all()
-    resultado = [r.nome for r in revendas]
-    return jsonify(resultado)
+    try:
+        revendas = Revenda.query.filter_by(status='Ativo').order_by(Revenda.nome).all()
+        resultado = [
+            {
+                'codigo': r.codigo,
+                'nome': r.nome
+            }
+            for r in revendas
+        ]
+
+        return jsonify(resultado), 200
+
+    except Exception as e:
+        print("Erro ao buscar revendas:", e)
+        return jsonify({'error': 'Erro ao buscar revendas'}), 500
 
 @contratos_bp.route('/get/list/clientes', methods=['GET'])
 def get_list_clientes():
@@ -711,14 +682,23 @@ def get_list_clientes():
     if not empresa_id:
         return jsonify({'erro': 'Empresa não definida na sessão'}), 401
 
-    # Filtra clientes ativos e pertencentes à empresa da sessão
     clientes = Cliente.query.filter_by(
         estado_atual='Ativo',
         empresa_id=empresa_id
     ).order_by(Cliente.razao_social).all()
 
-    resultado = [{'id': c.id, 'razao_social': c.razao_social, 'codigo': c.sequencia, 'cnpj_cpf': c.cnpj_cpf} for c in clientes]
+    resultado = [
+        {
+            'id': c.id,
+            'razao_social': c.razao_social,
+            'codigo': c.sequencia,
+            'cnpj_cpf': c.cnpj_cpf
+        } 
+        for c in clientes
+    ]
+
     return jsonify(resultado)
+
 
 @contratos_bp.route('/vincular-clientes', methods=['POST'])
 def vincular_clientes():
@@ -812,13 +792,12 @@ def desvincular_clientes():
 
 @contratos_bp.route('/vincular-planos', methods=['POST'])
 def vincular_planos():
-    empresa_id = session.get('empresa')
     try:
         db.session.begin()
 
         # 1. Obter o contrato pelo ID
-        contrato_id = request.form.get('contrato_id')
-        contrato = Contrato.query.filter_by.get(contrato_id)
+        contrato_id = request.form.get('contrato_id_vincular_plano')
+        contrato = Contrato.query.get(contrato_id)
 
         if not contrato:
             raise ValueError("Contrato não encontrado.")
@@ -859,7 +838,7 @@ def desvincular_planos():
     try:
         db.session.begin()
 
-        contrato_id = request.form.get('contrato_id')
+        contrato_id = request.form.get('desvincular_contrato_id_planos')
         plano_ids = request.form.getlist('planos_ids')  # nome do campo no formulário HTML
 
         contrato = Contrato.query.get(contrato_id)
@@ -903,7 +882,8 @@ def planos_por_contrato(contrato_id):
         {
             'id': plano.id,
             'nome': plano.nome,
-            'valor': str(plano.valor)
+            'valor': str(plano.valor),
+            'codigo': plano.codigo 
         } for plano in planos
     ])
 
@@ -945,13 +925,15 @@ def produtos_por_contrato(contrato_id):
         {
             'id': produto.id,
             'nome': produto.nome,
+            'codigo': produto.codigo,
+            'valor': produto.preco_base
         } for produto in produtos
     ])
 
 @contratos_bp.route('/desvincular-produtos', methods=['POST'])
 def desvincular_produtos():
     try:
-        contrato_id = request.form.get('contrato_id')
+        contrato_id = request.form.get('desvincular_contrato_id_produtos')
         produto_ids = request.form.getlist('produto_ids')
 
         contrato = Contrato.query.get(contrato_id)

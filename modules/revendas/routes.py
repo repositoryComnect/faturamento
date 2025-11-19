@@ -9,7 +9,7 @@ revendas_bp = Blueprint('revendas_bp', __name__)
 @revendas_bp.route('/api/vendedores')
 def api_vendedores():
     vendedores = Vendedor.query.filter_by(ativo=True).order_by(Vendedor.id).all()
-    return jsonify([{'id': v.id, 'nome': v.nome} for v in vendedores])
+    return jsonify([{'codigo': v.codigo, 'nome': v.nome} for v in vendedores])
 
 @revendas_bp.route('/delete/revendas', methods=['POST'])
 def delete_revendas():
