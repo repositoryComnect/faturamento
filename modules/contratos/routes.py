@@ -4,7 +4,7 @@ from datetime import datetime, date
 from sqlalchemy.orm import joinedload
 from sqlalchemy import text
 from modules.utils.utils import formatar_telefone, safe_float, safe_date, parse_date, formatar_cep, formatar_cpf_cnpj
-from modules.contratos.utils import parse_date, parse_int, parse_float, parse_bool
+from modules.contratos.utils import parse_date, parse_int, parse_float, parse_bool, montar_dict_contrato
 import re
 
 contratos_bp = Blueprint('contratos_bp', __name__)
@@ -171,15 +171,6 @@ def buscar_contrato():
 
 @contratos_bp.route('/contratos/alterar', methods=['POST'])
 def alterar_contrato():
-    def parse_date(date_str):
-        if not date_str:
-            return None
-        try:
-            day, month, year = map(int, date_str.split('/'))
-            return f"{year}-{month:02d}-{day:02d}"
-        except:
-            return None
-
     try:
         numero = request.form.get('contract_number')
         razao_social = request.form.get('company_name')
@@ -406,91 +397,22 @@ def buscar_contrato_por_numero(numero):
         return jsonify({'error': 'Empresa não selecionada'}), 400
 
     try:
-        # Busca o contrato e já faz join com o cliente
-        contrato = Contrato.query.options(joinedload(Contrato.cliente))\
-                    .filter_by(numero=numero, empresa_id=empresa_id).first()
-        
+        contrato = (
+            Contrato.query
+            .options(joinedload(Contrato.cliente))
+            .filter_by(numero=numero, empresa_id=empresa_id)
+            .first()
+        )
+
         if not contrato:
             return jsonify({'error': f'Contrato {numero} não encontrado'}), 404
 
-        # Dados do contrato
-        data = {
-            'id': contrato.id,
-            'numero': contrato.numero,
-            'razao_social': contrato.razao_social or None,
-            'nome_fantasia': contrato.nome_fantasia or None,
-            'atualizacao': safe_date(contrato.atualizacao),
-            'cadastramento': safe_date(contrato.cadastramento),
-            'tipo': contrato.tipo or None,
-            'tipo_pessoa': contrato.tipo_pessoa or None,
-            'contato': contrato.contato or None,
-            'id_matriz_portal': contrato.id_matriz_portal or None,
-            'email': contrato.email or None,
-            'telefone': formatar_telefone(contrato.telefone or None),
-            'cep': formatar_cep(contrato.cep or None),
-            'cnpj_cpf': formatar_cpf_cnpj(contrato.cnpj_cpf or None),
-            'revenda': contrato.revenda if contrato.revenda not in (None, "", "null") else "Não possui revenda",
-            'vendedor': contrato.vendedor if contrato.vendedor not in (None, "", "null") else "Não possui vendedor",
-            'endereco': contrato.endereco or None,
-            'complemento': contrato.complemento or None,
-            'bairro': contrato.bairro or None,
-            'cidade': contrato.cidade or None,
-            'estado': contrato.estado or None,
-            'dia_vencimento': contrato.dia_vencimento or None,
-            'fator_juros': safe_float(contrato.fator_juros),
-            'contrato_revenda': contrato.contrato_revenda or None,
-            'faturamento_contrato': contrato.faturamento_contrato or None,
-            'estado_contrato': contrato.estado_contrato or None,
-            'data_estado': safe_date(contrato.data_estado),
-            'motivo_estado': contrato.motivo_estado or None,
-        }
-
-        # Cliente principal do contrato 
-        clientes = []
-        if contrato.cliente:
-            clientes.append({
-                'id': contrato.cliente.id,
-                'sequencia': contrato.cliente.sequencia,
-                'razao_social': contrato.cliente.razao_social,
-                'nome_fantasia': contrato.cliente.nome_fantasia,
-                'cnpj_cpf': formatar_cpf_cnpj(contrato.cliente.cnpj_cpf),
-                'tipo_serviço': contrato.cliente.tipo_servico,
-                'cidade': contrato.cliente.cidade,
-                'estado_atual': contrato.cliente.estado_atual,
-            })
-        data['clientes'] = clientes 
-
-        # Planos
-        data['planos'] = []
-        if hasattr(contrato, 'planos') and contrato.planos:
-            for p in contrato.planos:
-                data['planos'].append({
-                    'id': p.id,
-                    'codigo': p.codigo,
-                    'nome': p.nome,
-                    'valor': safe_float(p.valor, 0.00)
-                })
-
-        # Produtos
-        data['produtos'] = []
-        associacoes = ContratoProduto.query.filter_by(contrato_id=contrato.id).all()
-        for assoc in associacoes:
-            produto = Produto.query.get(assoc.produto_id)
-            if produto:
-                data['produtos'].append({
-                    'codigo': produto.codigo,
-                    'id': produto.id,
-                    'nome': produto.nome or None,
-                    'descricao': produto.descricao or 'N/A',
-                    'quantidade': assoc.quantidade or 0,
-                    'valor_unitario': safe_float(produto.preco_base, 0.00)
-                })
-
-        return jsonify(data)
+        return jsonify(montar_dict_contrato(contrato))
 
     except Exception as e:
         print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
         return jsonify({'error': 'Erro ao processar a requisição'}), 500
+
 
 @contratos_bp.route('/set_contrato', methods=['POST'])
 def set_contrato():
@@ -698,7 +620,6 @@ def get_list_clientes():
     ]
 
     return jsonify(resultado)
-
 
 @contratos_bp.route('/vincular-clientes', methods=['POST'])
 def vincular_clientes():
@@ -1195,6 +1116,39 @@ def render_planos_codigo(codigo):
         planos=planos,
         plano_selecionado=plano_selecionado
     )
+
+@contratos_bp.route('/contratos/proximo/<numero_atual>', methods=['GET'])
+def proximo_contrato(numero_atual):
+    empresa_id = session.get('empresa')
+    if not empresa_id:
+        return jsonify({'error': 'Empresa não selecionada'}), 400
+
+    # Primeiro localizar o contrato atual
+    contrato_atual = (
+        Contrato.query
+        .filter_by(numero=numero_atual, empresa_id=empresa_id)
+        .first()
+    )
+
+    if not contrato_atual:
+        return jsonify({'error': 'Contrato atual não encontrado'}), 404
+
+    # Buscar o próximo pelo ID crescente
+    contrato = (
+        Contrato.query
+        .filter(
+            Contrato.id > contrato_atual.id,
+            Contrato.empresa_id == empresa_id
+        )
+        .order_by(Contrato.id.asc())
+        .first()
+    )
+
+    if not contrato:
+        return jsonify({}), 200
+
+    # Agora retorna exatamente como a rota oficial
+    return jsonify(montar_dict_contrato(contrato))
 
 '''@contratos_bp.route('/render_clientes/buscar-por-numero/<sequencia>', methods=['GET'])
 def buscar_render_cliente_por_contrato(sequencia):

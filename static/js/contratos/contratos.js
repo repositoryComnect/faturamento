@@ -405,4 +405,57 @@ function preencherCamposContrato(contrato) {
 }
 
 
+function proximoContrato(numeroAtual) {
+    if (!numeroAtual) return;
 
+    $('#loadingContrato').removeClass('d-none');
+
+    $.ajax({
+        url: '/contratos/proximo/' + numeroAtual,
+        method: 'GET',
+        success: function(data) {
+            if (!data || Object.keys(data).length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Não há mais contratos',
+                    text: 'Você já está no último contrato cadastrado.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 4000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                });
+                return;
+            }
+
+            // Preenche os campos do contrato — usa a função já existente:
+            updateContractFields(data);
+
+            // Atualiza tabelas
+            clientesData = Array.isArray(data.clientes) ? data.clientes : [];
+            planosData = Array.isArray(data.planos) ? data.planos : [];
+            renderClientesPage();
+            renderPlanosPage();
+            renderProdutos(data.produtos);
+
+            // Soma valores
+            const totalPlanos = (data.planos || []).reduce((acc, p) => acc + (p.valor || 0), 0);
+            const totalProdutos = (data.produtos || []).reduce((acc, p) => acc + ((p.quantidade || 0) * (p.valor_unitario || 0)), 0);
+            $('#valor_contrato').val((totalPlanos + totalProdutos).toFixed(2));
+        },
+        error: function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao buscar próximo contrato',
+                text: 'Ocorreu um problema na busca.',
+                toast: true,
+                position: 'top-end',
+                timer: 3000,
+                showConfirmButton: false
+            });
+        },
+        complete: function() {
+            $('#loadingContrato').addClass('d-none');
+        }
+    });
+}

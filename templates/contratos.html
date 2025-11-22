@@ -44,9 +44,7 @@
                 </form>
             </div>
         </div>
-
-
-        
+    
         {% if not contrato %}
             <div class="alert alert-warning">
                 Nenhum contrato encontrado. Por favor, crie um novo contrato ou selecione um existente.
@@ -63,7 +61,7 @@
                         <div class="row g-3">
                             <div class="col-md-2">
                                 <label class="form-label">Código Contrato:</label>
-                                <div class="input-group">
+                                <div class="d-flex gap-2">
                                     <input type="text" class="form-control" id="numeroContrato"
                                         value="{{ contrato.numero if contrato else '' }}" 
                                         onchange="buscarDadosContrato(this.value)">
@@ -76,6 +74,11 @@
                                     <!-- Botão de listagem para abrir modal -->
                                     <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#listarContratosModal">
                                         <i class="bi bi-card-list"></i>
+                                    </button>
+
+                                    <!-- Botão de listagem para abrir modal -->
+                                    <button class="btn btn-secondary" type="button" onclick="proximoContrato(numeroContrato.value)">
+                                        <i class="bi bi-arrow-right"></i>
                                     </button>
 
                                     <!-- Spinner de loading -->
@@ -142,8 +145,7 @@
                                         id="revenda" 
                                         name="revenda" 
                                         value="{{ contrato.revenda if contrato.revenda else 'Não possui revenda' }}" 
-                                        readonly
-                                        >
+                                        readonly>
 
                             </div>
                             <div class="col-md-3">
@@ -282,17 +284,11 @@
                             </div>
                             </div>
                         </div>
-
-                        </div> <!-- table-responsive -->
-                    </div> <!-- row -->
-                    </div> <!-- card-body -->
-                </div> <!-- collapse -->
-            </div> <!-- card -->
-
-
-
-
-
+                    </div>
+                </div>
+            </div> 
+                </div> 
+            </div> 
 
             <div class="card mb-2">
                 <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#detailsCollapse">
@@ -338,85 +334,83 @@
             </div>
 
 
-        <!-- ====================== -->
         <!-- SEÇÃO DE PLANOS -->
-        <!-- ====================== -->
         <div class="card mb-2">
-        <div class="card-header section-header d-flex justify-content-between align-items-center"
-            data-bs-toggle="collapse" href="#plansCollapse">
-            <h5 class="mb-0">Plano Associado ao Contrato</h5>
-        </div>
+            <div class="card-header section-header d-flex justify-content-between align-items-center"
+                data-bs-toggle="collapse" href="#plansCollapse">
+                <h5 class="mb-0">Plano Associado ao Contrato</h5>
+            </div>
 
-        <div class="collapse" id="plansCollapse">
-            <div class="card-body">
-            <div class="row g-2">
-                <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
-                <table class="planos-table table table-striped table-bordered">
-                    <thead>
-                    <tr class="text-center">
-                        <th>Código</th>
-                        <th>Nome do Plano</th>
-                        <th>Valor</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% if contrato.planos and contrato.planos|length > 0 %}
-                        {% for plano in contrato.planos %}
-                        <tr>
-                        <td>{{ plano.codigo }}</td>
-                        <td>{{ plano.nome }}</td>
-                        <td>R$ {{ "%.2f"|format(plano.valor) }}</td>
+            <div class="collapse" id="plansCollapse">
+                <div class="card-body">
+                <div class="row g-2">
+                    <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
+                    <table class="planos-table table table-striped table-bordered">
+                        <thead>
+                        <tr class="text-center">
+                            <th>Código</th>
+                            <th>Nome do Plano</th>
+                            <th>Valor</th>
                         </tr>
-                        {% endfor %}
-                    {% else %}
-                    <tr>
-                        <td colspan="5" class="text-center">
-                        <i class="bi bi-exclamation-circle me-2"></i>
-                        Nenhum plano associado encontrado
-                        </td>
-                    </tr>
-                    {% endif %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        {% if contrato.planos and contrato.planos|length > 0 %}
+                            {% for plano in contrato.planos %}
+                            <tr>
+                            <td>{{ plano.codigo }}</td>
+                            <td>{{ plano.nome }}</td>
+                            <td>R$ {{ "%.2f"|format(plano.valor) }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            Nenhum plano associado encontrado
+                            </td>
+                        </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
 
-                <!-- Paginação de Planos -->
-                <div id="planos-pagination" class="d-flex justify-content-center mt-3">
-                    <button id="planos-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
-                    <span id="planos-pageInfo" class="align-self-center"></span>
-                    <button id="planos-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
-                </div>
-
-                <!-- Botões de Ação -->
-                <div class="container mt-5 mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-success me-2 btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#vincularPlanoContractModal">
-                        <i class="fas fa-list-alt"></i> Vincular Plano
-                        </button>
+                    <!-- Paginação de Planos -->
+                    <div id="planos-pagination" class="d-flex justify-content-center mt-3">
+                        <button id="planos-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                        <span id="planos-pageInfo" class="align-self-center"></span>
+                        <button id="planos-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-primary me-2 btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#createPlanoModal">
-                        <i class="bi bi-plus-circle me-2"></i> Criar Plano
-                        </button>
+                    <!-- Botões de Ação -->
+                    <div class="container mt-5 mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-success me-2 btn-sm"
+                                    data-bs-toggle="modal" data-bs-target="#vincularPlanoContractModal">
+                            <i class="fas fa-list-alt"></i> Vincular Plano
+                            </button>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-primary me-2 btn-sm"
+                                    data-bs-toggle="modal" data-bs-target="#createPlanoModal">
+                            <i class="bi bi-plus-circle me-2"></i> Criar Plano
+                            </button>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-danger me-2 btn-sm"
+                                    data-bs-toggle="modal" data-bs-target="#desvincularPlanoContractModal">
+                            <i class="bi bi-trash me-2"></i> Desvincular Plano
+                            </button>
+                        </div>
+                        </div>
                     </div>
 
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-danger me-2 btn-sm"
-                                data-bs-toggle="modal" data-bs-target="#desvincularPlanoContractModal">
-                        <i class="bi bi-trash me-2"></i> Desvincular Plano
-                        </button>
-                    </div>
-                    </div>
-                </div>
-
-                </div> <!-- /table-responsive -->
-            </div> <!-- /row -->
-            </div> <!-- /card-body -->
-        </div> <!-- /collapse -->
-        </div> <!-- /card -->
+                    </div> 
+                </div> 
+                </div> 
+            </div> 
+        </div> 
 
 
         <!-- Seção de Produtos Associados -->
@@ -490,13 +484,43 @@
                         </div>
                     </div>
                 </div>
-                
-        </div>
-    {% endif %}
-    
-    
-</div>  
+            </div>
+        
+            {% endif %}
 
+            <div class="card mb-2">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#faturamentoCollapse" aria-expanded="false" aria-controls="faturamentoCollapse">
+                    <h5 class="mb-0">Detalhes de Faturamento</h5>
+                </div>
+                <div class="collapse" id="faturamentoCollapse">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Observações:</label>
+                                <textarea class="form-control" rows="3" id="observacao" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+    
+            <div class="card">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#otherDetailsCollapse" aria-expanded="false" aria-controls="otherDetailsCollapse">
+                    <h5 class="mb-0">Outros Detalhes do Contrato</h5>
+                </div>
+                <div class="collapse" id="otherDetailsCollapse">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label class="form-label">Observações:</label>
+                                <textarea class="form-control" rows="3" id="observacao" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div> 
+               
 {% endblock %}
 
 {% block scripts %}

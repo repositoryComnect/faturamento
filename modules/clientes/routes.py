@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, render_template, redirect, url_fo
 from application.models.models import db, Cliente, Contrato, cliente_contrato, Revenda, Instalacao
 from sqlalchemy import text
 from datetime import datetime
-from modules.clientes.utils import parse_date, format_date
+from modules.clientes.utils import parse_date, format_date, montar_dict_cliente
 from modules.utils.utils import formatar_cpf_cnpj, formatar_cep, formatar_telefone
 import re
 
@@ -82,7 +82,7 @@ def buscar_cliente_por_contrato(sequencia):
                 for inst in cliente.instalacoes
             ],
 
-            # 🔥 Lista de contratos vinculados ao cliente
+            # Lista de contratos vinculados ao cliente
             'contratos': [
                 {
                     'id': c.id,
@@ -836,3 +836,41 @@ def buscar_cliente_listagem(sequencia):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@cliente_bp.route('/clientes/proximo/<sequencia>', methods=['GET'])
+def buscar_proximo_cliente(sequencia):
+    empresa_id = session.get('empresa')
+
+    try:
+        atual = (
+            Cliente.query
+            .filter(
+                Cliente.sequencia == sequencia,
+                Cliente.empresa_id == empresa_id,
+                Cliente.estado_atual != 'Arquivado'
+            )
+            .first()
+        )
+
+        if not atual:
+            return jsonify({'error': 'Cliente atual não encontrado'}), 404
+
+        proximo = (
+            Cliente.query
+            .filter(
+                Cliente.sequencia > atual.sequencia,
+                Cliente.empresa_id == empresa_id,
+                Cliente.estado_atual != 'Arquivado'
+            )
+            .order_by(Cliente.sequencia.asc())
+            .first()
+        )
+
+        if not proximo:
+            return jsonify({}), 200
+
+        return jsonify(montar_dict_cliente(proximo))
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+

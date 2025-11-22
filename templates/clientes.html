@@ -64,7 +64,7 @@
                         <div class="row g-3">
                             <div class="col-md-2">
                                 <label class="form-label">Código Cliente:</label>
-                            <div class="input-group">
+                            <div class="d-flex gap-2">
 
                                 <input type="text" class="form-control" value="{{ cliente.sequencia }}" id="sequencia" onchange="buscarDadosCliente(this.value)">
                                 
@@ -77,6 +77,12 @@
                                         <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#listarClientesModal">
                                             <i class="bi bi-card-list"></i>
                                         </button>
+
+                                        <!-- Botão de listagem para abrir modal -->
+                                        <button class="btn btn-secondary" type="button" onclick="buscarProximoCliente()">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </button>
+
 
                                 <div id="loadingCliente" class="input-group-text d-none">
                                     <div class="spinner-border spinner-border-sm" role="status"></div>
@@ -220,6 +226,8 @@
                                     <tr class="text-center">
                                         <th>Código</th>
                                         <th>Nome do Contrato</th>
+                                        <th>Plano</th>
+                                        <th>Produtos</th>
                                         <th>Valor</th>
                                     </tr>
                                 </thead>
