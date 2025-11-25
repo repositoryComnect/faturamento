@@ -33,216 +33,297 @@
         </div>
     </div>
     
-    <!--<div class="planos-container p-0">
-        <div class="planos-list">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Nome do Plano</th>
-                        <th>Valor</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if planos %}
-                        {% for plano in planos %}
-                        <tr class="{% if plano_selecionado and plano.id == plano_selecionado.id %}table-primary{% endif %}">
-                            <td><a href="/planos/{{ plano.id }}" class="text-decoration-none">{{ plano.nome }}</a>
-                                <br>
-                                <small class="text-muted">Código: {{ plano.codigo }}</small></td>
-                            
-                            <td>R$ {{ "%0.2f"|format(plano.valor|float) }}</td>
-                        </tr>
-                        {% endfor %}
-                    {% else %}
-                        <tr>
-                            <td colspan="2" class="text-center">Nenhum plano cadastrado</td>
-                        </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-            
-            {% if pagination and pagination.pages > 1 %}
-            <div class="compact-pagination mt-2">
-                {% if pagination.has_prev %}
-                    <a href="{{ url_for('home_bp.render_planos', page=pagination.prev_num) }}" class="page-link" title="Página anterior">
-                        <i class="bi bi-arrow-left"></i>
-                    </a>
-                {% endif %}
-                
-                <span class="current-page mx-2">
-                    Página {{ pagination.page }} de {{ pagination.pages }}
-                </span>
-                
-                {% if pagination.has_next %}
-                    <a href="{{ url_for('home_bp.render_planos', page=pagination.next_num) }}" class="page-link" title="Próxima página">
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                {% endif %}
-            </div>
-            {% endif %}
-        </div>-->
 
-        <!-- FORMULÁRIO DE PLANOS -->
-        <div class="planos-form">
-                <!-- Informações Básicas -->
-                <div class="card mb-1">
-                    <div class="card-header section-header d-flex justify-content-between align-items-center" 
-                         data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" 
-                         aria-expanded="true" aria-controls="basicInfoCollapse">
-                        <h5 class="mb-0">Informações Básicas</h5>
+    <!-- FORMULÁRIO DE PLANOS -->
+    <div class="planos-form">
+            <!-- Informações Básicas -->
+            <div class="card mb-1">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" 
+                        data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" 
+                        aria-expanded="true" aria-controls="basicInfoCollapse">
+                    <h5 class="mb-0">Informações Básicas</h5>
+                </div>
+                <div class="collapse show" id="basicInfoCollapse">
+                    <div class="card-body">
+                        <div class="row">
+
+                            <!-- CÓDIGO DO PLANO (alinhado como o de contrato) -->
+                            <div class="col-md-2">
+                                <label class="form-label">Código Plano:</label>
+                                <div class="d-flex gap-2">
+
+                                    <!-- Campo Código -->
+                                    <input type="text" class="form-control" id="codigo_plano"
+                                        value="{{ plano.codigo if plano else '' }}"
+                                        onchange="buscarPlanoPorCodigo(this.value)">
+
+                                    <!-- Buscar -->
+                                    <button class="btn btn-secondary" type="button" onclick="buscarPlanoPorCodigo(codigo_plano.value)">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+
+                                    <!-- Listagem -->
+                                    <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#listarPlanosModal">
+                                        <i class="bi bi-card-list"></i>
+                                    </button>
+
+                                    <!-- Próximo -->
+                                    <button class="btn btn-secondary" type="button" onclick="proximoCodigoPlano()">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </button>
+
+                                    <!-- Spinner -->
+                                    <span id="loadingCodigoPlano" class="input-group-text d-none">
+                                        <div class="spinner-border spinner-border-sm" role="status"></div>
+                                    </span>
+
+                                </div>
+                            </div>
+
+                            <!-- NOME DO PLANO -->
+                            <div class="col-md-3">
+                                <label class="form-label">Nome do Plano:</label>
+                                <input type="text" id="nome_plano" name="nome_plano" class="form-control"
+                                    value="{{ plano.nome if plano else '' }}" readonly>
+                            </div>
+
+                            <!-- VALOR DO PLANO -->
+                            <div class="col-md-1">
+                                <label class="form-label">Valor:</label>
+                                <input type="text" id="valor_plano" name="valor_plano" class="form-control"
+                                    value="{{ plano.valor if plano else '' }}" readonly>
+                            </div>
+
+                            <!-- ID PRODUTO PORTAL -->
+                            <div class="col-md-1">
+                                <label class="form-label">Id Produto Portal:</label>
+                                <input type="text" id="id_produto_plano" name="id_produto_plano" class="form-control" value="{{ plano.id_produto_portal if plano else '' }}" readonly>
+                            </div>
+
+                            <div class="col-md-1">
+                                <label class="form-label">Cadastramento:</label>
+                                <input type="text" id="cadastramento_plano" name="cadastramento_plano" 
+                                    class="form-control" 
+                                    value="{{ plano.data_criacao.strftime('%d/%m/%Y') if plano and plano.data_criacao else '' }}"
+                                    readonly>
+                            </div>
+
+                            <div class="col-md-1">
+                                <label class="form-label">Atualização:</label>
+                                <input type="text" id="atualizacao_plano" name="atualizacao_plano" 
+                                    class="form-control" 
+                                    value="{{ plano.data_atualizacao.strftime('%d/%m/%Y') if plano and plano.data_atualizacao else '' }}"
+                                    readonly>
+                            </div>
+
+                            <!-- VINCULAR CONTRATO -->
+                            <div class="col-md-1">
+                                <label class="form-label">Contrato:</label>
+                                <input type="text" id="contrato_id_plano" name="contrato_id_plano" class="form-control" value="{{ plano.contrato_id if plano else '' }}" readonly> 
+                            </div>
+
+
+                            <!-- VINCULAR PRODUTO -->
+                            <div class="col-md-1">
+                                <label class="form-label">Produto:</label>
+                                <input id="produto_id_plano" name="produto_id_plano" class="form-control" value="{{ plano.produto_id if plano else '' }}" readonly>
+                            </div>
+
+                            <!-- QUANTIDADE DO PRODUTO -->
+                            <div class="col-md-1">
+                                <label class="form-label">Quantidade Produto:</label>
+                                <input type="number" id="qtd_produto_plano" name="qtd_produto_plano" class="form-control" value="{{ plano.qtd_produto if plano else '' }}" readonly>
+                            </div>
+
+                        </div>
+
                     </div>
-                    <div class="collapse show" id="basicInfoCollapse">
-                        <div class="card-body">
-                            <div class="row">
+                </div>
+            </div>
 
-                                <!-- CÓDIGO DO PLANO (alinhado como o de contrato) -->
-                                <div class="col-md-2">
-                                    <label class="form-label">Código Plano:</label>
-                                    <div class="d-flex gap-2">
+            
 
-                                        <!-- Campo Código -->
-                                        <input type="text" class="form-control" id="codigo_plano"
-                                            value="{{ plano.codigo if plano else '' }}"
-                                            onchange="buscarPlanoPorCodigo(this.value)">
+            <!-- Informações Fiscais -->
+            <div class="card mb-1">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" 
+                    data-bs-toggle="collapse" data-bs-target="#sec-licenca" 
+                    aria-expanded="false" aria-controls="sec-licenca">
+                    <h5 class="mb-0">Informações Fiscais</h5>
+                </div>
 
-                                        <!-- Buscar -->
-                                        <button class="btn btn-secondary" type="button" onclick="buscarPlanoPorCodigo(codigo_plano.value)">
-                                            <i class="bi bi-search"></i>
-                                        </button>
+                <div class="collapse" id="sec-licenca">
+                    <div class="card-body">
+                        <div class="row">
 
-                                        <!-- Listagem -->
-                                        <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#listarPlanosModal">
-                                            <i class="bi bi-card-list"></i>
-                                        </button>
+                            <!-- Primeira linha -->
+                            <div class="col-md-4">
+                                <label for="desc_boleto">Descrição Boleto:</label>
+                                <input type="text" id="desc_boleto_licenca_plano" name="desc_boleto_licenca_plano" 
+                                    class="form-control" value="" readonly>
+                            </div>
 
-                                        <!-- Próximo -->
-                                        <button class="btn btn-secondary" type="button" onclick="proximoCodigoPlano()">
-                                            <i class="bi bi-arrow-right"></i>
-                                        </button>
+                            <div class="col-md-3">
+                                <label for="aliquota_sp">Alíquota:</label>
+                                <input type="text" id="aliquota_sp_licenca_plano" name="aliquota_sp_licenca_plano" 
+                                    class="form-control" readonly>
+                            </div>
 
-                                        <!-- Spinner -->
-                                        <span id="loadingCodigoPlano" class="input-group-text d-none">
-                                            <div class="spinner-border spinner-border-sm" role="status"></div>
-                                        </span>
+                            <div class="col-md-5">
+                                <label for="cod_servico_sp">Código Serviço:</label>
+                                <input type="text" id="cod_servico_sp_licenca_plano" name="cod_servico_sp_licenca_plano" 
+                                    class="form-control" readonly>
+                            </div>
 
+                            <!-- Segunda linha — Descrição NF -->
+                            <div class=" col-md-12">
+                                <label for="desc_nf">Descrição para NF:</label>
+                                <textarea name="desc_nf_licenca_plano" id="desc_nf_licenca_plano" 
+                                        class="form-control" rows="3" readonly></textarea>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                    <!-- Seção de Planos Associadas -->
+            <div class="card mb-2">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#contratosCollapse">
+                    <h5 class="mb-0">Contratos Associadas ao Plano</h5>
+                </div>
+                <div class="collapse" id="contratosCollapse">
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
+                                <table class="contrato-table table table-striped table-bordered">
+                                    <thead>
+                                        <tr class="text-center">
+                                            <th>Código</th>
+                                            <th>Nome do Contrato</th>
+                                            <th>Plano</th>
+                                            <th>Produtos</th>
+                                            <th>Valor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- O JS preencherá esta parte -->
+                                    </tbody>
+                                </table>
+
+                                <!-- Paginação para instalações -->
+                                <div id="contrato-pagination" class="d-flex justify-content-center mt-3">
+                                    <button id="contrato-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                    <span id="contrato-pageInfo" class="align-self-center"></span>
+                                    <button id="contrato-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                                </div>
+
+                                <!-- Botões de ação -->
+                                <div class="container mt-5 mb-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularContratoModal">
+                                                <i class="bi bi-diagram-2"></i> Vincular Contrato
+                                            </button>
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+                                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createContractModal">
+                                                <i class="bi bi-plus-circle me-2"></i> Criar Contrato
+                                            </button>
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularContratoModal">
+                                                <i class="bi bi-trash me-2"></i> Desvincular Contrato
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <!-- NOME DO PLANO -->
-                                <div class="col-md-3">
-                                    <label class="form-label">Nome do Plano:</label>
-                                    <input type="text" id="nome_plano" name="nome_plano" class="form-control"
-                                        value="{{ plano.nome if plano else '' }}" readonly>
-                                </div>
-
-                                <!-- VALOR DO PLANO -->
-                                <div class="col-md-1">
-                                    <label class="form-label">Valor:</label>
-                                    <input type="text" id="valor_plano" name="valor_plano" class="form-control"
-                                        value="{{ plano.valor if plano else '' }}" readonly>
-                                </div>
-
-                                <!-- ID PRODUTO PORTAL -->
-                                <div class="col-md-1">
-                                    <label class="form-label">Id Produto Portal:</label>
-                                    <input type="text" id="id_produto_plano" name="id_produto_plano" class="form-control" value="{{ plano.id_produto_portal if plano else '' }}" readonly>
-                                </div>
-
-                                <div class="col-md-1">
-                                    <label class="form-label">Cadastramento:</label>
-                                    <input type="text" id="cadastramento_plano" name="cadastramento_plano" 
-                                        class="form-control" 
-                                        value="{{ plano.data_criacao.strftime('%d/%m/%Y') if plano and plano.data_criacao else '' }}"
-                                        readonly>
-                                </div>
-
-                                <div class="col-md-1">
-                                    <label class="form-label">Atualização:</label>
-                                    <input type="text" id="atualizacao_plano" name="atualizacao_plano" 
-                                        class="form-control" 
-                                        value="{{ plano.data_atualizacao.strftime('%d/%m/%Y') if plano and plano.data_atualizacao else '' }}"
-                                        readonly>
-                                </div>
-
-                                <!-- VINCULAR CONTRATO -->
-                                <div class="col-md-1">
-                                    <label class="form-label">Contrato:</label>
-                                    <input type="text" id="contrato_id_plano" name="contrato_id_plano" class="form-control" value="{{ plano.contrato_id if plano else '' }}" readonly> 
-                                </div>
-
-
-                                <!-- VINCULAR PRODUTO -->
-                                <div class="col-md-1">
-                                    <label class="form-label">Vincular Produto:</label>
-                                    <input id="produto_id_plano" name="produto_id_plano" class="form-control" value="{{ plano.produto_id if plano else '' }}" readonly>
-                                </div>
-
-                                <!-- QUANTIDADE DO PRODUTO -->
-                                <div class="col-md-1">
-                                    <label class="form-label">Quantidade Produto:</label>
-                                    <input type="number" id="qtd_produto_plano" name="qtd_produto_plano" class="form-control" value="{{ plano.qtd_produto if plano else '' }}" readonly>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Informações Fiscais -->
-                <div class="card mb-1">
-                    <div class="card-header section-header d-flex justify-content-between align-items-center" 
-                        data-bs-toggle="collapse" data-bs-target="#sec-licenca" 
-                        aria-expanded="false" aria-controls="sec-licenca">
-                        <h5 class="mb-0">Informações Fiscais</h5>
-                    </div>
-
-                    <div class="collapse" id="sec-licenca">
-                        <div class="card-body">
-                            <div class="row">
-
-                                <!-- Primeira linha -->
-                                <div class="col-md-4">
-                                    <label for="desc_boleto">Descrição Boleto:</label>
-                                    <input type="text" id="desc_boleto_licenca_plano" name="desc_boleto_licenca_plano" 
-                                        class="form-control" value="" readonly>
-                                </div>
-
-                                <div class="col-md-3">
-                                    <label for="aliquota_sp">Alíquota:</label>
-                                    <input type="text" id="aliquota_sp_licenca_plano" name="aliquota_sp_licenca_plano" 
-                                        class="form-control" readonly>
-                                </div>
-
-                                <div class="col-md-5">
-                                    <label for="cod_servico_sp">Código Serviço:</label>
-                                    <input type="text" id="cod_servico_sp_licenca_plano" name="cod_servico_sp_licenca_plano" 
-                                        class="form-control" readonly>
-                                </div>
-
-                                <!-- Segunda linha — Descrição NF -->
-                                <div class=" col-md-12">
-                                    <label for="desc_nf">Descrição para NF:</label>
-                                    <textarea name="desc_nf_licenca_plano" id="desc_nf_licenca_plano" 
-                                            class="form-control" rows="3" readonly></textarea>
-                                </div>
-
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Seção de Produtos Associados -->
+            <div class="card mb-2">
+                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#productsCollapse">
+                    <h5 class="mb-0">Produtos Associados ao Plano</h5>
+                </div>
+                <div class="collapse" id="productsCollapse">
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
+                                <table class="produtos-table table table-striped table-bordered">
+                                    <thead>
+                                        <tr class="text-center">
+                                            <th>Código</th>
+                                            <th>Nome do Produto</th>
+                                            <th>Descrição</th>
+                                            <th>Quantidade</th>
+                                            <th>Preço Unitário</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    
+                                            <tr>
+                                                <td colspan="5" class="text-center">
+                                                    <i class="bi bi-exclamation-circle me-2"></i>
+                                                    Nenhum produto associado encontrado
+                                                </td>
+                                            </tr>
+                                    </tbody>
+                                </table>
+                                <!-- Paginação específica para Planos -->
+                                <div id="produto-pagination" class="d-flex justify-content-center mt-3">
+                                    <button id="produto-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                    <span id="produto-pageInfo" class="align-self-center"></span>
+                                    <button id="produto-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                                </div>
+                                <div class="container mt-5 mb-4">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        
+                                            <div class="d-flex gap-2">    
+                                                <button type="button" class="btn btn-success me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularProdutoContractModal">
+                                                    <i class="bi bi-shop"></i>  Vincular Produto
+                                                </button>
+                                            </div>
+
+                                            <div class="d-flex gap-2">    
+                                                <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createProdutoModal">
+                                                    <i class="bi bi-plus-circle me-2"></i>  Criar Produto
+                                                </button>
+                                            </div>
+                                            <div class="d-flex gap-2">    
+                                                <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularProdutoContractModal">
+                                                    <i class="bi bi-trash me-2"></i>Desvincular Produto
+                                                </button>
+                                            </div>
+                                        </div>   
+                                    </div>  
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
         </div>
+    </div>
 
    
 </div>
 {% endblock %}
 
 {% block scripts %}
-<script src="{{ url_for('static', filename='js/planos/planos.js') }}"></script>
-{% include 'extensions/links_popup.html' %}
+    <script src="{{ url_for('static', filename='js/planos/planos.js') }}"></script>
+    
+    <!--Bloco de links importantes-->
+    {% include 'extensions/links_popup.html' %}
 
- {% include 'popup/planos/popup_delete_planos.html' %}
+    <!-- Bloco popup planos -->
+    {% include 'popup/planos/popup_delete_planos.html' %}
     {% include 'popup/planos/popup_criar_plano.html' %}
+    {% include 'popup/planos/popup_listagem_planos.html' %}
 
 {% endblock %}

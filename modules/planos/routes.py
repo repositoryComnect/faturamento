@@ -334,6 +334,27 @@ def buscar_plano_por_codigo(codigo):
         traceback.print_exc()   # <-- MOSTRA O ERRO REAL NO LOG
         return jsonify({'error': str(e)}), 500   # <-- devolve o erro real
 
+@planos_bp.route('/listagem/planos/popup', methods=['GET'])
+def planos_listagem_ativos():
+    empresa_id = session.get('empresa')
+
+    if not empresa_id:
+        return jsonify({'erro': 'Empresa não definida na sessão'}), 401
+
+    # Filtra planos da empresa
+    planos = Plano.query.filter_by(empresa_id=empresa_id).order_by(Plano.codigo).all()
+
+    resultado = [
+        {
+            'id': p.id,
+            'codigo': p.codigo,
+            'nome': p.nome,
+            'valor': float(p.valor) if p.valor else 0.0
+        }
+        for p in planos
+    ]
+
+    return jsonify(resultado)
 
 
     
