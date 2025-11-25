@@ -89,3 +89,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .alert {
     margin-bottom: 1.5rem;
 }
+
+/* PADRONIZAÇÃO DOS CARDS DAS SECTIONS */
+    .section-card {
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        border: 1px solid #e5e5e5;
+    }
+
+    .section-card .card-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e1e1e1;
+        padding: 12px 16px;
+        cursor: pointer;
+    }
+
+    .section-card .card-header h5 {
+        margin: 0;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .section-card .card-body {
+        background: #fff;
+        padding: 20px;
+    }

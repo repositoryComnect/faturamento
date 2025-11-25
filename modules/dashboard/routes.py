@@ -43,7 +43,7 @@ def contratosChart():
         for month, status, count in cadastros:
             month_name = meses.get(int(month), "Desconhecido")
             if month_name not in data_dict:
-                data_dict[month_name] = {'ativo': 0, 'suspenso': 0, 'cancelado': 0}
+                data_dict[month_name] = {'ativo': 0, 'suspenso': 0, 'cancelado': 0, 'arquivado': 0}
             data_dict[month_name][status.lower()] = count
 
         # Transformar em lista para JS
@@ -53,7 +53,8 @@ def contratosChart():
                 'month': month_name,
                 'ativo': counts.get('ativo', 0),
                 'suspenso': counts.get('suspenso', 0),
-                'cancelado': counts.get('cancelado', 0)
+                'cancelado': counts.get('cancelado', 0),
+                'arquivado': counts.get('arquivado', 0)
             })
 
         return jsonify(data)

@@ -404,7 +404,7 @@ function preencherCamposContrato(contrato) {
     limparTabelasRelacionadas();
 }
 
-
+// Próximo número contrato, ação botão
 function proximoContrato(numeroAtual) {
     if (!numeroAtual) return;
 

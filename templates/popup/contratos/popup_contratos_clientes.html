@@ -51,159 +51,216 @@
                     </div>
 
                     <!-- Basic Information -->
-                    <div class="modal-section-header">Informações Básicas</div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-2">
-                            <label class="form-label">Código Contrato:</label>
-                            <input type="text" class="form-control" id="cliente_numero_contrato" name="cliente_numero_contrato" readonly>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                                data-bs-toggle="collapse" data-bs-target="#cardInfoBasica"
+                                style="cursor:pointer;">
+                            Informações Básicas
+                            <i class="bi bi-chevron-down"></i>
                         </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Código Cliente:</label>
-                            <input type="text" class="form-control" id="cliente_sequencia" name="cliente_sequencia" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Razão Social:</label>
-                            <input type="text" class="form-control" id="cliente_nome_empresa" name="cliente_nome_empresa">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Nome Fantasia:</label>
-                            <input type="text" class="form-control" id="cliente_nome_fantasia" name="cliente_nome_fantasia">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Cadastramento:</label>
-                            <input type="text" class="form-control" id="cliente_cadastramento" name="cliente_cadastramento" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Atualização:</label>
-                            <input type="text" class="form-control" id="cliente_atualizacao" name="cliente_atualizacao" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Tipo:</label>
-                            <input type="text" class="form-control" id="cliente_tipo" name="cliente_tipo" readonly>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">CNPJ/CPF:</label>
-                            <input type="text" class="form-control" id="cliente_cnpj_cpf" name="cliente_cnpj_cpf">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">IE:</label>
-                            <input type="text" class="form-control" id="cliente_ie" name="cliente_ie">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">IM:</label>
-                            <input type="text" class="form-control" id="cliente_im" name="cliente_im">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Contato:</label>
-                            <input type="text" class="form-control" id="cliente_contato" name="cliente_contato">
-                        </div>
-                        <div class="col-md-5">
-                            <label class="form-label">E-mail:</label>
-                            <input type="email" class="form-control" id="cliente_email" name="cliente_email">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Telefone:</label>
-                            <input type="tel" class="form-control" id="cliente_telefone" name="cliente_telefone">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Tipo de Serviço:</label>
-                            <input type="text" class="form-control" id="cliente_tipo_servico" name="cliente_tipo_servico">
+
+                        <div id="cardInfoBasica" class="collapse show">
+                            <div class="card-body">
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Código Contrato:</label>
+                                        <input type="text" class="form-control" id="cliente_numero_contrato" name="cliente_numero_contrato" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Código Cliente:</label>
+                                        <input type="text" class="form-control" id="cliente_sequencia" name="cliente_sequencia" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Razão Social:</label>
+                                        <input type="text" class="form-control" id="cliente_nome_empresa" name="cliente_nome_empresa">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Nome Fantasia:</label>
+                                        <input type="text" class="form-control" id="cliente_nome_fantasia" name="cliente_nome_fantasia">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Cadastramento:</label>
+                                        <input type="text" class="form-control" id="cliente_cadastramento" name="cliente_cadastramento" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Atualização:</label>
+                                        <input type="text" class="form-control" id="cliente_atualizacao" name="cliente_atualizacao" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Tipo:</label>
+                                        <input type="text" class="form-control" id="cliente_tipo" name="cliente_tipo" readonly>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">CNPJ/CPF:</label>
+                                        <input type="text" class="form-control" id="cliente_cnpj_cpf" name="cliente_cnpj_cpf">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">IE:</label>
+                                        <input type="text" class="form-control" id="cliente_ie" name="cliente_ie">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">IM:</label>
+                                        <input type="text" class="form-control" id="cliente_im" name="cliente_im">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Contato:</label>
+                                        <input type="text" class="form-control" id="cliente_contato" name="cliente_contato">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label">E-mail:</label>
+                                        <input type="email" class="form-control" id="cliente_email" name="cliente_email">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Telefone:</label>
+                                        <input type="tel" class="form-control" id="cliente_telefone" name="cliente_telefone">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Tipo de Serviço:</label>
+                                        <input type="text" class="form-control" id="cliente_tipo_servico" name="cliente_tipo_servico">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Commercial Information -->
-                    <div class="modal-section-header">Informações Comerciais</div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-2">
-                            <label class="form-label">CEP:</label>
-                            <input type="text" class="form-control" id="cliente_cep" name="cliente_cep" readonly>
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                                data-bs-toggle="collapse" data-bs-target="#cardInfoComerciais"
+                                style="cursor:pointer;">
+                            Informações Comerciais
+                            <i class="bi bi-chevron-down"></i>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Endereço</label>
-                            <input type="text" class="form-control" id="cliente_endereco" name="cliente_endereco" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Complemento:</label>
-                            <input type="text" class="form-control" id="cliente_complemento" name="cliente_complemento" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Bairro:</label>
-                            <input type="text" class="form-control" id="cliente_bairro" name="cliente_bairro" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Cidade:</label>
-                            <input type="text" class="form-control" id="cliente_cidade" name="cliente_cidade" readonly>
-                        </div>
-                        <div class="col-md-1">
-                            <label class="form-label">UF:</label>
-                            <input type="text" class="form-control" id="cliente_uf" name="cliente_uf" readonly>
+
+                        <div id="cardInfoComerciais" class="collapse">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <label class="form-label">CEP:</label>
+                                        <input type="text" class="form-control" id="cliente_cep" name="cliente_cep" readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Endereço</label>
+                                        <input type="text" class="form-control" id="cliente_endereco" name="cliente_endereco" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Complemento:</label>
+                                        <input type="text" class="form-control" id="cliente_complemento" name="cliente_complemento" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Bairro:</label>
+                                        <input type="text" class="form-control" id="cliente_bairro" name="cliente_bairro" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Cidade:</label>
+                                        <input type="text" class="form-control" id="cliente_cidade" name="cliente_cidade" readonly>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label">UF:</label>
+                                        <input type="text" class="form-control" id="cliente_uf" name="cliente_uf" readonly>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
 
                     <!-- Billing Address -->
-                    <div class="modal-section-header">Endereço de Cobrança do Cliente</div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-2">
-                            <label class="form-label">CEP Cobrança:</label>
-                            <input type="text" class="form-control" id="cliente_cep_cobranca" name="cliente_cep_cobranca">
+                    <!-- CARD 4 - Endereço de Cobrança -->
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                                data-bs-toggle="collapse" data-bs-target="#cardCobranca"
+                                style="cursor:pointer;">
+                                Endereço de Cobrança
+                                <i class="bi bi-chevron-down"></i>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Endereço Cobrança:</label>
-                            <input type="text" class="form-control" id="cliente_endereco_cobranca" name="cliente_endereco_cobranca">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Cidade Cobrança:</label>
-                            <input type="text" class="form-control" id="cliente_cidade_cobranca" name="cliente_cidade_cobranca">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">UF Cobrança:</label>
-                            <select class="form-select" id="cliente_uf_cobranca" name="cliente_uf_cobranca" required>
-                                <option value="">Selecione</option>
-                                <option value="RJ">RJ</option>
-                                <option value="SP">SP</option>
-                                <option value="MG">MG</option>
-                                <option value="DF">DF</option>
-                                <option value="SC">SC</option>
-                                <option value="ES">ES</option>
-                                <option value="AC">AC</option>
-                                <option value="CE">CE</option>
-                                <option value="AL">AL</option>
-                                <option value="BA">BA</option>
-                                <option value="AM">AM</option>
-                                <option value="SE">SE</option>
-                                <option value="TO">TO</option>
-                                <option value="RR">RR</option>
-                                <option value="PI">PI</option>
-                                <option value="RN">RN</option>
-                                <option value="RS">RS</option>
-                                <option value="PB">PB</option>
-                                <option value="PR">PR</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Telefone Cobrança:</label>
-                            <input type="text" class="form-control" id="cliente_telefone_cobranca" name="cliente_telefone_cobranca">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Bairro Cobrança:</label>
-                            <input type="text" class="form-control" id="cliente_bairro_cobranca" name="cliente_bairro_cobranca">
+
+                        <div id="cardCobranca" class="collapse">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-2">
+                                        <label class="form-label">CEP Cobrança:</label>
+                                        <input type="text" class="form-control" id="cliente_cep_cobranca" name="cliente_cep_cobranca">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Endereço Cobrança:</label>
+                                        <input type="text" class="form-control" id="cliente_endereco_cobranca" name="cliente_endereco_cobranca">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Cidade Cobrança:</label>
+                                        <input type="text" class="form-control" id="cliente_cidade_cobranca" name="cliente_cidade_cobranca">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">UF Cobrança:</label>
+                                        <select class="form-select" id="cliente_uf_cobranca" name="cliente_uf_cobranca" required>
+                                            <option value="">Selecione</option>
+                                            <option value="RJ">RJ</option>
+                                            <option value="SP">SP</option>
+                                            <option value="MG">MG</option>
+                                            <option value="DF">DF</option>
+                                            <option value="SC">SC</option>
+                                            <option value="ES">ES</option>
+                                            <option value="AC">AC</option>
+                                            <option value="CE">CE</option>
+                                            <option value="AL">AL</option>
+                                            <option value="BA">BA</option>
+                                            <option value="AM">AM</option>
+                                            <option value="SE">SE</option>
+                                            <option value="TO">TO</option>
+                                            <option value="RR">RR</option>
+                                            <option value="PI">PI</option>
+                                            <option value="RN">RN</option>
+                                            <option value="RS">RS</option>
+                                            <option value="PB">PB</option>
+                                            <option value="PR">PR</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Telefone Cobrança:</label>
+                                        <input type="text" class="form-control" id="cliente_telefone_cobranca" name="cliente_telefone_cobranca">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Bairro Cobrança:</label>
+                                        <input type="text" class="form-control" id="cliente_bairro_cobranca" name="cliente_bairro_cobranca">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Contract Associations -->
-                    <div class="modal-section-header">Contratos</div>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-12">
-                            <label class="form-label">Contratos Disponíveis</label>
-                            <select class="form-select" id="cliente_contratos_associados" name="cliente_contratos_associados" multiple></select>
-                            <small class="text-muted">Segure Ctrl (Windows) ou Command (Mac) para selecionar múltiplos itens</small>
+                    <!-- CARD 5 - Vincular Contratos -->
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                                data-bs-toggle="collapse" data-bs-target="#cardVinculos"
+                                style="cursor:pointer;">
+                            Vincular Contratos
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div id="cardVinculos" class="collapse">
+                            <div class="card-body">
+                                <label class="form-label">Contratos Disponíveis</label>
+                                <select class="form-select" id="cliente_contratos_associados" name="cliente_contratos_associados" multiple></select>
+                                <small class="text-muted">Segure Ctrl (Windows) ou Command (Mac) para selecionar múltiplos itens</small>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Observations -->
-                    <div class="modal-section-header">Observações</div>
-                    <div class="mb-4">
-                        <textarea class="form-control" id="cliente_observacao" name="cliente_observacao" rows="4"></textarea>
+                    <!-- CARD 6 - Observações -->
+                    <div class="card mb-3">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                            data-bs-toggle="collapse" data-bs-target="#cardObs"
+                            style="cursor:pointer;">
+                            Observações
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div id="cardObs" class="collapse">
+                            <div class="card-body">
+                                <textarea class="form-control" id="cliente_observacao" name="cliente_observacao" rows="4"></textarea>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="modal-footer">

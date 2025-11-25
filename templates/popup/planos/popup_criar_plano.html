@@ -1,18 +1,24 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_clientes.css') }}">
+</head>
 
-<!-- MODAL DE PLANOS (ESTILO PADRÃO) -->
-<div class="modal fade" id="createPlanoModal" tabindex="-1" aria-labelledby="createPlanoModalLabel" aria-hidden="true">
+<!-- Modal: Formulário de Planos -->
+<div class="modal fade" id="criarPlanoModal" tabindex="-1" aria-labelledby="criarPlanoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content">
+        <div class="modal-content shadow-lg">
 
-            <!-- Header -->
+            <!-- HEADER -->
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="createPlanoModalLabel">Novo Plano</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title fw-bold" id="criarPlanoModalLabel">
+                    Criar Plano
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <!-- Body -->
-            <div class="modal-body">
-                <form method="POST" action="{{ url_for('planos_bp.insert_planos') }}" id="createPlanoForm">
+            <!-- BODY -->
+            <div class="modal-body bg-light">
+
+                <form method="POST" action="{{ url_for('planos_bp.insert_planos') }}">
 
                     <!-- CARD: Informações Básicas -->
                     <div class="card mb-3 section-card">
@@ -26,41 +32,45 @@
 
                         <div class="collapse show" id="basicInfoPopupPlanosCollapse">
                             <div class="card-body">
-                                <div class="row g-3 mb-4">
+                                <div class="row g-3">
 
                                     <div class="col-md-2">
                                         <label class="form-label">Código:</label>
-                                        <input type="text" id="codigo_contrato_plano" name="codigo_contrato_plano" class="form-control" readonly>
+                                        <input type="text" id="codigo" name="codigo" class="form-control"
+                                               value="{{ plano_selecionado.codigo if plano_selecionado else '' }}" readonly>
                                     </div>
 
                                     <div class="col-md-5">
                                         <label class="form-label">Nome do Plano:</label>
-                                        <input type="text" id="nome" name="nome" class="form-control" required>
+                                        <input type="text" id="nome" name="nome" class="form-control"
+                                               value="{{ plano_selecionado.nome if plano_selecionado else '' }}" required>
                                     </div>
 
-                                    <div class="col-md-1">
+                                    <div class="col-md-2">
                                         <label class="form-label">Valor:</label>
-                                        <input type="text" id="valor" name="valor" class="form-control" placeholder="0.00">
-                                    </div>
-
-                                    <div class="col-md-1">
-                                        <label class="form-label">Id Portal:</label>
-                                        <input type="text" id="id_produto" name="id_produto" class="form-control">
+                                        <input type="text" id="valor" name="valor" class="form-control"
+                                               placeholder="0.00"
+                                               value="{{ plano_selecionado.valor if plano_selecionado else '' }}">
                                     </div>
 
                                     <div class="col-md-3">
+                                        <label class="form-label">Id Produto Portal:</label>
+                                        <input type="text" id="id_produto" name="id_produto" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-5">
                                         <label class="form-label">Vincular a Contrato:</label>
                                         <select id="contrato_id" name="contrato_id" class="form-select">
                                             <option value="">Carregando contratos...</option>
                                         </select>
                                     </div>
 
-                                    <div class="col-md-4">
-                                        <label class="form-label">Vincular ao Cliente:</label>
+                                    <!--<div class="col-md-4">
+                                        <label class="form-label">Vincular ao Cliente</label>
                                         <select id="cliente_id" name="cliente_id" class="form-select">
                                             <option value="">Carregando clientes...</option>
                                         </select>
-                                    </div>
+                                    </div>-->
 
                                     <div class="col-md-4">
                                         <label class="form-label">Vincular Produto:</label>
@@ -74,16 +84,17 @@
                                         </select>
                                     </div>
 
-                                    <div class="col-md-2">
-                                        <label class="form-label">Qtd Produto:</label>
-                                        <input type="number" id="qtd_produto" name="qtd_produto" class="form-control" placeholder="0">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Quantidade Produto:</label>
+                                        <input type="number" id="qtd_produto" name="qtd_produto" class="form-control">
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Informações Fiscais -->
+                    <!-- CARD: Informações Fiscais -->
                     <div class="card mb-3 section-card">
                         <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
                              data-bs-toggle="collapse" data-bs-target="#secLicencaPopupPlanos"
@@ -95,7 +106,7 @@
 
                         <div class="collapse" id="secLicencaPopupPlanos">
                             <div class="card-body">
-                                <div class="row g-3 mb-4">
+                                <div class="row g-3">
 
                                     <div class="col-md-6">
                                         <label class="form-label">Descrição Boleto:</label>
@@ -114,25 +125,26 @@
 
                                     <div class="col-md-12">
                                         <label class="form-label">Descrição para NF:</label>
-                                        <textarea name="desc_nf_licenca" id="desc_nf_licenca" class="form-control"></textarea>
+                                        <textarea name="desc_nf_licenca" id="desc_nf_licenca" class="form-control" rows="3"></textarea>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Ações -->
+                    <!-- AÇÕES -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <button type="submit" class="btn btn-primary" id="saveClientBtn">Salvar</button>
                     </div>
 
                 </form>
+
             </div>
 
         </div>
     </div>
 </div>
 
-
-<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_contratos_planos.js') }}"></script>
+<script src="{{ url_for('static', filename='js/planos/popup_js/popup_planos.js') }}"></script>

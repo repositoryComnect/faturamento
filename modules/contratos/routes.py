@@ -66,41 +66,65 @@ def delete_contrato():
 
         contrato_id = contrato[0]
 
+        # ----------------------------------------------------------------------
+        # CHECK — Obtém informações completas do cliente (sequencia + fantasia + CNPJ)
+        # ----------------------------------------------------------------------
         if action == 'check':
-            count = db.session.execute(
-                text("SELECT COUNT(*) FROM cliente_contrato WHERE contrato_id = :id"),
-                {'id': contrato_id}
-            ).scalar()
+
+            contrato_info = db.session.execute(text("""
+                SELECT 
+                    c.id,
+                    c.numero,
+                    c.cliente_id,
+                    cli.sequencia AS cliente_sequencia,
+                    cli.nome_fantasia AS cliente_fantasia,
+                    cli.cnpj_cpf AS cliente_cnpj,
+                    cli.razao_social AS cliente_nome
+                FROM contratos c
+                LEFT JOIN clientes cli ON cli.id = c.cliente_id
+                WHERE c.id = :id
+            """), {'id': contrato_id}).fetchone()
 
             return jsonify({
                 'success': True,
-                'hasClients': count > 0,
-                'count': count,
+                'hasClients': contrato_info.cliente_id is not None,
                 'contrato': {
-                    'id': contrato_id,
-                    'numero': contrato[1],
-                    'sequencia': contrato_id
+                    'id': contrato_info.id,
+                    'numero': contrato_info.numero,
+                    'cliente_sequencia': contrato_info.cliente_sequencia,
+                    'cliente_nome': contrato_info.cliente_nome,
+                    'cliente_fantasia': contrato_info.cliente_fantasia,
+                    'cliente_cnpj': contrato_info.cliente_cnpj
                 }
             })
 
+        # ----------------------------------------------------------------------
+        # UNLINK — agora opcional — caso ainda deseje manter a funcionalidade
+        # ----------------------------------------------------------------------
         elif action == 'unlink':
-            # Desvincula todas as relações antes da inativação
-            db.session.execute(text("DELETE FROM cliente_contrato WHERE contrato_id = :id"), {'id': contrato_id})
+
+            # Caso não deseje mais essa opção, basta remover o bloco acima
+            db.session.execute(text("UPDATE contratos SET cliente_id = NULL WHERE id = :id"), {'id': contrato_id})
             db.session.execute(text("DELETE FROM contrato_plano WHERE contrato_id = :id"), {'id': contrato_id})
             db.session.execute(text("DELETE FROM contratos_produtos WHERE contrato_id = :id"), {'id': contrato_id})
+
             db.session.commit()
 
             return jsonify({'success': True, 'message': f'Contrato {numero} desvinculado com sucesso'})
 
+        # ----------------------------------------------------------------------
+        # DELETE — Soft delete real (apenas arquiva, sem desvincular)
+        # ----------------------------------------------------------------------
         elif action == 'delete':
-            # Soft delete: primeiro desvincula e depois arquiva
-            db.session.execute(text("DELETE FROM cliente_contrato WHERE contrato_id = :id"), {'id': contrato_id})
-            db.session.execute(text("DELETE FROM contrato_plano WHERE contrato_id = :id"), {'id': contrato_id})
-            db.session.execute(text("DELETE FROM contratos_produtos WHERE contrato_id = :id"), {'id': contrato_id})
 
-            # Em vez de deletar o contrato, apenas altera o estado
+            # 🔥 Soft delete → mantém TUDO, só atualiza estado
             db.session.execute(
-                text("UPDATE contratos SET estado_contrato = 'Arquivado' WHERE id = :id"),
+                text("""
+                    UPDATE contratos 
+                    SET estado_contrato = 'Arquivado',
+                        data_estado = CURRENT_DATE
+                    WHERE id = :id
+                """),
                 {'id': contrato_id}
             )
 
@@ -108,6 +132,7 @@ def delete_contrato():
 
             return jsonify({'success': True, 'message': f'Contrato {numero} arquivado com sucesso'})
 
+        # ----------------------------------------------------------------------
         return jsonify({'error': True, 'message': 'Ação inválida'}), 400
 
     except Exception as e:
@@ -177,7 +202,6 @@ def alterar_contrato():
         nome_fantasia = request.form.get('trade_name')
         atualizacao = parse_date(request.form.get('update_datetime_edit'))
         tipo = request.form.get('type')
-        responsavel = request.form.get('responsible')
         contato = request.form.get('contact')
         email = request.form.get('email_edit_contract')
         telefone = request.form.get('phone')
@@ -212,7 +236,6 @@ def alterar_contrato():
                     nome_fantasia = :nome_fantasia,
                     tipo = :tipo,
                     atualizacao = :atualizacao,
-                    responsavel = :responsavel,
                     contato = :contato,
                     email = :email,
                     telefone = :telefone,
@@ -238,7 +261,6 @@ def alterar_contrato():
                 'nome_fantasia': nome_fantasia,
                 'tipo': tipo,
                 'atualizacao': atualizacao,
-                'responsavel': responsavel,
                 'contato': contato,
                 'email': email,
                 'telefone': telefone,
@@ -299,97 +321,6 @@ def listar_contratos():
         return render_template('listar_contratos.html', 
                                error=f"Não foi possível carregar os contratos: {str(e)}")
 
-"""@contratos_bp.route('/contratos/buscar-por-numero/<numero>', methods=['GET'])
-def buscar_contrato_por_numero(numero):
-    empresa_id = session.get('empresa')
-    if not empresa_id:
-        return jsonify({'error': 'Empresa não selecionada'}), 400
-
-    try:
-        contrato = Contrato.query.filter_by(numero=numero, empresa_id=empresa_id).first()
-        if not contrato:
-            return jsonify({'error': f'Contrato {numero} não encontrado'}), 404
-
-        data = {
-            'id': contrato.id,
-            'numero': contrato.numero,
-            'razao_social': contrato.razao_social or None,
-            'nome_fantasia': contrato.nome_fantasia or None,
-            'atualizacao': safe_date(contrato.atualizacao),
-            'cadastramento': safe_date(contrato.cadastramento),
-            'tipo': contrato.tipo or None,
-            'tipo_pessoa': contrato.tipo_pessoa or None,
-            'contato': contrato.contato or None,
-            'id_matriz_portal': contrato.id_matriz_portal or None,
-            'email': contrato.email or None,
-            'telefone': formatar_telefone(contrato.telefone or None),
-            'cep': formatar_cep(contrato.cep or None),
-            'cnpj_cpf': formatar_cpf_cnpj(contrato.cnpj_cpf or None),
-
-            'revenda': contrato.revenda if contrato.revenda not in (None, "", "null") else "Não possui revenda",
-            'vendedor': contrato.vendedor if contrato.vendedor not in (None, "", "null") else "Não possui vendedor",
-
-            'endereco': contrato.endereco or None,
-            'complemento': contrato.complemento or None,
-            'bairro': contrato.bairro or None,
-            'cidade': contrato.cidade or None,
-            'estado': contrato.estado or None,
-            'dia_vencimento': contrato.dia_vencimento or None,
-            'fator_juros': safe_float(contrato.fator_juros),
-            'contrato_revenda': contrato.contrato_revenda or None,
-            'faturamento_contrato': contrato.faturamento_contrato or None,
-            'estado_contrato': contrato.estado_contrato or None,
-            'data_estado': safe_date(contrato.data_estado),
-            'motivo_estado': contrato.motivo_estado or None,
-        }
-
-        # Clientes associados
-        data['clientes'] = []
-        if hasattr(contrato, 'clientes') and contrato.clientes:
-            for c in contrato.clientes:
-                data['clientes'].append({
-                    'sequencia' : c.sequencia or None,
-                    'nome_fantasia': c.nome_fantasia or None,
-                    'razao_social': c.razao_social or None,
-                    'cnpj_cpf': c.cnpj_cpf or None,
-                    'atividade': c.atividade or None,
-                    'cidade': c.cidade or None,
-                    'estado_atual': c.estado_atual or None,
-                    'numero_contrato_cadastrado': c.numero_contrato or None
-                })
-
-        # Planos associados
-        data['planos'] = []
-        if hasattr(contrato, 'planos') and contrato.planos:
-            for p in contrato.planos:
-                data['planos'].append({
-                    'id': p.id,
-                    'codigo': p.codigo,
-                    'nome': p.nome,
-                    'valor': safe_float(p.valor, 0.00)
-                })
-
-        # Produtos associados
-        data['produtos'] = []
-        associacoes = ContratoProduto.query.filter_by(contrato_id=contrato.id).all()
-        for assoc in associacoes:
-            produto = Produto.query.get(assoc.produto_id)
-            if produto:
-                data['produtos'].append({
-                    'codigo' : produto.codigo,
-                    'id': produto.id,
-                    'nome': produto.nome or None,
-                    'descricao': produto.descricao or 'N/A',
-                    'quantidade': assoc.quantidade or 0,
-                    'valor_unitario': safe_float(produto.preco_base, 0.00)
-                })
-
-        return jsonify(data)
-
-    except Exception as e:
-        print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
-        return jsonify({'error': 'Erro ao processar a requisição'}), 500"""
-
 @contratos_bp.route('/contratos/buscar-por-numero/<numero>', methods=['GET'])
 def buscar_contrato_por_numero(numero):
     empresa_id = session.get('empresa')
@@ -412,7 +343,6 @@ def buscar_contrato_por_numero(numero):
     except Exception as e:
         print(f"ERRO AO BUSCAR CONTRATO {numero}: {str(e)}")
         return jsonify({'error': 'Erro ao processar a requisição'}), 500
-
 
 @contratos_bp.route('/set_contrato', methods=['POST'])
 def set_contrato():
@@ -1149,87 +1079,3 @@ def proximo_contrato(numero_atual):
 
     # Agora retorna exatamente como a rota oficial
     return jsonify(montar_dict_contrato(contrato))
-
-'''@contratos_bp.route('/render_clientes/buscar-por-numero/<sequencia>', methods=['GET'])
-def buscar_render_cliente_por_contrato(sequencia):
-    empresa_id = session.get('empresa')
-    try:
-        cliente = (
-            Cliente.query
-            .filter(
-                Cliente.sequencia == sequencia,
-                Cliente.empresa_id == empresa_id,
-                Cliente.estado_atual != 'Arquivado'
-            )
-            .first()
-        )
-
-        if not cliente:
-            return jsonify({'error': f'Cliente {sequencia} não encontrado'}), 404
-
-        # Função auxiliar para formatar datas
-        def format_date(date):
-            return date.strftime('%d/%m/%Y') if date else None
-
-        data = {
-            'sequencia': cliente.sequencia,
-            'cadastramento': cliente.cadastramento or None,
-            'atualizacao': cliente.atualizacao or None,
-            'razao_social': cliente.razao_social or None,
-            'nome_fantasia': cliente.nome_fantasia or None,
-            'contato': cliente.contato_principal or None,
-            'email': cliente.email or None,
-            'telefone': formatar_telefone(cliente.telefone or None),
-            'tipo': cliente.tipo or None,
-            'cnpj_cpf': formatar_cpf_cnpj(cliente.cnpj_cpf or None),
-            'im': cliente.im or None,
-            'ie': cliente.ie or None,
-            'revenda_nome': cliente.revenda_nome or None,
-            'vendedor_nome': cliente.vendedor_nome or None,
-            'tipo_servico': cliente.tipo_servico or None,
-            'localidade': cliente.localidade or None,
-            'regiao': cliente.regiao or None,
-            'atividade': cliente.atividade or None,
-            'cep': formatar_cep(cliente.cep or None),
-            'endereco': cliente.endereco or None,
-            'complemento': cliente.complemento or None,
-            'bairro': cliente.bairro or None,
-            'cidade': cliente.cidade or None,
-            'cep_cobranca': cliente.cep_cobranca or None,
-            'endereco_cobranca': cliente.endereco_cobranca or None,
-            'cidade_cobranca': cliente.cidade_cobranca or None,
-            'telefone_cobranca': cliente.telefone_cobranca or None,
-            'bairro_cobranca': cliente.bairro_cobranca or None,
-            'uf_cobranca': cliente.uf_cobranca or None,
-            'estado': cliente.estado or None,
-            'fator_juros': float(cliente.fator_juros) if cliente.fator_juros else None,
-            'plano_nome': cliente.plano_nome or None,
-            'observacao': cliente.observacao or None,
-            'data_estado': format_date(cliente.data_estado) or None,
-            'dia_vencimento': cliente.dia_vencimento or None,
-
-            # NOVO: Lista de instalações vinculadas ao cliente
-            'instalacoes': [
-                {
-                    'id': inst.id,
-                    'codigo_instalacao': inst.codigo_instalacao,
-                    'razao_social': inst.razao_social,
-                    'cep': inst.cep,
-                    'endereco': inst.endereco,
-                    'bairro': inst.bairro,
-                    'cidade': inst.cidade,
-                    'uf': inst.uf,
-                    'cadastramento': format_date(inst.cadastramento),
-                    'id_portal': inst.id_portal,
-                    'status': inst.status,
-                    'observacao': inst.observacao or '',
-                    'valor_plano': float(getattr(inst, 'valor_plano', 0.00))  # Proteção caso não exista
-                }
-                for inst in cliente.instalacoes
-            ]
-        }
-
-        return render_template('clientes.html', cliente=data)
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500'''

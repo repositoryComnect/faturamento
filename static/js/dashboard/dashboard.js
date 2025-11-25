@@ -24,6 +24,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                         label: 'Cancelados',
                         data: dataBar.map(item => item.cancelado),
                         backgroundColor: '#F44336'
+                    },
+                    {
+                        label: 'Arquivado',
+                        data: dataBar.map(item => item.arquivado),
+                        backgroundColor: '#F47B20'
                     }
                 ]
             },
@@ -56,6 +61,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         const responsePie = await fetch('/statusChart');
         const dataPie = await responsePie.json();
 
+        const STATUS_COLORS = {
+            'Ativos': '#2196F3',
+            'Suspensos': '#FFC107',
+            'Cancelado': '#F44336',
+            'Arquivado': '#F47B20'
+        };
+
         const ctxPie = document.getElementById('statusChart').getContext('2d');
         new Chart(ctxPie, {
             type: 'pie',
@@ -63,9 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 labels: dataPie.map(item => item.status),
                 datasets: [{
                     data: dataPie.map(item => item.count),
-                    backgroundColor: [
-                        '#36A2EB', '#FF6384', '#FFCE56', '#4BC0C0', '#9966FF'
-                    ],
+                    backgroundColor: dataPie.map(item => STATUS_COLORS[item.status] || '#999'),
                     borderWidth: 1
                 }]
             },
@@ -95,4 +105,5 @@ document.addEventListener("DOMContentLoaded", async () => {
         document.getElementById('statusChart').outerHTML =
             '<div class="alert alert-danger">Erro ao carregar dados do gráfico de status</div>';
     }
+
 });

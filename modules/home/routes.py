@@ -49,28 +49,21 @@ def render_clientes():
 def render_planos():
     empresa_id = session.get('empresa')
 
-    page = request.args.get('page', 1, type=int)
-    per_page = 10 
-
     try:
+        # Carrega o primeiro plano apenas
         plano = db.session.execute(
-            db.select(Plano).filter_by(empresa_id=empresa_id).limit(1)
+            db.select(Plano).filter_by(empresa_id=empresa_id).order_by(Plano.id).limit(1)
         ).scalar_one_or_none()
-
-        # Consulta paginada filtrada por empresa
-        planos_paginados = Plano.query.filter_by(empresa_id=empresa_id)\
-                                      .order_by(Plano.id)\
-                                      .paginate(page=page, per_page=per_page, error_out=False)
 
         return render_template(
             'planos.html',
-            plano=plano,
-            planos=planos_paginados.items,
-            pagination=planos_paginados
+            plano=plano
         )
+
     except Exception as e:
         print(f"Erro ao carregar planos: {str(e)}")
-        return render_template('planos.html', plano=None, planos=[], pagination=None)
+        return render_template('planos.html', plano=None)
+
 
 @home_bp.route('/ferramentas', methods=['GET'])
 @login_required

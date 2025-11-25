@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, render_template, request, redirect, url_fo
 from application.models.models import db, Plano, Contrato, Produto, Cliente
 from sqlalchemy import text
 from datetime import datetime
+from modules.planos.utils import montar_dict_plano
 import re
 
 planos_bp = Blueprint('planos_bp', __name__)
@@ -256,6 +257,82 @@ def get_produtos():
     produtos = Produto.query.order_by(Produto.codigo).all()
     resultado = [{'id': p.id, 'codigo': p.codigo, 'nome': p.nome, 'preco_base': p.preco_base} for p in produtos]
     return jsonify(resultado) 
+
+@planos_bp.route('/planos/proximo/<codigo_atual>', methods=['GET'])
+def proximo_plano(codigo_atual):
+    empresa_id = session.get('empresa')
+    if not empresa_id:
+        return jsonify({'error': 'Empresa não selecionada'}), 400
+
+    # Localizar o plano atual pelo código
+    plano_atual = (
+        Plano.query
+        .filter_by(codigo=codigo_atual, empresa_id=empresa_id)
+        .first()
+    )
+
+    if not plano_atual:
+        return jsonify({'error': 'Plano atual não encontrado'}), 404
+
+    # Buscar o próximo plano pelo ID crescente
+    plano = (
+        Plano.query
+        .filter(
+            Plano.id > plano_atual.id,
+            Plano.empresa_id == empresa_id
+        )
+        .order_by(Plano.id.asc())
+        .first()
+    )
+
+    if not plano:
+        return jsonify({}), 200
+
+    # Retorno com suas colunas reais
+    return jsonify({
+        "id": plano.id,
+        "codigo": plano.codigo,
+        "nome": plano.nome,
+        "valor": plano.valor,
+        "id_produto_portal": plano.id_portal,
+        "licenca_valor": plano.licenca_valor,
+        "produto": plano.produto,
+        "qtd_produto": plano.qtd_produto,
+        "desc_boleto_licenca": plano.desc_boleto_licenca,
+        "aliquota_sp_licenca": plano.aliquota_sp_licenca,
+        "cod_servico_sp_licenca": plano.cod_servico_sp_licenca,
+        "desc_nf_licenca": plano.desc_nf_licenca,
+        "valor_base_produto": plano.valor_base_produto,
+
+        # só a data
+        "cadastramento": plano.data_criacao.strftime("%d/%m/%Y") if plano.data_criacao else "",
+        "atualizacao": plano.data_atualizacao.strftime("%d/%m/%Y") if plano.data_atualizacao else ""
+
+        
+    })
+
+@planos_bp.route('/planos/buscar-por-codigo/<codigo>', methods=['GET'])
+def buscar_plano_por_codigo(codigo):
+    empresa_id = session.get('empresa')
+    if not empresa_id:
+        return jsonify({'error': 'Empresa não selecionada'}), 400
+
+    try:
+        plano = (
+            Plano.query
+            .filter_by(codigo=codigo, empresa_id=empresa_id)
+            .first()
+        )
+
+        if not plano:
+            return jsonify({'error': f'Plano {codigo} não encontrado'}), 404
+
+        return jsonify(montar_dict_plano(plano))
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()   # <-- MOSTRA O ERRO REAL NO LOG
+        return jsonify({'error': str(e)}), 500   # <-- devolve o erro real
 
 
 

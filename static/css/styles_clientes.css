@@ -154,7 +154,7 @@ input[type="search"] {
 }
 
 
-/* ===== TABELAS DE PRODUTOS ===== */
+/* ===== TABELAS DE INSTALAÇÕES ===== */
 .instalacao-table {
     width: 100%;
     margin-bottom: 1rem;
@@ -192,7 +192,7 @@ input[type="search"] {
 }
 
 
-/* ===== TABELAS DE PRODUTOS ===== */
+/* ===== TABELAS DE PLANOS ===== */
 .plano-table {
     width: 100%;
     margin-bottom: 1rem;
@@ -224,6 +224,43 @@ input[type="search"] {
 }
 
 .plano-table td:nth-child(5) {
+    text-align: right;
+    font-family: 'Courier New', monospace;
+    font-weight: 500;
+}
+
+/* ===== TABELAS DE PRODUTOS ===== */
+.contrato-table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.contrato-table th {
+    background-color: #f1f3f5;
+    font-weight: 600;
+    
+    font-size: 0.85rem;
+    padding: 10px;
+}
+
+.contrato-table td {
+    padding: 10px;
+    vertical-align: middle;
+    border-top: 1px solid #e9ecef;
+}
+
+.contrato-table tr:hover {
+    background-color: #f8f9fa;
+    transition: background-color 0.2s ease;
+}
+
+.contrato-table td:nth-child(5) {
     text-align: right;
     font-family: 'Courier New', monospace;
     font-weight: 500;

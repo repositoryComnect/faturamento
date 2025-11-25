@@ -468,15 +468,15 @@ $(document).ready(function () {
                 if (data.success) {
                     currentContract = data.contrato;
                     contractNumberDisplay.textContent = currentContract.numero;
-                    contractSequenceDisplay.textContent = currentContract.sequencia || '-';  // Fallback
+                    contractSequenceDisplay.textContent = `${currentContract.cliente_sequencia  || '-' } - ${currentContract.cliente_fantasia || '-' } - ${currentContract.cliente_cnpj || '-' }`;
+
                     contractInfo.classList.remove('d-none');
     
                     if (data.hasClients) {
                         showValidationResult('Contrato encontrado com clientes vinculados', 'warning');
-                        clientsCountText.textContent = `Possui ${data.count} cliente(s) vinculado(s).`;
                         unlinkOptions.classList.remove('d-none');
                         confirmDeleteBtn.classList.remove('d-none');
-                        confirmDeleteBtn.textContent = 'Desvincular e Excluir';
+                        confirmDeleteBtn.textContent = 'Excluir';
                         validateBtn.classList.add('d-none');
                     } else {
                         showValidationResult('Contrato pode ser excluído sem problemas', 'success');

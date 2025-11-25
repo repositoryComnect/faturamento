@@ -1,223 +1,292 @@
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_contratos.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_contratos.css') }}">
 </head>
 <body>
-    <!-- Create Contract Modal -->
-    <div class="modal fade" id="createContractModal" tabindex="-1" aria-labelledby="createContractModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="createContractModalLabel">Novo Contrato</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="createContractForm" action="{{ url_for('contratos_bp.set_contrato') }}" method="POST">
-                        <!-- Basic Information Section -->
-                        <div class="modal-section-header">Informações Básicas</div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-2">
-                                <label class="form-label">Nº Contrato:</label>
-                                <input type="text" class="form-control" id="numero_contrato" name="numero_contrato" required readonly>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Razão Social:</label>
-                                <input type="text" class="form-control" id="razao_social" name="razao_social" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Nome Fantasia:</label>
-                                <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Cadastramento:</label>
-                                <input type="text" class="form-control" id="current_datetime" name="current_datetime" readonly>
-                            </div>
-                            
-                            <div class="col-md-2">
-                                <label class="form-label">Atualização:</label>
-                                <input type="text" class="form-control" id="update_datetime" name="update_datetime" readonly>
-                            </div>
-                            
-                            <div class="col-md-2">
-                                <label class="form-label">Tipo de Contrato:</label>
-                                <select class="form-select" id="tipo_contrato" name="tipo_contrato">
-                                    <option value="Hardware">Hardware</option>
-                                    <option value="Software">Software</option>
-                                    <option value="Serviço">Serviço</option>
-                                    <option value="Manutenção">Manutenção</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Contato:</label>
-                                <input type="text" class="form-control" id="contato" name="contato" required>
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label">Id Portal:</label>
-                                <input type="text" class="form-control" id="portal_id" name="portal_id" required>
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label class="form-label">E-mail:</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Telefone:</label>
-                                <input type="tel" class="form-control" id="telefone" name="telefone" required>
-                            </div>
-                            
-                            <div class="col-md-2">
-                                <label class="form-label">CNPJ/CPF:</label>
-                                <input type="text" class="form-control" id="cnpj" name="cnpj">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Tipo:</label>
-                                <select class="form-select" name="people_type" id="people_type">
-                                    <option value="Pessoa Física">Pessoa Física</option>
-                                    <option value="Pessoa Jurídica">Pessoa Jurídica</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Revenda:</label>
-                                <select class="form-select" name="revenda_selecionada" id="revenda_selecionada">
-                                    <option value="">Selecione uma revenda</option>
-                                        {% for revenda in revendas %}
-                                    <option value="{{ revenda.id }}">{{ revenda.nome }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label" for="vendedor_selecionado">Distribuidor:</label>
-                                    <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
-                                    <option value="">Selecione um distribuidor</option>
-                                        {% for vendedor in vendedores %}
-                                    <option value="{{ vendedor.nome }}">{{ vendedor.nome }}</option>
-                                        {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label" for="cliente_selecionado">Cliente:</label>
-                                <select id="cliente_selecionado" name="cliente_selecionado" class="form-select">
-                                    <option value="">Vincule um cliente</option>
-                                </select>
-                            </div>
-                            
-                        </div>
-                        
-                        <!-- Address Section -->
-                        <div class="modal-section-header">Endereço do Contrato</div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-2">
-                                <label class="form-label">CEP:</label>
-                                <input type="text" class="form-control" id="cep" name="cep" required>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Endereço:</label>
-                                <input type="text" class="form-control" id="endereco" name="endereco" required>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Complemento:</label>
-                                <input type="text" class="form-control" id="complemento" name="complemento">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Bairro:</label>
-                                <input type="text" class="form-control" id="bairro" name="bairro" required>
-                            </div>          
-                            <div class="col-md-2">
-                                <label class="form-label">Cidade:</label>
-                                <input type="text" class="form-control" id="cidade" name="cidade" required>
-                            </div>
-                            <div class="col-md-1">
-                                <label class="form-label">UF:</label>
-                                <select class="form-select" id="uf" name="uf" required>
-                                    <option value="RJ"></option>
-                                    <option value="RJ">RJ</option>
-                                    <option value="SP">SP</option>
-                                    <option value="MG">MG</option>
-                                    <option value="DF">DF</option>
-                                    <option value="SC">SC</option>
-                                    <option value="ES">ES</option>
-                                    <option value="AC">AC</option>
-                                    <option value="CE">CE</option>
-                                    <option value="AL">AL</option>
-                                    <option value="BA">BA</option>
-                                    <option value="AM">AM</option>
-                                    <option value="SE">SE</option>
-                                    <option value="TO">TO</option>
-                                    <option value="RR">RR</option>
-                                    <option value="PI">PI</option>
-                                    <option value="RN">RN</option>
-                                    <option value="RS">RS</option>
-                                    <option value="PB">PB</option>
-                                    <option value="PR">PR</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="modal-section-header">Detalhes do Contrato</div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-2">
-                                <label class="form-label">Dia Vencimento:</label>
-                                <input type="number" class="form-control" id="dia_vencimento" name="dia_vencimento" min="1" max="31">
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Fator moderador da taxa de juros:</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" name="fator_juros" id="fator_juros" value="100">
-                                    <span class="input-group-text">%</span>
-                                </div>
-                            </div>
-                        
-                            <div class="col-md-2">
-                                <label class="form-label">Estado:</label>
-                                <select class="form-select" name="estado_contrato" id="estado_contrato">
-                                    <option value="Ativo">Ativo</option>
-                                    <option value="Cancelado">Cancelado</option>
-                                    <option value="Suspenso">Suspenso</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label">Data Status:</label>
-                                <input type="text" class="form-control" id="date_status" name="date_status" readonly>
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Motivo:</label>
-                                <input type="text" class="form-control" id="motivo_estado" name="motivo_estado">
-                            </div>
-                        </div>
-                        
-                        <div class="modal-section-header">Relação de Planos</div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-8">
-                                <label class="form-label">Plano:</label>
-                                <select class="form-select" name="plano_id" id="plano">
-                                    <option value="">Carregando planos...</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-4">
-                                <label class="form-label">Valor do Plano:</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">R$</span>
-                                    <input type="number" class="form-control" name="plan_value" id="plan_value" step="0.01" readonly>
-                                </div>
-                            </div>
+<!-- Create Contract Modal -->
+<div class="modal fade" id="createContractModal" tabindex="-1" aria-labelledby="createContractModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg">
 
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="createContractModalLabel">Novo Contrato</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body bg-light">
+                <form id="createContractForm" action="{{ url_for('contratos_bp.set_contrato') }}" method="POST">
+
+                    <!-- CARD: Informações Básicas -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                             data-bs-toggle="collapse" data-bs-target="#basicInfoContrato" aria-expanded="true"
+                             aria-controls="basicInfoContrato" style="cursor:pointer;">
+                            <span>Informações Básicas</span>
+                            <i class="bi bi-chevron-down"></i>
                         </div>
-                        <!-- Observations Section -->
-                        <div class="modal-section-header">Observações</div>
-                        <div class="mb-4">
-                            <textarea class="form-control" name="observacao" id="observacao" rows="4"></textarea>
+
+                        <div class="collapse show" id="basicInfoContrato">
+                            <div class="card-body">
+                                <div class="row g-3 mb-0">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Nº Contrato:</label>
+                                        <input type="text" class="form-control" id="numero_contrato" name="numero_contrato" required readonly>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Razão Social:</label>
+                                        <input type="text" class="form-control" id="razao_social" name="razao_social" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Nome Fantasia:</label>
+                                        <input type="text" class="form-control" id="nome_fantasia" name="nome_fantasia" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Cadastramento:</label>
+                                        <input type="text" class="form-control" id="current_datetime" name="current_datetime" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Atualização:</label>
+                                        <input type="text" class="form-control" id="update_datetime" name="update_datetime" readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Tipo de Contrato:</label>
+                                        <select class="form-select" id="tipo_contrato" name="tipo_contrato">
+                                            <option value="Hardware">Hardware</option>
+                                            <option value="Software">Software</option>
+                                            <option value="Serviço">Serviço</option>
+                                            <option value="Manutenção">Manutenção</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Contato:</label>
+                                        <input type="text" class="form-control" id="contato" name="contato" required>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label">Id Portal:</label>
+                                        <input type="text" class="form-control" id="portal_id" name="portal_id" required>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">E-mail:</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Telefone:</label>
+                                        <input type="tel" class="form-control" id="telefone" name="telefone" required>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">CNPJ/CPF:</label>
+                                        <input type="text" class="form-control" id="cnpj" name="cnpj">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Tipo:</label>
+                                        <select class="form-select" name="people_type" id="people_type">
+                                            <option value="Pessoa Física">Pessoa Física</option>
+                                            <option value="Pessoa Jurídica">Pessoa Jurídica</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Revenda:</label>
+                                        <select class="form-select" name="revenda_selecionada" id="revenda_selecionada">
+                                            <option value="">Selecione uma revenda</option>
+                                            {% for revenda in revendas %}
+                                                <option value="{{ revenda.id }}">{{ revenda.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label" for="vendedor_selecionado">Distribuidor:</label>
+                                        <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
+                                            <option value="">Selecione um distribuidor</option>
+                                            {% for vendedor in vendedores %}
+                                                <option value="{{ vendedor.nome }}">{{ vendedor.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label" for="cliente_selecionado">Cliente:</label>
+                                        <select id="cliente_selecionado" name="cliente_selecionado" class="form-select">
+                                            <option value="">Vincule um cliente</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn btn-primary" id="saveContractBtn">Salvar</button>
+                    </div>
+
+                    <!-- CARD: Endereço -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                             data-bs-toggle="collapse" data-bs-target="#enderecoContrato" aria-expanded="false"
+                             aria-controls="enderecoContrato" style="cursor:pointer;">
+                            <span>Endereço do Contrato</span>
+                            <i class="bi bi-chevron-down"></i>
                         </div>
-                    </form>
-                </div>
+
+                        <div class="collapse" id="enderecoContrato">
+                            <div class="card-body">
+                                <div class="row g-3 mb-0">
+                                    <div class="col-md-2">
+                                        <label class="form-label">CEP:</label>
+                                        <input type="text" class="form-control" id="cep" name="cep" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Endereço:</label>
+                                        <input type="text" class="form-control" id="endereco" name="endereco" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Complemento:</label>
+                                        <input type="text" class="form-control" id="complemento" name="complemento">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Bairro:</label>
+                                        <input type="text" class="form-control" id="bairro" name="bairro" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Cidade:</label>
+                                        <input type="text" class="form-control" id="cidade" name="cidade" required>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label">UF:</label>
+                                        <select class="form-select" id="uf" name="uf" required>
+                                            <option value=""></option>
+                                            <option value="RJ">RJ</option>
+                                            <option value="SP">SP</option>
+                                            <option value="MG">MG</option>
+                                            <option value="DF">DF</option>
+                                            <option value="SC">SC</option>
+                                            <option value="ES">ES</option>
+                                            <option value="AC">AC</option>
+                                            <option value="CE">CE</option>
+                                            <option value="AL">AL</option>
+                                            <option value="BA">BA</option>
+                                            <option value="AM">AM</option>
+                                            <option value="SE">SE</option>
+                                            <option value="TO">TO</option>
+                                            <option value="RR">RR</option>
+                                            <option value="PI">PI</option>
+                                            <option value="RN">RN</option>
+                                            <option value="RS">RS</option>
+                                            <option value="PB">PB</option>
+                                            <option value="PR">PR</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD: Detalhes do Contrato -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                             data-bs-toggle="collapse" data-bs-target="#detalhesContrato" aria-expanded="false"
+                             aria-controls="detalhesContrato" style="cursor:pointer;">
+                            <span>Detalhes do Contrato</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div class="collapse" id="detalhesContrato">
+                            <div class="card-body">
+                                <div class="row g-3 mb-0">
+                                    <div class="col-md-2">
+                                        <label class="form-label">Dia Vencimento:</label>
+                                        <input type="number" class="form-control" id="dia_vencimento" name="dia_vencimento" min="1" max="31">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Fator moderador da taxa de juros:</label>
+                                        <div class="input-group">
+                                            <input type="number" class="form-control" name="fator_juros" id="fator_juros" value="100">
+                                            <span class="input-group-text">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Estado:</label>
+                                        <select class="form-select" name="estado_contrato" id="estado_contrato">
+                                            <option value="Ativo">Ativo</option>
+                                            <option value="Cancelado">Cancelado</option>
+                                            <option value="Suspenso">Suspenso</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Data Status:</label>
+                                        <input type="text" class="form-control" id="date_status" name="date_status" readonly>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Motivo:</label>
+                                        <input type="text" class="form-control" id="motivo_estado" name="motivo_estado">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD: Relação de Planos -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                             data-bs-toggle="collapse" data-bs-target="#planosContrato" aria-expanded="false"
+                             aria-controls="planosContrato" style="cursor:pointer;">
+                            <span>Relação de Planos</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div class="collapse" id="planosContrato">
+                            <div class="card-body">
+                                <div class="row g-3 mb-0">
+                                    <div class="col-md-8">
+                                        <label class="form-label">Plano:</label>
+                                        <select class="form-select" name="plano_id" id="plano">
+                                            <option value="">Carregando planos...</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Valor do Plano:</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">R$</span>
+                                            <input type="number" class="form-control" name="plan_value" id="plan_value" step="0.01" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD: Observações -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                             data-bs-toggle="collapse" data-bs-target="#obsContrato" aria-expanded="false"
+                             aria-controls="obsContrato" style="cursor:pointer;">
+                            <span>Observações</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div class="collapse" id="obsContrato">
+                            <div class="card-body">
+                                <textarea class="form-control" name="observacao" id="observacao" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FOOTER / AÇÕES -->
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+                        <button type="button" class="btn btn-secondary px-2" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary px-2" id="saveContractBtn">Salvar</button>
+                    </div>
+
+                </form>
+
+
             </div>
         </div>
     </div>
+</div>
 
 <script src="{{ url_for('static', filename='js/contratos/popup_js/popup_contratos.js') }}"></script>
-
 </body>
 </html>

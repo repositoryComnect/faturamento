@@ -84,7 +84,6 @@
 
         <!-- FORMULÁRIO DE PLANOS -->
         <div class="planos-form">
-            <form method="POST" action="{{ url_for('planos_bp.insert_planos') }}">
                 <!-- Informações Básicas -->
                 <div class="card mb-1">
                     <div class="card-header section-header d-flex justify-content-between align-items-center" 
@@ -95,59 +94,97 @@
                     <div class="collapse show" id="basicInfoCollapse">
                         <div class="card-body">
                             <div class="row">
-                                <div class="form-group col-md-1">
-                                    <label for="codigo">Código:</label>
-                                    <input type="text" id="codigo" name="codigo" class="form-control" 
-                                           value="{{ plano_selecionado.codigo if plano_selecionado else '' }}" 
-                                           placeholder="000" readonly>
-                                </div>
-                                
-                                <div class="form-group col-md-5">
-                                    <label for="nome">Nome do Plano:</label>
-                                    <input type="text" id="nome" name="nome" class="form-control" 
-                                           value="{{ plano_selecionado.nome if plano_selecionado else '' }}" required>
-                                </div>
-                                <div class="form-group col-md-1">
-                                    <label for="valor">Valor:</label>
-                                    <input type="text" id="valor" name="valor" class="form-control" 
-                                           value="{{ plano_selecionado.valor if plano_selecionado else '' }}" 
-                                           placeholder="0.00">
-                                </div>
-                                <div class="form-group col-md-1">
-                                    <label for="id_produto">Id Produto Portal:</label>
-                                    <input type="text" id="id_produto" name="id_produto" class="form-control" value="">
-                                </div>
-                                
-                                <div class="form-group col-md-4">
-                                    <label for="contrato_id">Vincular a Contrato:</label>
-                                    <select id="contrato_id" name="contrato_id" class="form-select">
-                                        <option value="">Carregando contratos...</option>
-                                    </select>
+
+                                <!-- CÓDIGO DO PLANO (alinhado como o de contrato) -->
+                                <div class="col-md-2">
+                                    <label class="form-label">Código Plano:</label>
+                                    <div class="d-flex gap-2">
+
+                                        <!-- Campo Código -->
+                                        <input type="text" class="form-control" id="codigo_plano"
+                                            value="{{ plano.codigo if plano else '' }}"
+                                            onchange="buscarPlanoPorCodigo(this.value)">
+
+                                        <!-- Buscar -->
+                                        <button class="btn btn-secondary" type="button" onclick="buscarPlanoPorCodigo(codigo_plano.value)">
+                                            <i class="bi bi-search"></i>
+                                        </button>
+
+                                        <!-- Listagem -->
+                                        <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#listarPlanosModal">
+                                            <i class="bi bi-card-list"></i>
+                                        </button>
+
+                                        <!-- Próximo -->
+                                        <button class="btn btn-secondary" type="button" onclick="proximoCodigoPlano()">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </button>
+
+                                        <!-- Spinner -->
+                                        <span id="loadingCodigoPlano" class="input-group-text d-none">
+                                            <div class="spinner-border spinner-border-sm" role="status"></div>
+                                        </span>
+
+                                    </div>
                                 </div>
 
-                                <div class="form-group col-md-4">
-                                    <label for="cliente_id">Vincular ao Cliente:</label>
-                                    <select id="cliente_id" name="cliente_id" class="form-select">
-                                        <option value="">Carregando clientes...</option>
-                                    </select>
+                                <!-- NOME DO PLANO -->
+                                <div class="col-md-3">
+                                    <label class="form-label">Nome do Plano:</label>
+                                    <input type="text" id="nome_plano" name="nome_plano" class="form-control"
+                                        value="{{ plano.nome if plano else '' }}" readonly>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label for="produto_id">Vincular Produto:</label>
-                                    <select id="produto_id" name="produto_id" class="form-select">
-                                        <option value="">Carregando produtos...</option>
-                                        {% for produto in produtos %}
-                                            <option value="{{ produto.id }}" data-preco="{{ produto.preco_base }}">
-                                                {{ produto.nome }}
-                                            </option>
-                                        {% endfor %}
-                                    </select>
+
+                                <!-- VALOR DO PLANO -->
+                                <div class="col-md-1">
+                                    <label class="form-label">Valor:</label>
+                                    <input type="text" id="valor_plano" name="valor_plano" class="form-control"
+                                        value="{{ plano.valor if plano else '' }}" readonly>
                                 </div>
-                                <div class="form-group col-md-1">
-                                    <label for="qtd_produto">Quantidade Produto:</label>
-                                    <input type="number" id="qtd_produto" name="qtd_produto" class="form-control" 
-                                           value="" placeholder="0">
+
+                                <!-- ID PRODUTO PORTAL -->
+                                <div class="col-md-1">
+                                    <label class="form-label">Id Produto Portal:</label>
+                                    <input type="text" id="id_produto_plano" name="id_produto_plano" class="form-control" value="{{ plano.id_produto_portal if plano else '' }}" readonly>
                                 </div>
+
+                                <div class="col-md-1">
+                                    <label class="form-label">Cadastramento:</label>
+                                    <input type="text" id="cadastramento_plano" name="cadastramento_plano" 
+                                        class="form-control" 
+                                        value="{{ plano.data_criacao.strftime('%d/%m/%Y') if plano and plano.data_criacao else '' }}"
+                                        readonly>
+                                </div>
+
+                                <div class="col-md-1">
+                                    <label class="form-label">Atualização:</label>
+                                    <input type="text" id="atualizacao_plano" name="atualizacao_plano" 
+                                        class="form-control" 
+                                        value="{{ plano.data_atualizacao.strftime('%d/%m/%Y') if plano and plano.data_atualizacao else '' }}"
+                                        readonly>
+                                </div>
+
+                                <!-- VINCULAR CONTRATO -->
+                                <div class="col-md-1">
+                                    <label class="form-label">Contrato:</label>
+                                    <input type="text" id="contrato_id_plano" name="contrato_id_plano" class="form-control" value="{{ plano.contrato_id if plano else '' }}" readonly> 
+                                </div>
+
+
+                                <!-- VINCULAR PRODUTO -->
+                                <div class="col-md-1">
+                                    <label class="form-label">Vincular Produto:</label>
+                                    <input id="produto_id_plano" name="produto_id_plano" class="form-control" value="{{ plano.produto_id if plano else '' }}" readonly>
+                                </div>
+
+                                <!-- QUANTIDADE DO PRODUTO -->
+                                <div class="col-md-1">
+                                    <label class="form-label">Quantidade Produto:</label>
+                                    <input type="number" id="qtd_produto_plano" name="qtd_produto_plano" class="form-control" value="{{ plano.qtd_produto if plano else '' }}" readonly>
+                                </div>
+
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -155,48 +192,57 @@
                 <!-- Informações Fiscais -->
                 <div class="card mb-1">
                     <div class="card-header section-header d-flex justify-content-between align-items-center" 
-                         data-bs-toggle="collapse" data-bs-target="#sec-licenca" 
-                         aria-expanded="false" aria-controls="sec-licenca">
+                        data-bs-toggle="collapse" data-bs-target="#sec-licenca" 
+                        aria-expanded="false" aria-controls="sec-licenca">
                         <h5 class="mb-0">Informações Fiscais</h5>
                     </div>
+
                     <div class="collapse" id="sec-licenca">
                         <div class="card-body">
                             <div class="row">
-                                <div class="form-group col-md-6">
+
+                                <!-- Primeira linha -->
+                                <div class="col-md-4">
                                     <label for="desc_boleto">Descrição Boleto:</label>
-                                    <input type="text" id="desc_boleto_licenca" name="desc_boleto_licenca" class="form-control" value="">
+                                    <input type="text" id="desc_boleto_licenca_plano" name="desc_boleto_licenca_plano" 
+                                        class="form-control" value="" readonly>
                                 </div>
-                                <div class="form-group col-md-3">
+
+                                <div class="col-md-3">
                                     <label for="aliquota_sp">Alíquota:</label>
-                                    <input type="text" id="aliquota_sp_licenca" name="aliquota_sp_licenca" class="form-control" placeholder="0.00">
+                                    <input type="text" id="aliquota_sp_licenca_plano" name="aliquota_sp_licenca_plano" 
+                                        class="form-control" readonly>
                                 </div>
-                                <div class="form-group col-md-3">
+
+                                <div class="col-md-5">
                                     <label for="cod_servico_sp">Código Serviço:</label>
-                                    <input type="text" id="cod_servico_sp_licenca" name="cod_servico_sp_licenca" class="form-control" placeholder="000">
+                                    <input type="text" id="cod_servico_sp_licenca_plano" name="cod_servico_sp_licenca_plano" 
+                                        class="form-control" readonly>
                                 </div>
-                                <div class="form-group col-md-12">
+
+                                <!-- Segunda linha — Descrição NF -->
+                                <div class=" col-md-12">
                                     <label for="desc_nf">Descrição para NF:</label>
-                                    <textarea name="desc_nf_licenca" id="desc_nf_licenca" class="form-control"></textarea>
+                                    <textarea name="desc_nf_licenca_plano" id="desc_nf_licenca_plano" 
+                                            class="form-control" rows="3" readonly></textarea>
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
-
-                <!-- Ações -->
-                <div class="form-actions mt-4">
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                    <a href="/planos" class="btn btn-secondary">Cancelar</a>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
 
-    {% include 'popup/planos/popup_delete_planos.html' %}
+   
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/planos/planos.js') }}"></script>
+{% include 'extensions/links_popup.html' %}
+
+ {% include 'popup/planos/popup_delete_planos.html' %}
+    {% include 'popup/planos/popup_criar_plano.html' %}
 
 {% endblock %}

@@ -1,187 +1,104 @@
+function proximoCodigoPlano() {
+    let codigoAtual = document.getElementById('codigo_plano').value;
+    if (!codigoAtual) return;
 
-    function toggleCollapse(id) {
-        const collapse = document.getElementById(id);
-        const icon = collapse.previousElementSibling.querySelector('i');
-        
-        collapse.classList.toggle('show');
-        
-        if (collapse.classList.contains('show')) {
-            icon.classList.remove('bi-chevron-up');
-            icon.classList.add('bi-chevron-down');
-        } else {
-            icon.classList.remove('bi-chevron-down');
-            icon.classList.add('bi-chevron-up');
-        }
-    }
-    
-    function confirmarExclusao(planoId) {
-        if (confirm('Tem certeza que deseja excluir este plano?')) {
-            window.location.href = '/planos/excluir/' + planoId;
-        }
-    }
+    $('#loadingCodigoPlano').removeClass('d-none');
 
+    fetch(`/planos/proximo/${codigoAtual}`)
+        .then(response => response.json())
+        .then(data => {
+            $('#loadingCodigoPlano').addClass('d-none');
 
-
-//<!-- SCRIPT PARA CARREGAR CONTRATOS -->
-    document.addEventListener("DOMContentLoaded", function () {
-        fetch("/contratos_ativos")
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById("contrato_id");
-                select.innerHTML = '<option value="">Selecione um contrato</option>';
-                const planoContratoId = "{{ plano.contrato_id or '' }}";
-    
-                data.forEach(contrato => {
-                    const option = document.createElement("option");
-                    option.value = contrato.id;
-                    option.text = `${contrato.numero} - ${contrato.razao_social}`;
-                    if (planoContratoId && planoContratoId == contrato.id.toString()) {
-                        option.selected = true;
-                    }
-                    select.appendChild(option);
+            // Caso seja o último plano
+            if (!data || Object.keys(data).length === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Último plano',
+                    text: 'Você já está no último plano cadastrado.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 4000,
+                    timerProgressBar: true,
+                    showConfirmButton: false
                 });
-            })
-            .catch(error => {
-                console.error("Erro ao carregar contratos:", error);
-                const select = document.getElementById("contrato_id");
-                select.innerHTML = '<option value="">Erro ao carregar contratos</option>';
-            });
-    });
-
-
-
-
-document.addEventListener("DOMContentLoaded", function () {
-    fetch("/clientes_ativos_planos")
-        .then(response => response.json())
-        .then(data => {
-            const select = document.getElementById("cliente_id");
-            select.innerHTML = '<option value="">Selecione um cliente</option>';
-
-            // Caso exista um cliente já vinculado (ex: ao editar um plano)
-            const clienteSelecionadoId = "{{ plano.cliente_id or '' }}";
-
-            data.forEach(cliente => {
-                const option = document.createElement("option");
-                option.value = cliente.id;
-                option.textContent = `${cliente.sequencia} - ${cliente.razao_social}`;
-
-                if (clienteSelecionadoId && clienteSelecionadoId == cliente.id.toString()) {
-                    option.selected = true;
-                }
-
-                select.appendChild(option);
-            });
-        })
-        .catch(error => {
-            console.error("Erro ao carregar clientes:", error);
-            const select = document.getElementById("cliente_id");
-            select.innerHTML = '<option value="">Erro ao carregar clientes</option>';
-        });
-});
-
-
-//  Busca o próximo código de plano
-function carregarCodigoPlano(modalEl) {
-    const campo = modalEl.querySelector('#codigo');
-    if (!campo) return;
-
-    fetch('/proximo_codigo_plano')
-        .then(response => response.json())
-        .then(data => {
-            if (data.proximo_codigo) {
-                campo.value = data.proximo_codigo;
-            } else {
-                console.warn("Código de plano não retornado pela API.");
+                return;
             }
+
+            // Preenche os campos da tela
+            document.getElementById('codigo_plano').value = data.codigo ?? "";
+            document.getElementById('nome_plano').value = data.nome ?? "";
+            document.getElementById('valor_plano').value = data.valor ?? "";
+            document.getElementById('id_produto_plano').value = data.id_produto_portal ?? "";
+            document.getElementById('contrato_id_plano').value = data.contrato_id ?? "";
+            document.getElementById('produto_id_plano').value = data.produto ?? "";
+            document.getElementById('qtd_produto_plano').value = data.qtd_produto ?? "";
+            document.getElementById('desc_boleto_licenca_plano').value = data.desc_boleto ?? "";
+            document.getElementById('aliquota_sp_licenca_plano').value = data.aliquota_sp ?? "";
+            document.getElementById('cod_servico_sp_licenca_plano').value = data.cod_servico_sp ?? "";
+            document.getElementById('desc_nf_licenca_plano').value = data.desc_nf ?? "";
+            document.getElementById('cadastramento_plano').value = data.cadastramento ?? "";
+            document.getElementById('atualizacao_plano').value = data.atualizacao ?? "";
         })
-        .catch(error => {
-            console.error("Erro ao buscar código de plano:", error);
+        .catch(err => {
+            $('#loadingCodigoPlano').addClass('d-none');
+            console.error("Erro ao buscar próximo plano:", err);
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro ao buscar próximo plano',
+                text: 'Ocorreu um problema na busca.',
+                toast: true,
+                position: 'top-end',
+                timer: 3000,
+                showConfirmButton: false
+            });
         });
 }
 
-//  Se o campo existir na página normal
-document.addEventListener("DOMContentLoaded", function () {
-    const campoPagina = document.querySelector('#codigo');
-    if (campoPagina) {
-        carregarCodigoPlano(document);
-    }
-});
 
-//  Quando o modal abrir
-document.addEventListener('shown.bs.modal', function (event) {
-    if (event.target.id === "createPlanoModal") {
-        carregarCodigoPlano(event.target);
-    }
-});
+// Buscar planos por código 
 
+function buscarPlanoPorCodigo(codigo) {
+    if (!codigo) return;
 
+    $('#loadingCodigoPlano').removeClass('d-none');
 
+    fetch(`/planos/buscar-por-codigo/${codigo}`)
+        .then(response => response.json())
+        .then(data => {
+            $('#loadingCodigoPlano').addClass('d-none');
 
-
-// Script que traz os produtos
- document.addEventListener("DOMContentLoaded", function () {
-        fetch("/planos/get_produtos", { method: "POST" })
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById("produto_id");
-                select.innerHTML = '<option value="">Selecione um produto</option>';
-
-                // Garante que o template não quebre se 'plano' não estiver definido
-                const planoProdutoId = "{{ plano.produto_id if plano is defined else '' }}";
-
-                data.forEach(produto => {
-                    const option = document.createElement("option");
-                    option.value = produto.id;
-                    option.text = `${produto.codigo} - ${produto.nome} - ${produto.preco_base} R$`;
-
-                    if (planoProdutoId && planoProdutoId == produto.id.toString()) {
-                        option.selected = true;
-                    }
-
-                    select.appendChild(option);
+            if (data.error) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Plano não encontrado',
+                    text: data.error
                 });
-            })
-            .catch(error => {
-                console.error("Erro ao carregar produtos:", error);
-                const select = document.getElementById("produto_id");
-                select.innerHTML = '<option value="">Erro ao carregar produtos</option>';
+                return;
+            }
+
+            // Preenche os campos
+            document.getElementById('codigo_plano').value = data.codigo ?? "";
+            document.getElementById('nome_plano').value = data.nome ?? "";
+            document.getElementById('valor_plano').value = data.valor ?? "";
+            document.getElementById('id_produto_plano').value = data.id_produto_portal ?? "";
+            document.getElementById('contrato_id_plano').value = data.contrato_id ?? "";
+            document.getElementById('produto_id_plano').value = data.produto_id ?? "";
+            document.getElementById('qtd_produto_plano').value = data.qtd_produto ?? "";
+            document.getElementById('desc_boleto_licenca_plano').value = data.desc_boleto ?? "";
+            document.getElementById('aliquota_sp_licenca_plano').value = data.aliquota_sp ?? "";
+            document.getElementById('cod_servico_sp_licenca_plano').value = data.cod_servico_sp ?? "";
+            document.getElementById('desc_nf_licenca_plano').value = data.desc_nf ?? "";
+            document.getElementById('cadastramento_plano').value = data.cadastramento ?? "";
+        })
+        .catch(err => {
+            console.error("Erro ao buscar plano:", err);
+            $('#loadingCodigoPlano').addClass('d-none');
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Erro',
+                text: 'Ocorreu um erro ao buscar o plano.'
             });
-    });
-
-
-    // Script regras campos de valor
-
-    document.addEventListener("DOMContentLoaded", () => {
-    const valorInput = document.getElementById("valor");
-    const qtdProdutoInput = document.getElementById("qtd_produto");
-    const produtoSelect = document.getElementById("produto_id");
-
-    function atualizarEstadoQuantidade() {
-
-        const valorInformado = valorInput.value.trim() !== "";
-        const produtoVinculado = produtoSelect.value !== "";
-
-        // Se o VALOR for informado → desabilita quantidade
-        if (valorInformado) {
-            qtdProdutoInput.disabled = true;
-            return;
-        }
-
-        // Se existir produto vinculado → habilita quantidade
-        if (produtoVinculado) {
-            qtdProdutoInput.disabled = false;
-            return;
-        }
-
-        // Caso contrário deixa habilitado
-        qtdProdutoInput.disabled = false;
-    }
-
-    // Eventos
-    valorInput.addEventListener("input", atualizarEstadoQuantidade);
-    produtoSelect.addEventListener("change", atualizarEstadoQuantidade);
-
-    // Garantir estado correto quando o modal abrir
-    document.addEventListener('shown.bs.modal', atualizarEstadoQuantidade);
-});
+        });
+}
