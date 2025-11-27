@@ -152,7 +152,8 @@
                 'motivo_estado': '#motivo_estado',
                 'plano_nome': '#plano_nome',
                 'valor_plano': '#valor_plano',
-                'valor_contrato': '#valor_contrato'
+                'valor_contrato': '#valor_contrato',
+                'observacao' : '#observacao_contrato'
             };
 
             Object.keys(fieldMap).forEach(key => {
@@ -278,10 +279,10 @@
                             'estado': '#state',
                             'fator_juros': '#interest_rate_factor',
                             'dia_vencimento': '#last_day',
-                            'estado_contrato': '#current_state',
                             'data_estado': '#state_date',
                             'motivo_estado': '#reason',
                             'estado_contrato': '#current_state',
+                            'observacao': '#observacao_contrato_editar'
                         };
 
                         for (const key in fieldMap) {
@@ -399,6 +400,7 @@ function preencherCamposContrato(contrato) {
     document.getElementById("data_estado").value = contrato.data_estado || "";
     document.getElementById("motivo_estado").value = contrato.motivo_estado || "";
     document.getElementById("valor_contrato").value = contrato.valor_contrato || "";
+    document.getElementById("observacao").value = contrato.observacao || "";
 
     //  Se quiser limpar as tabelas vinculadas também:
     limparTabelasRelacionadas();

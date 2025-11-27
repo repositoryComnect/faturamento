@@ -15,7 +15,7 @@
             <button class="btn btn-primary me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#criarPlanoModal">
                 <i class="bi bi-plus-circle me-2"></i>Criar Plano
             </button>
-            <button class="btn btn-warning me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#editarPlanoModal">
+            <button class="btn btn-warning me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#atualizarPlanoModal">
                 <i class="bi bi-gear-wide-connected me-2"></i>Editar Plano
             </button>
             <button class="btn btn-danger me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#deletePlanoModal">
@@ -48,7 +48,7 @@
                         <div class="row">
 
                             <!-- CÓDIGO DO PLANO (alinhado como o de contrato) -->
-                            <div class="col-md-2">
+                            <div class="col-md-3">
                                 <label class="form-label">Código Plano:</label>
                                 <div class="d-flex gap-2">
 
@@ -89,8 +89,14 @@
 
                             <!-- VALOR DO PLANO -->
                             <div class="col-md-1">
-                                <label class="form-label">Valor:</label>
+                                <label class="form-label">Valor Base:</label>
                                 <input type="text" id="valor_plano" name="valor_plano" class="form-control"
+                                    value="{{ plano.valor if plano else '' }}" readonly>
+                            </div>
+
+                            <div class="col-md-1">
+                                <label class="form-label">Valor com Alíquota:</label>
+                                <input type="text" id="valor_plano_aliquota" name="valor_plano_aliquota" class="form-control"
                                     value="{{ plano.valor if plano else '' }}" readonly>
                             </div>
 
@@ -115,13 +121,6 @@
                                     value="{{ plano.data_atualizacao.strftime('%d/%m/%Y') if plano and plano.data_atualizacao else '' }}"
                                     readonly>
                             </div>
-
-                            <!-- VINCULAR CONTRATO -->
-                            <div class="col-md-1">
-                                <label class="form-label">Contrato:</label>
-                                <input type="text" id="contrato_id_plano" name="contrato_id_plano" class="form-control" value="{{ plano.contrato_id if plano else '' }}" readonly> 
-                            </div>
-
 
                             <!-- VINCULAR PRODUTO -->
                             <div class="col-md-1">
@@ -206,7 +205,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- O JS preencherá esta parte -->
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <i class="bi bi-exclamation-circle me-2"></i>
+                                                Nenhum contrato associado encontrado
+                                            </td>
+                                        </tr>
                                     </tbody>
                                 </table>
 
@@ -247,66 +251,66 @@
             </div>
 
             <!-- Seção de Produtos Associados -->
-            <div class="card mb-2">
-                <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#productsCollapse">
-                    <h5 class="mb-0">Produtos Associados ao Plano</h5>
-                </div>
-                <div class="collapse" id="productsCollapse">
-                    <div class="card-body">
-                        <div class="row g-2">
-                            <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
-                                <table class="produtos-table table table-striped table-bordered">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th>Código</th>
-                                            <th>Nome do Produto</th>
-                                            <th>Descrição</th>
-                                            <th>Quantidade</th>
-                                            <th>Preço Unitário</th>
+        <div class="card mb-2">
+            <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#productsCollapse">
+                <h5 class="mb-0">Produtos Associados ao Plano</h5>
+            </div>
+            <div class="collapse" id="productsCollapse">
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
+                            <table class="produtos-table table table-striped table-bordered">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>Código</th>
+                                        <th>Nome do Produto</th>
+                                        <th>Descrição</th>
+                                        <th>Quantidade</th>
+                                        <th>Preço Unitário</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                
+                                        <tr>
+                                            <td colspan="5" class="text-center">
+                                                <i class="bi bi-exclamation-circle me-2"></i>
+                                                Nenhum produto associado encontrado
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
+                                </tbody>
+                            </table>
+                            <!-- Paginação específica para Planos -->
+                            <div id="produto-pagination" class="d-flex justify-content-center mt-3">
+                                <button id="produto-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
+                                <span id="produto-pageInfo" class="align-self-center"></span>
+                                <button id="produto-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
+                            </div>
+                            <div class="container mt-5 mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
                                     
-                                            <tr>
-                                                <td colspan="5" class="text-center">
-                                                    <i class="bi bi-exclamation-circle me-2"></i>
-                                                    Nenhum produto associado encontrado
-                                                </td>
-                                            </tr>
-                                    </tbody>
-                                </table>
-                                <!-- Paginação específica para Planos -->
-                                <div id="produto-pagination" class="d-flex justify-content-center mt-3">
-                                    <button id="produto-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
-                                    <span id="produto-pageInfo" class="align-self-center"></span>
-                                    <button id="produto-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
-                                </div>
-                                <div class="container mt-5 mb-4">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        
-                                            <div class="d-flex gap-2">    
-                                                <button type="button" class="btn btn-success me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularProdutoContractModal">
-                                                    <i class="bi bi-shop"></i>  Vincular Produto
-                                                </button>
-                                            </div>
+                                        <div class="d-flex gap-2">    
+                                            <button type="button" class="btn btn-success me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#vincularProdutoContractModal">
+                                                <i class="bi bi-shop"></i>  Vincular Produto
+                                            </button>
+                                        </div>
 
-                                            <div class="d-flex gap-2">    
-                                                <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createProdutoModal">
-                                                    <i class="bi bi-plus-circle me-2"></i>  Criar Produto
-                                                </button>
-                                            </div>
-                                            <div class="d-flex gap-2">    
-                                                <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularProdutoContractModal">
-                                                    <i class="bi bi-trash me-2"></i>Desvincular Produto
-                                                </button>
-                                            </div>
-                                        </div>   
-                                    </div>  
-                                </div>
+                                        <div class="d-flex gap-2">    
+                                            <button type="button" class="btn btn-primary me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#createProdutoModal">
+                                                <i class="bi bi-plus-circle me-2"></i>  Criar Produto
+                                            </button>
+                                        </div>
+                                        <div class="d-flex gap-2">    
+                                            <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularProdutoContractModal">
+                                                <i class="bi bi-trash me-2"></i>Desvincular Produto
+                                            </button>
+                                        </div>
+                                    </div>   
+                                </div>  
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
         </div>
     </div>
@@ -325,5 +329,13 @@
     {% include 'popup/planos/popup_delete_planos.html' %}
     {% include 'popup/planos/popup_criar_plano.html' %}
     {% include 'popup/planos/popup_listagem_planos.html' %}
+    {% include 'popup/planos/popup_editar_plano.html' %}
+
+    <!-- Bloco criar contrato -->
+    {% include 'popup/contratos/popup_contratos.html' %}
+
+    <!-- Bloco criar produto-->
+    {% include 'popup/produto/popup_produto.html' %}
+
 
 {% endblock %}

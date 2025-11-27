@@ -307,7 +307,8 @@ $(document).ready(function () {
             'dia_vencimento': '#last_day',
             'estado_contrato': '#current_state',
             'data_estado': '#state_date',
-            'motivo_estado': '#reason'
+            'motivo_estado': '#reason', 
+            'observacao': '#observacao_contrato_editar'
           };
 
           for (const key in fieldMap) {

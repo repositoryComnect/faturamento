@@ -44,26 +44,33 @@ def render_clientes():
         print(f"Erro ao acessar clientes: {str(e)}")
         return render_template('clientes.html', cliente=None)
 
-@home_bp.route('/planos', methods=['GET'])
+@home_bp.route('/planos', defaults={'codigo': None}, methods=['GET'])
+@home_bp.route('/planos/<codigo>', methods=['GET'])
 @login_required
-def render_planos():
+def render_planos(codigo):
     empresa_id = session.get('empresa')
 
     try:
-        # Carrega o primeiro plano apenas
-        plano = db.session.execute(
-            db.select(Plano).filter_by(empresa_id=empresa_id).order_by(Plano.id).limit(1)
-        ).scalar_one_or_none()
+        # Se veio um código → busca pelo código
+        if codigo:
+            plano = db.session.execute(
+                db.select(Plano).filter_by(empresa_id=empresa_id, codigo=codigo)
+            ).scalar_one_or_none()
+        else:
+            # Sem código → busca o primeiro plano
+            plano = db.session.execute(
+                db.select(Plano).filter_by(empresa_id=empresa_id).order_by(Plano.id).limit(1)
+            ).scalar_one_or_none()
 
         return render_template(
             'planos.html',
-            plano=plano
+            plano=plano,
+            codigo=codigo  # opcional — útil se quiser exibir o código no front
         )
 
     except Exception as e:
         print(f"Erro ao carregar planos: {str(e)}")
         return render_template('planos.html', plano=None)
-
 
 @home_bp.route('/ferramentas', methods=['GET'])
 @login_required

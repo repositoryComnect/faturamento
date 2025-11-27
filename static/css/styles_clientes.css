@@ -158,7 +158,6 @@ input[type="search"] {
 .instalacao-table {
     width: 100%;
     margin-bottom: 1rem;
-    color: #212529;
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 8px;
@@ -196,7 +195,6 @@ input[type="search"] {
 .plano-table {
     width: 100%;
     margin-bottom: 1rem;
-    color: #212529;
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 8px;
@@ -207,7 +205,6 @@ input[type="search"] {
 .plano-table th {
     background-color: #f1f3f5;
     font-weight: 600;
-    
     font-size: 0.85rem;
     padding: 10px;
 }
@@ -225,7 +222,6 @@ input[type="search"] {
 
 .plano-table td:nth-child(5) {
     text-align: right;
-    font-family: 'Courier New', monospace;
     font-weight: 500;
 }
 
@@ -233,7 +229,6 @@ input[type="search"] {
 .contrato-table {
     width: 100%;
     margin-bottom: 1rem;
-    color: #212529;
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 8px;
@@ -243,10 +238,9 @@ input[type="search"] {
 
 .contrato-table th {
     background-color: #f1f3f5;
-    font-weight: 600;
-    
     font-size: 0.85rem;
     padding: 10px;
+    font-weight: normal !important;   /* 👈 remove o negrito */
 }
 
 .contrato-table td {
@@ -262,6 +256,5 @@ input[type="search"] {
 
 .contrato-table td:nth-child(5) {
     text-align: right;
-    font-family: 'Courier New', monospace;
     font-weight: 500;
 }

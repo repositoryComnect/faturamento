@@ -188,7 +188,8 @@ def buscar_contrato():
                 'dia_vencimento': contrato.dia_vencimento or None,
                 'data_estado': contrato.data_estado if contrato.data_estado else None,
                 'motivo_estado': contrato.motivo_estado or None,
-                'estado_contrato': contrato.estado_contrato or None
+                'estado_contrato': contrato.estado_contrato or None, 
+                'observacao': contrato.observacao or None
             }
         })
     else:
@@ -215,6 +216,7 @@ def alterar_contrato():
         fator_juros = request.form.get('interest_rate_factor')
         id_matriz_portal  = request.form.get('id_matriz_portal')
         contrato_revenda = request.form.get('revenda_selecionada')
+        observacao = request.form.get('observacao_contrato_editar')
 
         # Tratamento seguro do campo
         faturamento_contrato_raw = request.form.get('contract_value')
@@ -252,7 +254,8 @@ def alterar_contrato():
                     estado_contrato = :estado_contrato,
                     data_estado = :data_estado,
                     motivo_estado = :motivo_estado,
-                    atualizacao = CURRENT_TIMESTAMP
+                    atualizacao = CURRENT_TIMESTAMP,
+                    observacao = :observacao
                 WHERE numero = :numero
             """),
             {
@@ -278,6 +281,7 @@ def alterar_contrato():
                 'data_estado': data_estado,
                 'motivo_estado': motivo_estado, 
                 'id_matriz_portal': id_matriz_portal,
+                'observacao': observacao
             }
         )
         db.session.commit()
@@ -387,6 +391,7 @@ def set_contrato():
             'data_estado': parse_date(form_data.get('date_status')),
             'motivo_estado': form_data.get('motivo_estado'),
             'cliente_id' : form_data.get('cliente_selecionado'),
+            'observacao' : form_data.get('observacao'),
             'empresa_id': session.get('empresa') 
         }
 

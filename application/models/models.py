@@ -12,20 +12,6 @@ cliente_contrato = db.Table(
     db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id'), primary_key=True)
 )
 
-# Associação Cliente <-> Plano
-cliente_plano = db.Table(
-    'cliente_plano',
-    db.Column('cliente_id', db.Integer, db.ForeignKey('clientes.id'), primary_key=True),
-    db.Column('plano_id', db.Integer, db.ForeignKey('planos.id'), primary_key=True)
-)
-
-# Associação Cliente <-> Produto
-cliente_produto = db.Table(
-    'cliente_produto',
-    db.Column('cliente_id', db.Integer, db.ForeignKey('clientes.id'), primary_key=True),
-    db.Column('produto_id', db.Integer, db.ForeignKey('produtos.id'), primary_key=True)
-)
-
 # Tabelas associativas N:N entre Contrato : (Plano, Clientes, Produto)
 contrato_plano = db.Table(
     'contrato_plano',
@@ -126,100 +112,6 @@ class Vendedor(db.Model):
     # Relacionamento com Cliente
     clientes = db.relationship('Cliente', backref='vendedor', lazy=True)
 
-# Modelo antigo de N Clientes : N Contratos
-'''class Cliente(db.Model):
-    __tablename__ = 'clientes'
-    
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    
-    # Dados básicos
-    sequencia = db.Column(db.String(20))
-    cadastramento = db.Column(db.Date)
-    atualizacao = db.Column(db.Date)
-    razao_social = db.Column(db.String(100), nullable=False)
-    nome_fantasia = db.Column(db.String(100))
-    contato_principal = db.Column(db.String(100))
-    email = db.Column(db.String(100))
-    telefone = db.Column(db.String(20))
-    
-    # Dados jurídicos
-    tipo = db.Column(db.String(30))
-    cnpj_cpf = db.Column(db.String(18))
-    ie = db.Column(db.String(20))
-    im = db.Column(db.String(20))
-    
-    # Dados comerciais
-    revenda_nome = db.Column(db.String(100))  
-    vendedor_nome = db.Column(db.String(100))
-    tipo_servico = db.Column(db.String(50))
-    localidade = db.Column(db.String(50))
-    regiao = db.Column(db.String(50))
-    atividade = db.Column(db.String(50))
-    
-    # Endereço
-    cep = db.Column(db.String(10))
-    endereco = db.Column(db.String(200))
-    complemento = db.Column(db.String(100))
-    bairro = db.Column(db.String(100))
-    cidade = db.Column(db.String(100))
-    estado = db.Column(db.String(2))
-
-    # Endereço Cobrança
-    cep_cobranca = db.Column(db.String(15))
-    endereco_cobranca = db.Column(db.String(255))
-    cidade_cobranca = db.Column(db.String(100))
-    telefone_cobranca = db.Column(db.String(20))
-    bairro_cobranca = db.Column(db.String(100))
-    uf_cobranca = db.Column(db.String(2))
-    
-    # Condições comerciais
-    cliente_revenda = db.Column(db.Boolean, default=False)
-    fator_juros = db.Column(db.Numeric(5, 2))
-    estado_atual = db.Column(db.String(30))
-    data_estado = db.Column(db.Date)
-    
-    # Plano
-    plano_nome = db.Column(db.String(100))
-    dia_vencimento = db.Column(db.Integer)
-    motivo_estado = db.Column(db.String(200))
-    vendedor_id = db.Column(db.Integer, db.ForeignKey('vendedores.id'))
-    revenda_id = db.Column(db.Integer, db.ForeignKey('revendas.id'))
-    observacao = db.Column(db.Text)
-    created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
-    
-    # Novo campo para número de contrato
-    numero_contrato = db.Column(db.String(255))
-    
-    # Relacionamento com Empresa
-    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
-    empresa = db.relationship('Empresa', backref=db.backref('clientes', lazy=True))
-    
-    # Relacionamentos
-    contratos = db.relationship(
-        'Contrato',
-        secondary=cliente_contrato,
-        back_populates='clientes',
-        lazy=True
-    )
-
-    # Relacionamento N:N com Plano
-    planos = db.relationship(
-        'Plano',traga completo a de cliente agora com a alterção 1 cli
-        secondary=cliente_plano,
-        back_populates='clientes',
-        lazy=True
-    )
-
-    # Relacionamento N:N com Produto
-    produtos = db.relationship(
-        'Produto',
-        secondary=cliente_produto,
-        back_populates='clientes',
-        lazy=True
-    )
-
-    instalacoes = db.relationship('Instalacao', back_populates='cliente', lazy=True)'''
-
 class Cliente(db.Model):
     __tablename__ = 'clientes'
     
@@ -294,22 +186,6 @@ class Cliente(db.Model):
         lazy=True
     )
 
-    # Relacionamento N:N com Plano
-    planos = db.relationship(
-        'Plano',
-        secondary=cliente_plano,
-        back_populates='clientes',
-        lazy=True
-    )
-
-    # Relacionamento N:N com Produto
-    produtos = db.relationship(
-        'Produto',
-        secondary=cliente_produto,
-        back_populates='clientes',
-        lazy=True
-    )
-
     instalacoes = db.relationship('Instalacao', back_populates='cliente', lazy=True)
 
 class Produto(db.Model):
@@ -333,86 +209,6 @@ class Produto(db.Model):
         secondary='contratos_produtos',
         back_populates='produtos'
     )
-
-    clientes = db.relationship(
-        'Cliente',
-        secondary=cliente_produto,
-        back_populates='produtos'
-    )
-
-# Modelo antigo de N Contratos : N Clientes
-'''class Contrato(db.Model):
-    __tablename__ = 'contratos'
-    
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    numero = db.Column(db.String(50), unique=True, nullable=False)
-    cadastramento = db.Column(db.Date)
-    atualizacao = db.Column(db.Date)
-    tipo = db.Column(db.String(50))
-    id_matriz_portal = db.Column(db.String(50))
-    cnpj_cpf = db.Column(db.String(20))
-    tipo_pessoa = db.Column(db.String(40))
-    revenda = db.Column(db.String(50))
-    vendedor = db.Column(db.String(50))
-
-    # Dados do cliente
-    razao_social = db.Column(db.String(100))
-    nome_fantasia = db.Column(db.String(100))
-    contato = db.Column(db.String(100))
-    email = db.Column(db.String(100))
-    telefone = db.Column(db.String(20))
-
-    # Endereço
-    cep = db.Column(db.String(10))
-    endereco = db.Column(db.String(200))
-    complemento = db.Column(db.String(100))
-    bairro = db.Column(db.String(100))
-    cidade = db.Column(db.String(100))
-    estado = db.Column(db.String(2))
-
-    # Condições do contrato
-    dia_vencimento = db.Column(db.Integer)
-    fator_juros = db.Column(db.Numeric(5, 2))
-    contrato_revenda = db.Column(db.Boolean, default=False)
-    faturamento_contrato = db.Column(db.Boolean, default=False)
-    estado_contrato = db.Column(db.String(30))
-    data_estado = db.Column(db.Date)
-    motivo_estado = db.Column(db.String(200))
-    # Relacionamento com Empresa
-    empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
-    empresa = db.relationship('Empresa', backref=db.backref('contratos', lazy=True))
-
-    # Chaves estrangeiras
-    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=True)
-
-    # Relacionamento 1:N com NotaFiscal
-    notas_fiscais = db.relationship('NotaFiscal', backref='contrato', lazy=True)
-
-    # Relacionamento N:N com Cliente
-    clientes = db.relationship(
-        'Cliente',
-        secondary=cliente_contrato,
-        back_populates='contratos',
-        lazy=True
-    )
-
-   # Relacionamento com Produto através da tabela de junção
-    produtos = db.relationship(
-        'Produto',
-        secondary='contratos_produtos',
-        back_populates='contratos'
-    )
-
-    # Relacionamento N:N com Plano (muitos-para-muitos)
-    planos = db.relationship(
-        'Plano',
-        secondary=contrato_plano,
-        back_populates='contratos',
-        lazy=True
-    )
-
-    def __repr__(self):
-        return f'<Contrato {self.id}>'''
 
 class Contrato(db.Model):
     __tablename__ = 'contratos'
@@ -450,7 +246,8 @@ class Contrato(db.Model):
     faturamento_contrato = db.Column(db.Boolean, default=False)
     estado_contrato = db.Column(db.String(30))
     data_estado = db.Column(db.Date)
-    motivo_estado = db.Column(db.String(200))
+    motivo_estado = db.Column(db.String(50))
+    observacao = db.Column(db.String(100))
 
     # Empresa
     empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
@@ -484,8 +281,6 @@ class Contrato(db.Model):
     def __repr__(self):
         return f'<Contrato {self.id}>'
 
-
-    
 class ContratoProduto(db.Model):
     __tablename__ = 'contratos_produtos'
     
@@ -601,12 +396,6 @@ class Plano(db.Model):
         secondary=contrato_plano,
         back_populates='planos',
         lazy=True
-    )
-
-    clientes = db.relationship(
-        'Cliente',
-        secondary=cliente_plano,
-        back_populates='planos'
     )
     
     def __repr__(self):

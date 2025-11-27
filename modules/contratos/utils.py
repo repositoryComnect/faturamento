@@ -61,6 +61,7 @@ def montar_dict_contrato(contrato):
         'estado_contrato': contrato.estado_contrato or None,
         'data_estado': safe_date(contrato.data_estado),
         'motivo_estado': contrato.motivo_estado or None,
+        'observacao' : contrato.observacao or None
     }
 
     # Cliente principal

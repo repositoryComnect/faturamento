@@ -1,0 +1,157 @@
+<!-- Modal de Edição de Contrato -->
+<div class="modal fade" id="atualizarPlanoModal" tabindex="-1" aria-labelledby="atualizarPlanoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title fw-bold" id="atualizarPlanoModalLabel">Editar Plano</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body bg-light">
+                <form id="atualizarPlanoForm" action="{{ url_for('contratos_bp.alterar_contrato') }}" method="POST">
+
+                    <!-- CARD: Buscar Contratos -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                            data-bs-toggle="collapse" data-bs-target="#buscarPlanoCollapse"
+                            aria-expanded="true" aria-controls="buscarPlanoCollapse" style="cursor:pointer;">
+                            <span>Procurar Plano</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div class="collapse show" id="buscarPlanoCollapse">
+                            <div class="card-body">
+
+                                <label for="fetch_contract" class="form-label fw-semibold">Código ou Nome do Plano</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="fetch_contract" name="fetch_contract"
+                                           placeholder="Digite o número ou nome do contrato...">
+
+                                    <!-- Botão de busca -->
+                                    <button class="btn btn-secondary" type="button" id="btnBuscarContrato">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+
+                                    <!-- Spinner -->
+                                    <span id="loadingContrato" class="input-group-text d-none">
+                                        <div class="spinner-border spinner-border-sm"></div>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD: Informações Básicas -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                            data-bs-toggle="collapse" data-bs-target="#infoBasicaPlano"
+                            aria-expanded="true" aria-controls="infoBasicaPlano" style="cursor:pointer;">
+                            <span>Informações Básicas</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div class="collapse show" id="infoBasicaPlano">
+                            <div class="card-body">
+                                <div class="row g-3">
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Código Plano:</label>
+                                        <input type="text" class="form-control" id="atualizar_codigo_plano" name="atualizar_codigo_plano" readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Nome do Plano:</label>
+                                        <input type="text" class="form-control" id="atualizar_nome_plano" name="atualizar_nome_plano">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Valor:</label>
+                                        <input type="text" class="form-control" id="atualizar_valor_plano" name="atualizar_valor_plano">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">ID Portal:</label>
+                                        <input type="text" class="form-control" id="atualizar_id_portal_plano" name="atualizar_id_portal_plano" readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Cadastramento:</label>
+                                        <input type="text" class="form-control" id="atualizar_cadastramento_plano" name="atualizar_cadastramento_plano" readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Atualização:</label>
+                                        <input type="text" class="form-control" id="atualizar_atualizacao_plano" name="atualizar_atualizacao_plano" readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Produto:</label>
+                                        <input type="text" class="form-control" id="atualizar_produto_plano" name="atualizar_produto_plano">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Quantidade Produto:</label>
+                                        <input type="text" class="form-control" id="id_edit_portal" name="id_edit_portal">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD: Endereço -->
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                            data-bs-toggle="collapse" data-bs-target="#informacaoFiscal"
+                            aria-expanded="false" aria-controls="informacaoFiscal" style="cursor:pointer;">
+                            <span>Informações Fiscais</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div class="collapse" id="informacaoFiscal">
+                            <div class="card-body">
+                                <div class="row g-3">
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Descrição Boleto:</label>
+                                        <input type="text" class="form-control" id="zip_code_edit" name="zip_code_edit">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Alíquota:</label>
+                                        <input type="text" class="form-control" id="address" name="address">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Código Serviço:</label>
+                                        <input type="text" class="form-control" id="complement" name="complement">
+                                    </div>
+
+                                    <div class=" col-md-12">
+                                        <label for="desc_nf">Descrição para NF:</label>
+                                        <textarea name="desc_nf_licenca_plano" id="desc_nf_licenca_plano" 
+                                        class="form-control" rows="3" ></textarea>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- BOTÕES -->
+                    <div class="d-flex justify-content-end mt-3 gap-2">
+                        <button type="button" class="btn btn-secondary px-2" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-warning px-2">Salvar</button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/contratos/popup_js/contratos.js') }}"></script>
