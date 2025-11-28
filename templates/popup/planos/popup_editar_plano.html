@@ -10,7 +10,7 @@
             </div>
 
             <div class="modal-body bg-light">
-                <form id="atualizarPlanoForm" action="{{ url_for('contratos_bp.alterar_contrato') }}" method="POST">
+                <form id="atualizarPlanoForm" action="{{ url_for('planos_bp.edit_planos') }}" method="POST">
 
                     <!-- CARD: Buscar Contratos -->
                     <div class="card mb-3 border-0 shadow-sm">
@@ -24,18 +24,18 @@
                         <div class="collapse show" id="buscarPlanoCollapse">
                             <div class="card-body">
 
-                                <label for="fetch_contract" class="form-label fw-semibold">Código ou Nome do Plano</label>
+                                <label for="fetch_plano" class="form-label fw-semibold">Código ou Nome do Plano</label>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="fetch_contract" name="fetch_contract"
-                                           placeholder="Digite o número ou nome do contrato...">
+                                    <input type="text" class="form-control" id="fetch_plano" name="fetch_plano"
+                                           placeholder="Digite o número ou nome do plano...">
 
                                     <!-- Botão de busca -->
-                                    <button class="btn btn-secondary" type="button" id="btnBuscarContrato">
+                                    <button class="btn btn-secondary" type="button" id="btnBuscarPlano">
                                         <i class="bi bi-search"></i>
                                     </button>
 
                                     <!-- Spinner -->
-                                    <span id="loadingContrato" class="input-group-text d-none">
+                                    <span id="loadingPlano" class="input-group-text d-none">
                                         <div class="spinner-border spinner-border-sm"></div>
                                     </span>
                                 </div>
@@ -62,7 +62,7 @@
                                         <input type="text" class="form-control" id="atualizar_codigo_plano" name="atualizar_codigo_plano" readonly>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <div class="col-md-5">
                                         <label class="form-label">Nome do Plano:</label>
                                         <input type="text" class="form-control" id="atualizar_nome_plano" name="atualizar_nome_plano">
                                     </div>
@@ -87,15 +87,15 @@
                                         <input type="text" class="form-control" id="atualizar_atualizacao_plano" name="atualizar_atualizacao_plano" readonly>
                                     </div>
 
-                                    <div class="col-md-3">
+                                    <!--<div class="col-md-4">
                                         <label class="form-label">Produto:</label>
                                         <input type="text" class="form-control" id="atualizar_produto_plano" name="atualizar_produto_plano">
                                     </div>
 
                                     <div class="col-md-2">
                                         <label class="form-label">Quantidade Produto:</label>
-                                        <input type="text" class="form-control" id="id_edit_portal" name="id_edit_portal">
-                                    </div>
+                                        <input type="number" class="form-control" id="atualizar_quantidade_produto_plano" name="quantidade_produto_plano">
+                                    </div>-->
                                 </div>
                             </div>
                         </div>
@@ -116,22 +116,22 @@
 
                                     <div class="col-md-4">
                                         <label class="form-label">Descrição Boleto:</label>
-                                        <input type="text" class="form-control" id="zip_code_edit" name="zip_code_edit">
+                                        <input type="text" class="form-control" id="atualizar_descricao_boleto_plano" name="descricao_boleto_plano">
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Alíquota:</label>
-                                        <input type="text" class="form-control" id="address" name="address">
+                                        <input type="text" class="form-control" id="atualizar_aliquota_plano" name="atualizar_aliquota_plano">
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Código Serviço:</label>
-                                        <input type="text" class="form-control" id="complement" name="complement">
+                                        <input type="text" class="form-control" id="atualizar_codigo_servico_plano" name="atualizar_codigo_servico_plano">
                                     </div>
 
                                     <div class=" col-md-12">
                                         <label for="desc_nf">Descrição para NF:</label>
-                                        <textarea name="desc_nf_licenca_plano" id="desc_nf_licenca_plano" 
+                                        <textarea name="atualizar_descricao_nf_plano" id="atualizar_descricao_nf_plano" 
                                         class="form-control" rows="3" ></textarea>
                                     </div>
 

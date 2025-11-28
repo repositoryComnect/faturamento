@@ -382,6 +382,7 @@ class Plano(db.Model):
     aliquota_sp_licenca = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_licenca"
     cod_servico_sp_licenca = db.Column(db.String(20))  # name="cod_servico_sp_licenca"
     desc_nf_licenca = db.Column(db.String(200))  # name="desc_nf_licenca" (novo)
+    status = db.Column(db.String(15))
     empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
     empresa = db.relationship('Empresa', backref=db.backref('planos', lazy=True))
     

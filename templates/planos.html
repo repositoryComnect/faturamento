@@ -48,7 +48,7 @@
                         <div class="row">
 
                             <!-- CÓDIGO DO PLANO (alinhado como o de contrato) -->
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Código Plano:</label>
                                 <div class="d-flex gap-2">
 
@@ -81,7 +81,7 @@
                             </div>
 
                             <!-- NOME DO PLANO -->
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Nome do Plano:</label>
                                 <input type="text" id="nome_plano" name="nome_plano" class="form-control"
                                     value="{{ plano.nome if plano else '' }}" readonly>
@@ -132,6 +132,11 @@
                             <div class="col-md-1">
                                 <label class="form-label">Quantidade Produto:</label>
                                 <input type="number" id="qtd_produto_plano" name="qtd_produto_plano" class="form-control" value="{{ plano.qtd_produto if plano else '' }}" readonly>
+                            </div>
+
+                            <div class="col-md-1">
+                                <label class="form-label">Status:</label>
+                                <input type="text" id="status_plano" name="status_plano" class="form-control" value="{{ plano.status if plano else '' }}" readonly>
                             </div>
 
                         </div>
@@ -199,9 +204,9 @@
                                         <tr class="text-center">
                                             <th>Código</th>
                                             <th>Nome do Contrato</th>
-                                            <th>Plano</th>
-                                            <th>Produtos</th>
-                                            <th>Valor</th>
+                                            <th>CNPJ / CPF</th>
+                                            <th>Status</th>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>

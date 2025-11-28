@@ -281,7 +281,7 @@ $(document).ready(function () {
       data: JSON.stringify({ termo: termo }),
 
       success: function(data) {
-        console.log("📦 Dados recebidos:", data);
+        console.log("Dados recebidos:", data);
 
         if (data.success) {
           const contrato = data.contrato;

@@ -50,8 +50,8 @@
                         <td>{{ plano.licenca_valor }}</td>
                         <td>{{ plano.nf_descricao }}</td>
                         <td>{{ plano.aliquota_sp_licenca }}</td>
-                        <td>{{ plano.data_criacao }}</td>
-                        <td>{{ plano.data_atualizacao }}</td>
+                        <td>{{ plano.data_criacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>{{ plano.data_atualizacao.strftime('%d/%m/%Y %H:%M') }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

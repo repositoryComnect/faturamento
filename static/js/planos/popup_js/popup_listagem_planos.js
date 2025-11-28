@@ -3,16 +3,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const tbody = document.querySelector('#planosModalTable tbody');
     const pagination = document.getElementById('planosModalPagination');
 
-    // IDs alvo que você está usando no formulário principal — ajuste se seus ids forem outros
+    // Mapeamento dos inputs do formulário
     const TARGETS = {
-        idField: document.getElementById('plano_id'),            // opcional
-        codigoField: document.getElementById('codigo_plano'),   // seu campo de código
+        idField: document.getElementById('plano_id'),
+        codigoField: document.getElementById('codigo_plano'),
         nomeField: document.getElementById('nome_plano'),
         valorField: document.getElementById('valor_plano'),
         qtdField: document.getElementById('qtd_produto_plano'),
         produtoField: document.getElementById('produto_id_plano'),
         contratoField: document.getElementById('contrato_id_plano'),
-        cadastradoField: document.getElementById('cadastramento_plano')
+        cadastradoField: document.getElementById('cadastramento_plano'),
+        atualizacaoField: document.getElementById('atualizacao_plano'),
+        statusField: document.getElementById('status_plano'),
     };
 
     const perPage = 10;
@@ -38,7 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td>${escapeHtml(plano.nome ?? '')}</td>
                 <td class="text-center">${(typeof plano.valor === 'number') ? plano.valor.toFixed(2) : escapeHtml(plano.valor ?? '')}</td>
                 <td class="text-center">
-                    <button type="button" class="btn btn-sm btn-secondary selecionar-plano" data-codigo="${escapeHtml(plano.codigo)}" data-id="${plano.id}">
+                    <button type="button" class="btn btn-sm btn-secondary selecionar-plano"
+                        data-codigo="${escapeHtml(plano.codigo)}"
+                        data-id="${plano.id}">
                         Selecionar
                     </button>
                 </td>
@@ -49,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         renderPagination();
 
-        // Delegação para os botões "Selecionar"
         tbody.querySelectorAll(".selecionar-plano").forEach(btn => {
             btn.removeEventListener('click', onSelecionarClick);
             btn.addEventListener('click', onSelecionarClick);
@@ -66,12 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Preencher imediatamente campos visuais mínimos (se existirem)
+        // Preenche ID e código imediatamente
         if (TARGETS.codigoField) TARGETS.codigoField.value = codigo;
         if (TARGETS.idField && id) TARGETS.idField.value = id;
 
-        // Chamar a função que já faz a busca completa e preenche os campos.
-        // Certifique-se de que buscarPlanoPorCodigo está definida globalmente (em outro .js carregado antes).
+        // CHAMA A FUNÇÃO OFICIAL PARA OBTER DADOS COMPLETOS DO BACKEND
         if (typeof buscarPlanoPorCodigo === "function") {
             try {
                 buscarPlanoPorCodigo(codigo);
@@ -79,38 +81,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Erro ao executar buscarPlanoPorCodigo:", err);
             }
         } else {
-            console.warn("Função buscarPlanoPorCodigo não encontrada. Preenchendo campos com dados do modal como fallback.");
-
-            // Preenchimento fallback com os dados já presentes no objeto planos
-            const plano = planos.find(p => String(p.id) === String(id) || p.codigo === codigo);
-            if (plano) {
-                if (TARGETS.nomeField) TARGETS.nomeField.value = plano.nome ?? '';
-                if (TARGETS.valorField) TARGETS.valorField.value = (plano.valor != null) ? plano.valor : '';
-                if (TARGETS.qtdField) TARGETS.qtdField.value = plano.qtd_produto ?? '';
-                if (TARGETS.produtoField) TARGETS.produtoField.value = plano.produto ?? '';
-                if (TARGETS.contratoField) TARGETS.contratoField.value = plano.contrato_id ?? '';
-                if (TARGETS.cadastradoField) TARGETS.cadastradoField.value = plano.cadastramento ?? '';
-            }
+            console.warn("Função buscarPlanoPorCodigo não encontrada.");
         }
 
-        // Fechar modal de forma compatível com várias versões do bootstrap
+        // Fecha o modal
+        fecharModalBootstrap();
+    }
+
+
+    function fecharModalBootstrap() {
         try {
-            // método recomendado se disponível
             if (bootstrap && typeof bootstrap.Modal.getOrCreateInstance === 'function') {
                 bootstrap.Modal.getOrCreateInstance(modal).hide();
-            } else if (bootstrap && typeof bootstrap.Modal.getInstance === 'function') {
+                return;
+            }
+            if (bootstrap && typeof bootstrap.Modal.getInstance === 'function') {
                 const inst = bootstrap.Modal.getInstance(modal);
                 if (inst) inst.hide();
                 else new bootstrap.Modal(modal).hide();
-            } else {
-                // fallback: tentar disparar clique no botão fechar
-                const btnClose = modal.querySelector('[data-bs-dismiss="modal"]');
-                if (btnClose) btnClose.click();
+                return;
             }
+            const btnClose = modal.querySelector('[data-bs-dismiss="modal"]');
+            if (btnClose) btnClose.click();
         } catch (err) {
             console.warn("Não foi possível fechar modal via API do Bootstrap:", err);
         }
     }
+
+
 
     function renderPagination() {
         pagination.innerHTML = '';
@@ -141,6 +139,8 @@ document.addEventListener("DOMContentLoaded", function () {
         pagination.appendChild(makeLi(currentPage + 1, 'Próximo', currentPage === totalPages));
     }
 
+
+
     modal && modal.addEventListener('show.bs.modal', function () {
         tbody.innerHTML = `<tr><td colspan="4" class="text-center">Carregando planos...</td></tr>`;
         fetch("/listagem/planos/popup")
@@ -159,7 +159,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    // utilitário mínimo para evitar injeção de HTML nos dados da tabela
+
     function escapeHtml(str) {
         if (str === null || str === undefined) return '';
         return String(str)

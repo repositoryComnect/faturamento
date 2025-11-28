@@ -51,9 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-/* ============================
-   CARREGA CLIENTES
-============================ */
+//   CARREGA CLIENTES
 document.addEventListener("DOMContentLoaded", function () {
     fetch("/clientes_ativos_planos")
         .then(response => response.json())
@@ -83,9 +81,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-/* ============================
-   BUSCA PRÓXIMO CÓDIGO DE PLANO
-============================ */
+//   BUSCA PRÓXIMO CÓDIGO DE PLANO
+
 function carregarCodigoPlano(modalEl) {
     const campo = modalEl.querySelector('#codigo');
     if (!campo) return;
@@ -120,9 +117,8 @@ document.addEventListener('shown.bs.modal', function (event) {
 });
 
 
-/* ============================
-   CARREGA PRODUTOS
-============================ */
+//   CARREGA PRODUTOS
+
 document.addEventListener("DOMContentLoaded", function () {
     fetch("/planos/get_produtos", { method: "POST" })
         .then(response => response.json())
@@ -152,9 +148,8 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-/* ============================
-   REGRAS DE VALOR / QTD PRODUTO
-============================ */
+//   REGRAS DE VALOR / QTD PRODUTO
+
 document.addEventListener("DOMContentLoaded", () => {
     const valorInput = document.getElementById("valor");
     const qtdProdutoInput = document.getElementById("qtd_produto");
@@ -182,4 +177,118 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Ajuste ao abrir modal
     document.addEventListener('shown.bs.modal', atualizarEstadoQuantidade);
+});
+
+
+// Script buscar plano para edição
+$(document).ready(function () {
+
+  function buscarPlano(termo) {
+    if (!termo) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Campo vazio',
+        text: 'Digite o nome ou código do plano.',
+        toast: true,
+        position: 'top-end',
+        timer: 3000,
+        showConfirmButton: false
+      });
+      return;
+    }
+
+    const $input = $('#fetch_plano');
+    const $spinner = $('#loadingPlano');
+
+    $input.prop('disabled', true);
+    $spinner.removeClass('d-none');
+
+    $.ajax({
+      url: '/buscar_plano',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ termo: termo }),
+
+      success: function (data) {
+        console.log("Dados do plano:", data);
+
+        if (data.success) {
+          const plano = data.plano;
+
+          const fieldMap = {
+                "codigo": "#atualizar_codigo_plano",
+                "nome": "#atualizar_nome_plano",
+                "valor": "#atualizar_valor_plano",
+                "id_produto_portal": "#atualizar_id_portal_plano",
+                // "licenca_valor": "",
+                "produto": "#atualizar_produto_plano",
+                "qtd_produto": "#atualizar_quantidade_produto_plano",
+                "desc_boleto_licenca": "#atualizar_descricao_boleto_plano",
+                "aliquota_sp_licenca": "#atualizar_aliquota_plano",
+                "cod_servico_sp_licenca": "#atualizar_codigo_servico_plano",
+                "desc_nf_licenca": "#atualizar_descricao_nf_plano",
+                //"valor_base_produto": plano.valor_base_produto,
+
+                "cadastramento": "#atualizar_cadastramento_plano",
+                "atualizacao": "#atualizar_atualizacao_plano"
+          };
+
+          for (const key in fieldMap) {
+            if (plano[key] !== null && plano[key] !== undefined) {
+              $(fieldMap[key]).val(plano[key]);
+            }
+          }
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Plano encontrado!',
+            text: 'Os dados foram carregados com sucesso.',
+            toast: true,
+            position: 'top-end',
+            timer: 2500,
+            showConfirmButton: false
+          });
+
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Plano não encontrado',
+            text: 'Verifique o termo informado.',
+            timer: 5000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+          });
+        }
+      },
+
+      error: function () {
+        Swal.fire({
+          icon: 'error',
+          title: 'Erro ao buscar plano',
+          text: 'Erro de comunicação com o servidor.',
+          timer: 4000,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      },
+
+      complete: function () {
+        $input.prop('disabled', false);
+        $spinner.addClass('d-none');
+      }
+    });
+  }
+
+  $('#btnBuscarPlano').on('click', function () {
+    buscarPlano($('#fetch_plano').val());
+  });
+
+  $('#fetch_plano').on('keypress', function (e) {
+    if (e.which === 13) {
+      e.preventDefault();
+      buscarPlano($(this).val());
+    }
+  });
 });

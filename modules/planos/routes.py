@@ -1,8 +1,10 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from application.models.models import db, Plano, Contrato, Produto, Cliente
+from application.models.models import db, Plano, Contrato, Produto, Cliente, contrato_plano
 from sqlalchemy import text
 from datetime import datetime
-from modules.planos.utils import montar_dict_plano
+from modules.utils.utils import formatar_telefone, safe_float, safe_date, parse_date, formatar_cep, formatar_cpf_cnpj
+
+from modules.planos.utils import montar_dict_plano, parse_float
 import re
 
 planos_bp = Blueprint('planos_bp', __name__)
@@ -123,6 +125,58 @@ def insert_planos():
             'success': False,
             'message': f'Erro ao criar plano: {str(e)}'
         }), 500
+    
+@planos_bp.route('/edit/planos', methods=['POST'])
+def edit_planos():
+    empresa_id = session.get('empresa')
+    try:
+        form_data = request.form.to_dict()
+
+        # Obter o código do plano enviado pelo formulário
+        codigo = form_data.get('atualizar_codigo_plano')
+
+        if not codigo:
+            return jsonify({'success': False, 'message': 'Código do plano não enviado'}), 400
+
+        # Buscar o plano existente pelo código
+        plano = Plano.query.filter_by(codigo=codigo, empresa_id=empresa_id).first()
+
+        if not plano:
+            return jsonify({'success': False, 'message': 'Plano não encontrado'}), 404
+
+        # Dados do formulário
+        plano.nome = form_data.get('atualizar_nome_plano')
+        valor_base = parse_float(form_data.get('atualizar_valor_plano', 0))
+        plano.licenca_valor = round(valor_base, 2)
+
+        plano.id_portal = form_data.get('atualizar_id_portal_plano')
+
+        # Aliquota
+        aliquota_sp = parse_float(form_data.get('atualizar_aliquota_plano'))
+        plano.aliquota_sp_licenca = aliquota_sp
+
+        plano.desc_boleto_licenca = form_data.get('descricao_boleto_plano')
+        plano.cod_servico_sp_licenca = form_data.get('atualizar_codigo_servico_plano')
+        plano.desc_nf_licenca = form_data.get('atualizar_descricao_nf_plano')
+
+        # REAPLICA O CÁLCULO DO VALOR FINAL
+        if aliquota_sp > 0:
+            plano.valor = round(valor_base + (valor_base * aliquota_sp / 100), 2)
+        else:
+            plano.valor = round(valor_base, 2)
+
+        # Atualizar campo de atualização
+        plano.data_atualizacao = datetime.now()
+
+        db.session.commit()
+        return redirect(url_for('home_bp.render_planos'))
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'message': f'Erro ao editar plano: {str(e)}'
+        }), 500
 
 @planos_bp.route('/contratos_ativos', methods=['GET'])
 def contratos_ativos():
@@ -194,44 +248,29 @@ def get_list_planos():
 @planos_bp.route('/delete/planos', methods=['POST'])
 def delete_planos():
     codigo = request.form.get('delete_codigo_plano')
-    print(f"Código recebido para exclusão: {codigo}")
-    
-    try:
-        # 1. Buscar ID do plano
-        plano_id_result = db.session.execute(
-            text("SELECT id FROM planos WHERE codigo = :codigo"),
-            {'codigo': codigo}
-        ).first()
+    print(f"Código recebido para arquivamento: {codigo}")
 
-        if not plano_id_result:
+    try:
+        plano = Plano.query.filter_by(codigo=codigo).first()
+
+        if not plano:
             flash('Plano não encontrado com esse código.', 'error')
             print("Plano não encontrado.")
             return redirect(url_for('home_bp.render_planos'))
 
-        plano_id = plano_id_result[0]
-        print(f" Plano encontrado com ID: {plano_id}")
-
-        # 2. Deletar vínculos na tabela contrato_plano
-        deleted_links = db.session.execute(
-            text("DELETE FROM contrato_plano WHERE plano_id = :plano_id"),
-            {'plano_id': plano_id}
-        )
-        print(f"Vínculos removidos: {deleted_links.rowcount}")
-
-        # 3. Deletar o plano
-        deleted_plan = db.session.execute(
-            text("DELETE FROM planos WHERE id = :plano_id"),
-            {'plano_id': plano_id}
-        )
-        print(f" Plano deletado? {deleted_plan.rowcount > 0}")
+        # Soft delete
+        plano.status = 'Arquivado'
+        plano.data_atualizacao = datetime.utcnow()  # se quiser atualizar a data
 
         db.session.commit()
-        flash('Plano excluído com sucesso', 'success')
+
+        print(f"Plano {codigo} marcado como arquivado.")
+        flash('Plano arquivado com sucesso', 'success')
 
     except Exception as e:
         db.session.rollback()
-        print(f" Erro ao excluir plano: {str(e)}")
-        flash('Erro ao tentar excluir o plano.', 'error')
+        print(f"Erro ao arquivar plano: {str(e)}")
+        flash('Erro ao tentar arquivar o plano.', 'error')
 
     return redirect(url_for('home_bp.render_planos'))
 
@@ -264,75 +303,135 @@ def proximo_plano(codigo_atual):
     if not empresa_id:
         return jsonify({'error': 'Empresa não selecionada'}), 400
 
-    # Localizar o plano atual pelo código
-    plano_atual = (
-        Plano.query
-        .filter_by(codigo=codigo_atual, empresa_id=empresa_id)
-        .first()
-    )
-
-    if not plano_atual:
-        return jsonify({'error': 'Plano atual não encontrado'}), 404
-
-    # Buscar o próximo plano pelo ID crescente
-    plano = (
-        Plano.query
-        .filter(
-            Plano.id > plano_atual.id,
-            Plano.empresa_id == empresa_id
-        )
-        .order_by(Plano.id.asc())
-        .first()
-    )
-
-    if not plano:
-        return jsonify({}), 200
-
-    # Retorno com suas colunas reais
-    return jsonify({
-        "id": plano.id,
-        "codigo": plano.codigo,
-        "nome": plano.nome,
-        "valor": plano.valor,
-        "id_produto_portal": plano.id_portal,
-        "licenca_valor": plano.licenca_valor,
-        "produto": plano.produto,
-        "qtd_produto": plano.qtd_produto,
-        "desc_boleto_licenca": plano.desc_boleto_licenca,
-        "aliquota_sp_licenca": plano.aliquota_sp_licenca,
-        "cod_servico_sp_licenca": plano.cod_servico_sp_licenca,
-        "desc_nf_licenca": plano.desc_nf_licenca,
-        "valor_base_produto": plano.valor_base_produto,
-
-        # só a data
-        "cadastramento": plano.data_criacao.strftime("%d/%m/%Y") if plano.data_criacao else "",
-        "atualizacao": plano.data_atualizacao.strftime("%d/%m/%Y") if plano.data_atualizacao else ""
-
-        
-    })
-
-@planos_bp.route('/planos/buscar-por-codigo/<codigo>', methods=['GET'])
-def buscar_plano_por_codigo(codigo):
-    empresa_id = session.get('empresa')
-    if not empresa_id:
-        return jsonify({'error': 'Empresa não selecionada'}), 400
-
     try:
+        # Localizar o plano atual
+        plano_atual = (
+            Plano.query
+            .filter_by(codigo=codigo_atual, empresa_id=empresa_id)
+            .first()
+        )
+
+        if not plano_atual:
+            return jsonify({'error': 'Plano atual não encontrado'}), 404
+
+        # Buscar o próximo
         plano = (
             Plano.query
-            .filter_by(codigo=codigo, empresa_id=empresa_id)
+            .filter(
+                Plano.id > plano_atual.id,
+                Plano.empresa_id == empresa_id
+            )
+            .order_by(Plano.id.asc())
             .first()
         )
 
         if not plano:
-            return jsonify({'error': f'Plano {codigo} não encontrado'}), 404
+            return jsonify({}), 200
 
-        return jsonify(montar_dict_plano(plano))
+        # =================================================================
+        # BUSCAR CONTRATOS VINCULADOS AO PLANO (MESMA LÓGICA DO buscar-por-codigo)
+        # =================================================================
+        contratos = (
+            db.session.query(Contrato)
+            .join(contrato_plano, Contrato.id == contrato_plano.c.contrato_id)
+            .filter(contrato_plano.c.plano_id == plano.id)
+            .filter(Contrato.empresa_id == empresa_id)
+            .all()
+        )
+
+        contratos_json = []
+        for c in contratos:
+            contratos_json.append({
+                'id': c.id,
+                'numero': c.numero,
+                'razao_social': c.razao_social,
+                'nome_fantasia': c.nome_fantasia,
+                'contato': c.contato,
+                'email': c.email,
+                'telefone': c.telefone,
+                'cnpj_cpf': formatar_cpf_cnpj(c.cnpj_cpf),
+                'cidade': c.cidade,
+                'estado': c.estado,
+                'tipo': c.tipo,
+                'status': c.estado_contrato,
+                'dia_vencimento': c.dia_vencimento,
+                'plano_codigo': plano.codigo
+            })
+
+        retorno = montar_dict_plano(plano)
+        retorno['contratos'] = contratos_json
+
+        return jsonify(retorno)
 
     except Exception as e:
         import traceback
-        traceback.print_exc()   # <-- MOSTRA O ERRO REAL NO LOG
-        return jsonify({'error': str(e)}), 500   # <-- devolve o erro real
+        traceback.print_exc()   
+        return jsonify({'error': str(e)}), 500
+
+
+@planos_bp.route('/planos/buscar-por-codigo/<codigo>', methods=['GET'])
+def buscar_plano_por_codigo(codigo):
+    empresa_id = session.get('empresa')
+
+    try:
+        plano = db.session.execute(
+            db.select(Plano).filter_by(codigo=codigo, empresa_id=empresa_id)
+        ).scalar_one_or_none()
+
+        if not plano:
+            return jsonify({'error': 'Plano não encontrado'}), 404
+
+        # ==========================================
+        # BUSCAR CONTRATOS VINCULADOS AO PLANO
+        # ==========================================
+        contratos = (
+            db.session.query(Contrato)
+            .join(contrato_plano, Contrato.id == contrato_plano.c.contrato_id)
+            .filter(contrato_plano.c.plano_id == plano.id)
+            .filter(Contrato.empresa_id == empresa_id)
+            .all()
+        )
+
+        contratos_json = []
+        for c in contratos:
+            contratos_json.append({
+                'id': c.id,
+                
+                # CAMPOS REAIS EXISTENTES NA TABELA
+                'numero': c.numero,
+                'razao_social': c.razao_social,
+                'nome_fantasia': c.nome_fantasia,
+                'contato': c.contato,
+                'email': c.email,
+                'telefone': c.telefone,
+                'cnpj_cpf': formatar_cpf_cnpj(c.cnpj_cpf),
+                'cidade': c.cidade,
+                'estado': c.estado,
+                'tipo': c.tipo,
+                'status': c.estado_contrato,
+                'dia_vencimento': c.dia_vencimento,
+
+                # VALOR DO CONTRATO
+                #'valor': float(getattr(c, 'valor_total', 0)) if getattr(c, 'valor_total', None) not in (None, "") else 0,
+
+                # INFO DO PLANO
+                'plano_codigo': plano.codigo
+            })
+
+        # ==========================================
+        # RETORNAR O PLANO (JÁ COM OS CONTRATOS)
+        # ==========================================
+        retorno = montar_dict_plano(plano)        # usa sua função
+        retorno['contratos'] = contratos_json                # sobrepõe com campos reais
+
+        return jsonify(retorno)
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': f'Erro interno: {str(e)}'}), 500
+
+
 
 @planos_bp.route('/listagem/planos/popup', methods=['GET'])
 def planos_listagem_ativos():
@@ -356,5 +455,44 @@ def planos_listagem_ativos():
 
     return jsonify(resultado)
 
+@planos_bp.route('/buscar_plano', methods=['POST'])
+def buscar_plano():
+    data = request.get_json()
+    termo = data.get('termo', '')
+    empresa_id = session.get('empresa')
+
+    if not termo:
+        return jsonify({'success': False, 'error': 'Nenhum termo enviado'})
+
+    plano = Plano.query.filter(
+        Plano.empresa_id == empresa_id, (
+        (Plano.codigo.ilike(f"%{termo}%")) |
+        (Plano.nome.ilike(f"%{termo}%"))
+    )).first()
+
+    if plano:
+        return jsonify({
+            'success': True,
+            'plano': {
+                "codigo": plano.codigo,
+                "nome": plano.nome,
+                "valor": plano.valor,
+                "id_produto_portal": plano.id_portal,
+                "licenca_valor": plano.licenca_valor,
+                "produto": plano.produto,
+                "qtd_produto": plano.qtd_produto,
+                "desc_boleto_licenca": plano.desc_boleto_licenca,
+                "aliquota_sp_licenca": plano.aliquota_sp_licenca,
+                "cod_servico_sp_licenca": plano.cod_servico_sp_licenca,
+                "desc_nf_licenca": plano.desc_nf_licenca,
+                "valor_base_produto": plano.valor_base_produto,
+
+                # só a data
+                "cadastramento": plano.data_criacao.strftime("%d/%m/%Y") if plano.data_criacao else "",
+                "atualizacao": plano.data_atualizacao.strftime("%d/%m/%Y") if plano.data_atualizacao else ""
+            }
+        })
+    else:
+        return jsonify({'success': False, 'error': 'Plano não encontrado'})
 
     
