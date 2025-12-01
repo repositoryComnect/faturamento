@@ -228,7 +228,7 @@ $(document).ready(function () {
                 "cod_servico_sp_licenca": "#atualizar_codigo_servico_plano",
                 "desc_nf_licenca": "#atualizar_descricao_nf_plano",
                 //"valor_base_produto": plano.valor_base_produto,
-
+                "status": "#atualizar_status_plano", 
                 "cadastramento": "#atualizar_cadastramento_plano",
                 "atualizacao": "#atualizar_atualizacao_plano"
           };

@@ -361,6 +361,9 @@ def set_contrato():
         db.session.rollback()
         form_data = request.form.to_dict()
 
+        # Cliente selecionado
+        cliente_id = form_data.get('cliente_selecionado')
+
         # Dados principais do contrato
         contrato_data = {
             'numero': form_data.get('numero_contrato'),
@@ -390,12 +393,12 @@ def set_contrato():
             'estado_contrato': form_data.get('estado_contrato'),
             'data_estado': parse_date(form_data.get('date_status')),
             'motivo_estado': form_data.get('motivo_estado'),
-            'cliente_id' : form_data.get('cliente_selecionado'),
-            'observacao' : form_data.get('observacao'),
-            'empresa_id': session.get('empresa') 
+            'cliente_id': cliente_id,
+            'observacao': form_data.get('observacao'),
+            'empresa_id': empresa_id
         }
 
-        # Verifica se contrato já existe
+        # Verifica duplicidade
         if Contrato.query.filter_by(numero=contrato_data['numero']).first():
             return jsonify({
                 'success': False,
@@ -421,6 +424,15 @@ def set_contrato():
                 db.session.add(contrato_produto)
                 db.session.commit()
 
+        if cliente_id:
+            db.session.execute(
+                cliente_contrato.insert().values(
+                    cliente_id=int(cliente_id),
+                    contrato_id=novo_contrato.id
+                )
+            )
+            db.session.commit()
+
         # Associa plano
         plano_id = form_data.get('plano_id')
         if plano_id:
@@ -429,7 +441,7 @@ def set_contrato():
                 novo_contrato.planos.append(plano)
                 db.session.commit()
 
-        # Ajusta auto_increment (opcional)
+        # Ajusta auto_increment
         try:
             db.session.execute(
                 text("ALTER TABLE contratos AUTO_INCREMENT = :id"),

@@ -166,8 +166,8 @@ function buscarDadosCliente(numeroSequencia) {
                         tr.html(`
                             <td>${createLink(`/contratos/buscar-por-numero/${contrato.numero}`, contrato.numero)}</td>
                             <td>${contrato.razao_social || contrato.nome_fantasia || '-'}</td>
-                            <td>${contrato.plano}</td>
-                            <td>${contrato.produto}</td>
+                            <td>${contrato.plano_nome || ''}</td>
+                            <td>${contrato.produto_nome || ''}</td>
                             <td>${contrato.fator_juros != null ? contrato.fator_juros.toFixed(2) : '-'}</td>
                         `);
                         contratoTbody.append(tr);

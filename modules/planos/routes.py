@@ -67,9 +67,10 @@ def insert_planos():
         produto_id = form_data.get('produto_id')
         qtd_produto = int(form_data.get('qtd_produto') or 0)
         contrato_id = form_data.get('contrato_id')
+        status_plano = form_data.get('status_plano')
 
         # Cálculo do valor com base na quantidade e produto vinculado (se preço já não foi calculado no front)
-        produto = None  # ✅ inicializa
+        produto = None  
         base_valor_produto = None
 
         if produto_id:
@@ -100,6 +101,7 @@ def insert_planos():
             'produto': produto.nome if produto else None,
             'valor_base_produto' : base_valor_produto,
             'qtd_produto' : qtd_produto,
+            'status' : status_plano,
             'desc_nf_licenca': desc_nf_licenca,
             'data_criacao': datetime.now(),
             'data_atualizacao': datetime.now(),
@@ -158,6 +160,7 @@ def edit_planos():
         plano.desc_boleto_licenca = form_data.get('descricao_boleto_plano')
         plano.cod_servico_sp_licenca = form_data.get('atualizar_codigo_servico_plano')
         plano.desc_nf_licenca = form_data.get('atualizar_descricao_nf_plano')
+        plano.status = form_data.get('atualizar_status_plano')
 
         # REAPLICA O CÁLCULO DO VALOR FINAL
         if aliquota_sp > 0:
@@ -328,9 +331,7 @@ def proximo_plano(codigo_atual):
         if not plano:
             return jsonify({}), 200
 
-        # =================================================================
         # BUSCAR CONTRATOS VINCULADOS AO PLANO (MESMA LÓGICA DO buscar-por-codigo)
-        # =================================================================
         contratos = (
             db.session.query(Contrato)
             .join(contrato_plano, Contrato.id == contrato_plano.c.contrato_id)
@@ -381,9 +382,7 @@ def buscar_plano_por_codigo(codigo):
         if not plano:
             return jsonify({'error': 'Plano não encontrado'}), 404
 
-        # ==========================================
         # BUSCAR CONTRATOS VINCULADOS AO PLANO
-        # ==========================================
         contratos = (
             db.session.query(Contrato)
             .join(contrato_plano, Contrato.id == contrato_plano.c.contrato_id)
@@ -418,11 +417,9 @@ def buscar_plano_por_codigo(codigo):
                 'plano_codigo': plano.codigo
             })
 
-        # ==========================================
         # RETORNAR O PLANO (JÁ COM OS CONTRATOS)
-        # ==========================================
-        retorno = montar_dict_plano(plano)        # usa sua função
-        retorno['contratos'] = contratos_json                # sobrepõe com campos reais
+        retorno = montar_dict_plano(plano)       
+        retorno['contratos'] = contratos_json                
 
         return jsonify(retorno)
 
@@ -486,7 +483,7 @@ def buscar_plano():
                 "cod_servico_sp_licenca": plano.cod_servico_sp_licenca,
                 "desc_nf_licenca": plano.desc_nf_licenca,
                 "valor_base_produto": plano.valor_base_produto,
-
+                "status": plano.status,
                 # só a data
                 "cadastramento": plano.data_criacao.strftime("%d/%m/%Y") if plano.data_criacao else "",
                 "atualizacao": plano.data_atualizacao.strftime("%d/%m/%Y") if plano.data_atualizacao else ""

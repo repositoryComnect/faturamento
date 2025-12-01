@@ -62,7 +62,7 @@ def buscar_cliente_por_contrato(sequencia):
             'data_estado': format_date(cliente.data_estado) or None,
             'dia_vencimento': cliente.dia_vencimento or None,
 
-            # Lista de instalações vinculadas ao cliente
+            # Lista de instalações
             'instalacoes': [
                 {
                     'id': inst.id,
@@ -82,7 +82,7 @@ def buscar_cliente_por_contrato(sequencia):
                 for inst in cliente.instalacoes
             ],
 
-            # Lista de contratos vinculados ao cliente
+            # Lista de contratos
             'contratos': [
                 {
                     'id': c.id,
@@ -99,7 +99,15 @@ def buscar_cliente_por_contrato(sequencia):
                     'data_estado': format_date(c.data_estado),
                     'revenda': c.revenda,
                     'vendedor': c.vendedor,
-                    'produto_id': c.produto_id
+
+                    # Ajustado para N:N → pega o primeiro plano
+                    'plano_id': c.planos[0].id if c.planos else None,
+                    'plano_nome': c.planos[0].nome if c.planos else None,
+                    'valor_plano': float(c.planos[0].valor) if c.planos and c.planos[0].valor else None,
+
+                    # Ajustado também para produtos N:N
+                    'produto_id': c.produtos[0].id if c.produtos else None,
+                    'produto_nome': c.produtos[0].nome if c.produtos else None
                 }
                 for c in cliente.contratos
             ]
@@ -288,105 +296,11 @@ def get_numeros_contrato():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-"""@cliente_bp.route('/set/cliente', methods=['POST'])
-def set_cliente():
-    try:
-        db.session.begin()
-
-        # 1. Inserir o novo cliente
-        cliente_data = {
-            'numero_contrato': request.form.get('contract_number'),
-            'sequencia': request.form.get('sequencia_cliente'),
-            'cadastramento': parse_date(request.form.get('registration')),
-            'atualizacao': parse_date(request.form.get('update')),
-            'razao_social': request.form.get('company_name', '').strip(),
-            'nome_fantasia': request.form.get('trade_name', '').strip(),
-            'tipo': request.form.get('type'),
-            'cnpj_cpf': request.form.get('cnpj_cpf_cliente', '').strip(),
-            'ie': request.form.get('ie', '').strip(),
-            'im': request.form.get('im', '').strip(),
-            'contato_principal': request.form.get('contact', '').strip(),
-            'email': request.form.get('address_email', '').strip(),
-            'telefone': request.form.get('phone', '').strip(),
-            'estado_atual': request.form.get('estado_atual', 'Ativo'),
-            'revenda_nome': request.form.get('revenda_selecionada_client', '').strip(),
-            'vendedor_nome': request.form.get('vendedor_selecionado_client', '').strip(),
-            'tipo_servico': request.form.get('tipo_servico'),
-            'localidade': request.form.get('localidade', '').strip(),
-            'regiao': request.form.get('regiao', '').strip(),
-            'atividade': request.form.get('atividade', '').strip(),
-            'cep': request.form.get('zip_code_cep', '').strip(),
-            'endereco': request.form.get('address', '').strip(),
-            'complemento': request.form.get('complement', '').strip(),
-            'bairro': request.form.get('neighborhood', '').strip(),
-            'cidade': request.form.get('city', '').strip(),
-            'estado': request.form.get('state'),
-            'cep_cobranca': request.form.get('cep_cobranca'),
-            'endereco_cobranca': request.form.get('endereco_cobranca'),
-            'cidade_cobranca': request.form.get('cidade_cobranca'),
-            'telefone_cobranca': request.form.get('telefone_cobranca'),
-            'bairro_cobranca': request.form.get('bairro_cobranca'),
-            'uf_cobranca': request.form.get('uf_cobranca'),
-            'fator_juros': float(request.form.get('fator_juros', 0)),
-            'data_estado': parse_date(request.form.get('date_estate')),
-            'dia_vencimento': int(request.form.get('dia_vencimento', 10)),
-            'plano_nome': request.form.get('plano', '').strip(),
-            'motivo_estado': request.form.get('motivo_estado', '').strip(),
-            'observacao': request.form.get('observacao', '').strip(),
-            'empresa_id': session.get('empresa')
-        }
-
-        novo_cliente = Cliente(**cliente_data)
-        db.session.add(novo_cliente)
-        db.session.flush()  # Força o INSERT para obter o ID
-
-        # 2. Processar associação com contratos usando ORM
-        numeros_contratos = request.form.getlist('contratos_associados')
-        contratos_nao_encontrados = []
-
-        for numero_contrato in numeros_contratos:
-            contrato = Contrato.query.filter_by(numero=numero_contrato).first()
-            if contrato:
-                if novo_cliente not in contrato.clientes:
-                    contrato.clientes.append(novo_cliente)
-            else:
-                contratos_nao_encontrados.append(numero_contrato)
-
-        if contratos_nao_encontrados:
-            raise ValueError(f"Contratos não encontrados: {', '.join(contratos_nao_encontrados)}")
-
-        # Commit da transação
-        db.session.commit()
-
-        # Ajuste opcional do AUTO_INCREMENT
-        try:
-            db.session.execute(
-                text("ALTER TABLE clientes AUTO_INCREMENT = :id"),
-                {'id': novo_cliente.id + 1}
-            )
-            db.session.commit()
-        except Exception:
-            print("Não foi possível realizar o ajuste do AUTO_INCREMENT")
-
-        return redirect(url_for('home_bp.render_clientes'))
-
-    except ValueError as ve:
-        db.session.rollback()
-        flash(f"Erro de validação: {str(ve)}", "error")
-        return redirect(request.referrer or url_for('home_bp.render_clientes'))
-
-    except Exception as e:
-        db.session.rollback()
-        flash("Ocorreu um erro ao criar o cliente. Por favor, tente novamente.", "error")
-        print(f"Erro: {e}")
-        return redirect(request.referrer or url_for('home_bp.render_clientes'))"""
-
 @cliente_bp.route('/set/cliente', methods=['POST'])
 def set_cliente():
     try:
         db.session.begin()
 
-        # 1. Inserir o novo cliente
         cliente_data = {
             'numero_contrato': request.form.get('contract_number'),
             'sequencia': request.form.get('sequencia_cliente'),
@@ -440,14 +354,29 @@ def set_cliente():
         for numero_contrato in numeros_contratos:
             contrato = Contrato.query.filter_by(numero=numero_contrato).first()
 
+            if not contrato:
+                contratos_nao_encontrados.append(numero_contrato)
+                continue
+
             if contrato.cliente_id is None:
-                # Atualiza FK: 1 cliente → N contratos
+                # Atualiza FK direta
                 contrato.cliente_id = novo_cliente.id
+
+                # INSERE TAMBÉM NA TABELA AUXILIAR
+                db.session.execute(
+                    cliente_contrato.insert().values(
+                        cliente_id=novo_cliente.id,
+                        contrato_id=contrato.id
+                    )
+                )
             else:
                 contratos_nao_encontrados.append(numero_contrato)
 
         if contratos_nao_encontrados:
-            raise ValueError(f"Contrato já possui cliente vinculado: {', '.join(contratos_nao_encontrados)}")
+            raise ValueError(
+                f"Contrato já possui cliente vinculado ou não encontrado: "
+                f"{', '.join(contratos_nao_encontrados)}"
+            )
 
         # Commit final
         db.session.commit()
@@ -773,8 +702,8 @@ def buscar_cliente_listagem(sequencia):
 
         data = {
             'sequencia': cliente.sequencia,
-            'cadastramento': cliente.cadastramento,
-            'atualizacao': cliente.atualizacao,
+            'cadastramento': format_date(cliente.cadastramento),
+            'atualizacao': format_date(cliente.atualizacao),
             'razao_social': cliente.razao_social or None,
             'nome_fantasia': cliente.nome_fantasia or None,
             'contato': cliente.contato_principal or None,
@@ -823,9 +752,38 @@ def buscar_cliente_listagem(sequencia):
                     'id_portal': inst.id_portal,
                     'status': inst.status,
                     'observacao': inst.observacao or '',
-                    'valor_plano': float(getattr(inst, 'valor_plano', 0.00))  # Proteção caso não exista
+                    'valor_plano': float(getattr(inst, 'valor_plano', 0.00)),
                 }
                 for inst in cliente.instalacoes
+            ],
+
+            'contratos': [
+                {
+                    'id': c.id,
+                    'numero': c.numero,
+                    'razao_social': c.razao_social,
+                    'nome_fantasia': c.nome_fantasia,
+                    'contato': c.contato,
+                    'email': c.email,
+                    'telefone': c.telefone,
+                    'tipo': c.tipo,
+                    'estado_contrato': c.estado_contrato,
+                    'dia_vencimento': c.dia_vencimento,
+                    'fator_juros': float(c.fator_juros) if c.fator_juros else None,
+                    'data_estado': format_date(c.data_estado),
+                    'revenda': c.revenda,
+                    'vendedor': c.vendedor,
+
+                    # Ajustado para N:N → pega o primeiro plano
+                    'plano_id': c.planos[0].id if c.planos else None,
+                    'plano_nome': c.planos[0].nome if c.planos else None,
+                    'valor_plano': float(c.planos[0].valor) if c.planos and c.planos[0].valor else None,
+
+                    # Ajustado também para produtos N:N
+                    'produto_id': c.produtos[0].id if c.produtos else None,
+                    'produto_nome': c.produtos[0].nome if c.produtos else None
+                }
+                for c in cliente.contratos
             ]
         }
 

@@ -24,9 +24,7 @@ function proximoCodigoPlano() {
                 return;
             }
 
-            // ==========
             // CAMPOS
-            // ==========
             document.getElementById('codigo_plano').value = data.codigo ?? "";
             document.getElementById('nome_plano').value = data.nome ?? "";
             document.getElementById('valor_plano').value = data.valor ?? "";
@@ -41,9 +39,7 @@ function proximoCodigoPlano() {
             document.getElementById('atualizacao_plano').value = data.atualizacao ?? "";
             document.getElementById('status_plano').value = data.status ?? "";
 
-            // ====================
             // LISTA DE CONTRATOS
-            // ====================
             const tabela = document.querySelector(".contrato-table tbody");
             tabela.innerHTML = ""; 
 

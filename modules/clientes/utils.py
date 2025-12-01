@@ -15,10 +15,8 @@ def parse_date(date_str):
     except Exception:
         return None
         
-
 def format_date(date):
     return date.strftime('%d/%m/%Y') if date else None
-
 
 def montar_dict_cliente(cliente):
     return {
@@ -93,7 +91,15 @@ def montar_dict_cliente(cliente):
                 'data_estado': format_date(c.data_estado),
                 'revenda': c.revenda,
                 'vendedor': c.vendedor,
-                'produto_id': c.produto_id
+
+                # Ajustado para N:N → pega o primeiro plano
+                'plano_id': c.planos[0].id if c.planos else None,
+                'plano_nome': c.planos[0].nome if c.planos else None,
+                'valor_plano': float(c.planos[0].valor) if c.planos and c.planos[0].valor else None,
+
+                # Ajustado também para produtos N:N
+                'produto_id': c.produtos[0].id if c.produtos else None,
+                'produto_nome': c.produtos[0].nome if c.produtos else None
             }
             for c in cliente.contratos
         ]
