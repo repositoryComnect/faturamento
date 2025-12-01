@@ -120,9 +120,7 @@ document.addEventListener('shown.bs.modal', function (event) {
 });
 
 
-/* ============================
-   CARREGA PRODUTOS
-============================ */
+//   CARREGA PRODUTOS
 document.addEventListener("DOMContentLoaded", function () {
     fetch("/planos/get_produtos", { method: "POST" })
         .then(response => response.json())
@@ -152,9 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-/* ============================
-   REGRAS DE VALOR / QTD PRODUTO
-============================ */
+//   REGRAS DE VALOR / QTD PRODUTO
 document.addEventListener("DOMContentLoaded", () => {
     const valorInput = document.getElementById("valor");
     const qtdProdutoInput = document.getElementById("qtd_produto");
