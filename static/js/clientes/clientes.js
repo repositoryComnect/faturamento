@@ -36,7 +36,6 @@ function renderInstalacoesPage() {
 
         tbody.append(`
             <tr>
-                <td>${inst.id || ''}</td>
                 <td>${inst.codigo_instalacao || ''}</td>
                 <td>${inst.endereco || ''}</td>
                 <td>${inst.bairro || ''}</td>
@@ -173,7 +172,10 @@ function buscarDadosCliente(numeroSequencia) {
                         contratoTbody.append(tr);
                     });
                 } else {
-                    contratoTbody.html(`<tr><td colspan="3" class="text-center">Nenhum contrato vinculado</td></tr>`);
+                    contratoTbody.html(`<tr><td colspan="5" 
+                        class="text-center">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        Nenhum contrato vinculado</td></tr>`);
                 }
 
 
