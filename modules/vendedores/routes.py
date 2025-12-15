@@ -51,7 +51,7 @@ def get_vendedores():
         total = db.session.execute(text("SELECT COUNT(*) FROM vendedores")).scalar()
 
         return render_template(
-            'listar_vendedores.html',
+            '/listar/listar_vendedores.html',
             vendedores=vendedores,
             page=page,
             per_page=per_page,
@@ -61,7 +61,7 @@ def get_vendedores():
     except Exception as e:
         print(f"Erro ao listar vendedores: {str(e)}")
         return render_template(
-            'listar_revendas.html',
+            '/listar/listar_revendas.html',
             vendedores=[],
             page=1,
             per_page=10,

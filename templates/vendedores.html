@@ -38,36 +38,36 @@
         <div class="collapse show" id="basicInfoCollapse">
             <div class="card-body">
                 <form method="POST" action="{{ url_for('vendedores_bp.insert_vendedores') }}">
-                    <div class="row g-3">
-                        <div class="col-md-2">
-                            <label for="nome">Código:</label>
-                            <input type="text" id="codigo" name="codigo" class="form-control" readonly>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="nome">Nome:</label>
-                            <input type="text" id="nome_vendedor" name="nome_vendedor" class="form-control" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="nome">CPF:</label>
-                            <input type="text" id="cpf_vendedor" name="cpf_vendedor" class="form-control" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="cnpj">Telefone:</label>
-                            <input type="text" id="telefone_vendedor" name="telefone_vendedor" class="form-control" required>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label for="status">E-mail:</label>
-                            <input type="text" id="email_vendedor" name="email_vendedor" class="form-control" required>
-                        </div>
-                        <div class="col-md-2">
-                            <label for="id_conta">Status:</label>
-                            <select id="status" name="status" class="form-select">
-                                <option value="1" selected>Ativo</option>
-                                <option value="0">Inativo</option>
-                            </select>
-                        </div>
+                <div class="row g-3">
+                    <div class="col-md-2">
+                        <label for="nome">Código:</label>
+                        <input type="text" id="codigo" name="codigo" class="form-control" readonly>
                     </div>
+                    <div class="col-md-2">
+                        <label for="nome">Nome:</label>
+                        <input type="text" id="nome_vendedor" name="nome_vendedor" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="nome">CPF:</label>
+                        <input type="text" id="cpf_vendedor" name="cpf_vendedor" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="cnpj">Telefone:</label>
+                        <input type="text" id="telefone_vendedor" name="telefone_vendedor" class="form-control" required>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label for="status">E-mail:</label>
+                        <input type="text" id="email_vendedor" name="email_vendedor" class="form-control" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="id_conta">Status:</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="1" selected>Ativo</option>
+                            <option value="0">Inativo</option>
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

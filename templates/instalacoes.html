@@ -10,137 +10,221 @@
 {% block content %}
 
 <div class="container-fluid mt-5 mb-4">
-    <div class="d-flex justify-content-between align-items-center">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Instalações</h2>
+
         <div class="d-flex gap-3 flex-wrap align-items-center">
-            <!-- Botão Excluir -->
-            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteInstalacaoModal">
-                <i class="bi bi-trash me-2"></i>Excluir
+
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacoesModal">
+                <i class="bi bi-plus-circle me-2"></i>Criar Instalação
             </button>
 
-            <!-- Botão Listar Todos -->
-            <button class="btn btn-secondary" onclick="window.location.href=this.getAttribute('action')" 
+            <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateInstalacaoModal">
+                <i class="bi bi-gear-wide-connected me-2"></i>Editar Instalação
+            </button>
+
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteInstalacaoModal">
+                <i class="bi bi-trash me-2"></i>Excluir Instalação
+            </button>
+
+            <button class="btn btn-secondary"
+                    onclick="window.location.href=this.getAttribute('action')"
                     action="{{ url_for('instalacoes_bp.listar_instalacoes') }}">
                 <i class="bi bi-search me-2"></i>Listar Todos
             </button>
 
-            <!-- Campo de busca agrupado -->
             <div class="d-flex align-items-center" style="min-width: 300px;">
-                <input class="form-control me-2" type="search" name="search" id="search"
-                    placeholder="Código/Razão Social" aria-label="Search">
-                <button class="btn btn-outline-success" type="button" onclick="buscarInstalacoes()">
-                    Localizar
-                </button>
+                <input class="form-control me-2"
+                       type="search"
+                       name="search"
+                       id="search"
+                       placeholder="Código/Razão Social">
+                       <button class="btn btn-outline-success" type="button" onclick="buscarInstalacoes()">
+                            Localizar
+                       </button>
             </div>
         </div>
     </div>
 
 
-    <!-- Formulário de Instalação -->
-    <div class="card mb-2">
-        <div class="card-header section-header" data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse">
-            <h5 class="mb-0">Informações Básicas</h5>
-        </div>
-        <div class="collapse show" id="basicInfoCollapse">
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('instalacoes_bp.insert_instalacoes') }}">
+        {% if instalacoes %}
+        <!-- INFORMAÇÕES BÁSICAS -->
+        <div class="card mb-2">
+            <div class="card-header section-header"
+                 data-bs-toggle="collapse"
+                 data-bs-target="#basicInfoCollapse">
+                <h5 class="mb-0">Informações Básicas</h5>
+            </div>
+
+            <div class="collapse show" id="basicInfoCollapse">
+                <div class="card-body">
                     <div class="row g-3">
+
                         <div class="col-md-2">
-                            <label for="codigo_instalacao">Código Instalação:</label>
-                            <input type="text" id="codigo_instalacao" name="codigo_instalacao" class="form-control" readonly>
+                            <label for="codigo_instalacao" class="form-label">Código Instalação:</label>
+
+                            <div class="d-flex gap-2">
+
+                                <input type="text"
+                                    id="codigo_instalacao"
+                                    name="codigo_instalacao"
+                                    value="{{ instalacoes.codigo_instalacao }}"
+                                    class="form-control"
+                                    readonly>
+
+                                <button class="btn btn-secondary"
+                                        type="button"
+                                        onclick="buscarDadosCliente(document.getElementById('sequencia').value)">
+                                    <i class="bi bi-search"></i>
+                                </button>
+
+                                <button class="btn btn-secondary"
+                                        type="button"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#listarClientesModal">
+                                    <i class="bi bi-card-list"></i>
+                                </button>
+
+                                <button class="btn btn-secondary"
+                                        type="button"
+                                        onclick="buscarProximoCliente()">
+                                    <i class="bi bi-arrow-right"></i>
+                                </button>
+
+                                <span class="input-group-text d-none" id="loadingCliente">
+                                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                                </span>
+
+                            </div>
                         </div>
-                        <div class="col-md-2">
-                            <label for="cliente_selecionado">Cliente:</label>
-                            <select id="cliente_selecionado" name="cliente_selecionado" class="form-select">
-                                <option value="">Vincule um cliente</option>
-                            </select>
+
+
+                        <div class="col-md-3">
+                            <label for="razao_social">Razão Social:</label>
+                            <input type="text"
+                                   id="razao_social"
+                                   name="razao_social"
+                                   value="{{ instalacoes.razao_social }}"
+                                   class="form-control"
+                                   readonly>
                         </div>
-                        <div class="col-md-4">
-                            <label for="numero_serie">Razão Social:</label>
-                            <input type="text" id="razao_social" name="razao_social" class="form-control" readonly>
-                        </div>
+
                         <div class="col-md-1">
                             <label for="id_portal">ID Portal:</label>
-                            <input type="text" id="id_portal" name="id_portal" class="form-control">
+                            <input type="text"
+                                   id="id_portal"
+                                   name="id_portal"
+                                   value="{{ instalacoes.id_portal }}"
+                                   class="form-control">
                         </div>
+
                         <div class="col-md-2">
                             <label for="cadastramento">Cadastramento:</label>
-                            <input type="text" id="cadastramento" name="cadastramento" class="form-control" readonly>
+                            <input type="text"
+                                   id="cadastramento"
+                                   name="cadastramento"
+                                   value="{{ instalacoes.cadastramento }}"
+                                   class="form-control"
+                                   readonly>
                         </div>
+
+                        <div class="col-md-2">
+                            <label for="atualizacao">Atualização:</label>
+                            <input type="text"
+                                   id="atualizacao"
+                                   name="atualizacao"
+                                   value="{{ instalacoes.atualizacao }}"
+                                   class="form-control"
+                                   readonly>
+                        </div>
+
                         <div class="col-md-1">
                             <label for="status">Status:</label>
                             <select class="form-select" name="status" id="status">
-                                <option value="Ativo">Ativo</option>
-                                <option value="Cancelado">Cancelado</option>
-                                <option value="Suspenso">Suspenso</option>
+                                <option value="ativo" {{ 'selected' if instalacoes.status == 'ativo' }}>Ativo</option>
+                                <option value="cancelado" {{ 'selected' if instalacoes.status == 'cancelado' }}>Cancelado</option>
+                                <option value="suspenso" {{ 'selected' if instalacoes.status == 'suspenso' }}>Suspenso</option>
                             </select>
                         </div>
+
                     </div>
+                </div>
             </div>
         </div>
-    </div>
+        {% endif %}
 
-    <!-- Seção de Endereço de Instalação -->
-    <div class="card mb-2">
-        <div class="card-header section-header" data-bs-toggle="collapse" data-bs-target="#addressCollapse">
-            <h5 class="mb-0">Endereço de Instalação</h5>
-        </div>
-        <div class="collapse" id="addressCollapse">
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-1">
-                        <label for="cep">CEP:</label>
-                        <input type="text" id="cep" name="cep" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="endereco">Endereço:</label>
-                        <input type="text" id="endereco" name="endereco" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="bairro">Bairro:</label>
-                        <input type="text" id="bairro" name="bairro" class="form-control">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="cidade">Cidade:</label>
-                        <input type="text" id="cidade" name="cidade" class="form-control">
-                    </div>
-                    <div class="col-md-1">
-                        <label for="uf">UF:</label>
-                        <select class="form-select" id="uf" name="uf">
-                            <option value=""></option>
-                            {% for estado in ['RJ','SP','MG','DF','SC','ES','AC','CE','AL','BA','AM','SE','TO','RR','PI','RN','RS','PB','PR'] %}
+        <!-- ENDEREÇO -->
+        <div class="card mb-2">
+            <div class="card-header section-header"
+                 data-bs-toggle="collapse"
+                 data-bs-target="#addressCollapse">
+                <h5 class="mb-0">Endereço de Instalação</h5>
+            </div>
+
+            <div class="collapse" id="addressCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-1">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" name="cep" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="endereco">Endereço:</label>
+                            <input type="text" id="endereco" name="endereco" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="bairro">Bairro:</label>
+                            <input type="text" id="bairro" name="bairro" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" name="cidade" class="form-control">
+                        </div>
+
+                        <div class="col-md-1">
+                            <label for="uf">UF:</label>
+                            <select class="form-select" id="uf" name="uf">
+                                <option value=""></option>
+                                {% for estado in ['RJ','SP','MG','DF','SC','ES','AC','CE','AL','BA','AM','SE','TO','RR','PI','RN','RS','PB','PR'] %}
                                 <option value="{{ estado }}">{{ estado }}</option>
-                            {% endfor %}
-                        </select>
+                                {% endfor %}
+                            </select>
+                        </div>
+
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Observações -->
-    <div class="card mb-2">
-        <div class="card-header section-header" data-bs-toggle="collapse" data-bs-target="#observacaoCollapse">
-            <h5 class="mb-0">Observações</h5>
-        </div>
-        <div class="collapse" id="observacaoCollapse">
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-12">
-                        <label for="observacao">Observações:</label>
-                        <textarea class="form-control" rows="3" id="observacao" name="observacao"></textarea>
+        <!-- OBSERVAÇÕES -->
+        <div class="card mb-2">
+            <div class="card-header section-header"
+                 data-bs-toggle="collapse"
+                 data-bs-target="#observacaoCollapse">
+                <h5 class="mb-0">Observações</h5>
+            </div>
+
+            <div class="collapse" id="observacaoCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="observacao">Observações:</label>
+                            <textarea class="form-control"
+                                      rows="3"
+                                      id="observacao"
+                                      name="observacao"></textarea>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Botões -->
-    <div class="d-flex justify-content-end mt-3 gap-2">
-        <button type="submit" class="btn btn-primary">Salvar</button>
-        <a href="/revendas" class="btn btn-secondary">Cancelar</a>
-    </div>
-    </form>
+        
 </div>
 
 {% endblock %}
@@ -148,5 +232,6 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/instalacoes/instalacoes.js') }}"></script>
 {% include 'extensions/links_popup.html' %}
+{% include 'popup/instalacoes/popup_instalacoes.html' %}
 {% include 'popup/instalacoes/popup_delete_instalacoes.html' %}
 {% endblock %}

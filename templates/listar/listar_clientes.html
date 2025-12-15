@@ -1,0 +1,140 @@
+{% extends "base_template.html" %}
+
+{% block title %}Listar Clientes{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="voltar-wrapper">
+    <a href="{{ url_for('home_bp.render_clientes') }}" class="btn btn-primary btn-voltar">Voltar</a>
+</div>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-center align-items-center mb-3">
+        <h2 class="text-center">Lista de Clientes</h2>
+    </div>
+
+    <p class="text-muted text-center">Total de Clientes: {{ total }}</p>
+
+    {% if clientes|length == 0 %}
+        <div class="alert alert-warning text-center">Nenhum cliente encontrado.</div>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-light">
+                    <tr class="text-center">
+                        <th>Sequência</th>
+                        <th>Cadastramento</th>
+                        <th>Atualização</th>
+                        <th>Razão Social</th>
+                        <th>Nome Fantasia</th>
+                        <th>Contato</th>
+                        <th>Email</th>
+                        <th>Telefone</th>
+                        <th>CNPJ/CPF</th>
+                        <th>Revenda</th>
+                        <th>Vendedor</th>
+                        <th>Serviço</th>
+                        <th>CEP</th>
+                        <th>Endereço</th>
+                        <th>Cidade</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cliente in clientes %}
+                    <tr>
+                        <!-- CORREÇÃO APLICADA AQUI: Adicionada verificação para prevenir BuildError -->
+                        <td>
+                            {% if cliente.sequencia %}
+                                <a href="{{ url_for('cliente_bp.buscar_cliente_listagem', sequencia=cliente.sequencia) }}">{{ cliente.sequencia }}</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ cliente.cadastramento.strftime('%d/%m/%Y') if cliente.cadastramento else 'N/A' }}</td>
+                        <td>{{ cliente.atualizacao.strftime('%d/%m/%Y %H:%M') if cliente.atualizacao else 'N/A' }}</td>
+                        <td>{{ cliente.razao_social }}</td>
+                        <td>{{ cliente.nome_fantasia }}</td>
+                        <td>{{ cliente.contato_principal }}</td>
+                        <td>{{ cliente.email }}</td>
+                        <td>
+                            {% if cliente.telefone and cliente.telefone|length >= 10 %}
+                                ({{ cliente.telefone[:2] }}){{ cliente.telefone[2:7] }}-{{ cliente.telefone[7:] }}
+                            {% else %}
+                                {{ cliente.telefone or 'N/A' }}
+                            {% endif %}
+                        </td>
+
+                        <td>{{ cliente.cnpj_cpf }}</td>
+                        <td>{{ cliente.revenda_nome }}</td>
+                        <td>{{ cliente.vendedor_nome }}</td>
+                        <td>{{ cliente.tipo_servico }}</td>
+                        <td>{{ cliente.cep }}</td>
+                        <td>{{ cliente.endereco }}</td>
+                        <td>{{ cliente.cidade }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if cliente.estado_atual == 'Ativo' %}
+                                    bg-success
+                                {% elif cliente.estado_atual == 'Suspenso' %}
+                                    bg-warning text-dark
+                                {% elif cliente.estado_atual == 'Arquivado' %}
+                                    /* Você usou 'bg-orange', mas não é uma classe Bootstrap padrão.
+                                       Mantive o bg-danger como fallback para evitar erros de estilo, 
+                                       mas você pode definir 'bg-orange' no seu CSS. */
+                                    bg-danger
+                                {% else %}
+                                    bg-danger
+                                {% endif %}">
+                                {{ cliente.estado_atual or 'N/A' }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <!-- Paginação Bootstrap -->
+    <nav aria-label="Navegação de página" class="mt-3">
+        <ul class="pagination justify-content-center">
+            {% set total_pages = (total // per_page) + (1 if total % per_page > 0 else 0) %}
+
+            {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('cliente_bp.listar_clientes', page=page-1) }}">&laquo; Anterior</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">&laquo; Anterior</span>
+                </li>
+            {% endif %}
+
+            {% for p in range(1, total_pages + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('cliente_bp.listar_clientes', page=p) }}">{{ p }}</a>
+                </li>
+            {% endfor %}
+
+            {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('cliente_bp.listar_clientes', page=page+1) }}">Próxima &raquo;</a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">Próxima &raquo;</span>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

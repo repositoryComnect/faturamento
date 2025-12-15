@@ -169,12 +169,12 @@ def listar_instalacoes():
 
         total = db.session.execute(text(f"SELECT COUNT(*) FROM instalacoes WHERE empresa_id = {empresa_id}")).scalar()
 
-        return render_template('listar_instalacoes.html',
+        return render_template('/listar/listar_instalacoes.html',
                                instalacoes=instalacoes,
                                page=page,
                                per_page=per_page,
                                total=total)
     except Exception as e:
         print(f"Erro ao listar instalações: {str(e)}")
-        return render_template('listar_instalacoes.html', 
+        return render_template('/listar/listar_instalacoes.html', 
                                error=f"Não foi possível carregar as instalações: {str(e)}")

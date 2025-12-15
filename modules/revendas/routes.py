@@ -82,7 +82,7 @@ def get_revendas():
         total = db.session.execute(text("SELECT COUNT(*) FROM revendas")).scalar()
 
         return render_template(
-            'listar_revendas.html',
+            '/listar/listar_revendas.html',
             revendas=revendas,
             page=page,
             per_page=per_page,
@@ -92,7 +92,7 @@ def get_revendas():
     except Exception as e:
         print(f"Erro ao listar revendas: {str(e)}")
         return render_template(
-            'listar_revendas.html',
+            '/listar/listar_revendas.html',
             revendas=[],
             page=1,
             per_page=10,

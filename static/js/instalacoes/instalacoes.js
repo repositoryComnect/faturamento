@@ -47,7 +47,7 @@
         fetch('/proximo_codigo_instalacao')
             .then(response => response.json())
             .then(data => {
-                const campoCodigo = document.getElementById('codigo_instalacao');
+                const campoCodigo = document.getElementById('codigo_atualizacao_instalacao');
                 if (campoCodigo && data.proximo_codigo_instalacao) {
                     campoCodigo.value = data.proximo_codigo_instalacao;
                 }
@@ -117,3 +117,28 @@ function preencherCamposInstalacao(inst) {
         selectCliente.value = inst.cliente_id;
     }
 }
+
+
+//<!-- Módulo para trazer a data atual para poder realizar o cadastro -->
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const createModal = document.getElementById('createInstalacoesModal');
+
+        if (createModal) {
+            createModal.addEventListener('shown.bs.modal', function () {
+                const hoje = new Date();
+                const dia = String(hoje.getDate()).padStart(2, '0');
+                const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+                const ano = hoje.getFullYear();
+                const dataFormatada = `${dia}/${mes}/${ano}`;
+
+                const camposData = ['atualizacao_instalacao'];
+                camposData.forEach(id => {
+                    const campo = document.getElementById(id);
+                    if (campo && !campo.value) {
+                        campo.value = dataFormatada;
+                    }
+                });
+            });
+        }
+    });

@@ -38,7 +38,7 @@ def get_planos():
     }
 
     return render_template(
-        'listar_planos.html',
+        '/listar/listar_planos.html',
         planos=planos,
         page=page,
         per_page=per_page,
@@ -369,7 +369,6 @@ def proximo_plano(codigo_atual):
         traceback.print_exc()   
         return jsonify({'error': str(e)}), 500
 
-
 @planos_bp.route('/planos/buscar-por-codigo/<codigo>', methods=['GET'])
 def buscar_plano_por_codigo(codigo):
     empresa_id = session.get('empresa')
@@ -427,8 +426,6 @@ def buscar_plano_por_codigo(codigo):
         import traceback
         traceback.print_exc()
         return jsonify({'error': f'Erro interno: {str(e)}'}), 500
-
-
 
 @planos_bp.route('/listagem/planos/popup', methods=['GET'])
 def planos_listagem_ativos():

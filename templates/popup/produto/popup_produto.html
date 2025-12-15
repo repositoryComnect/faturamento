@@ -1,79 +1,94 @@
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_clientes.css')}}">
-    
+
 <body>
     <div class="modal fade" id="createProdutoModal" tabindex="-1" aria-labelledby="createProdutoModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
+
+                <!-- Cabeçalho do Modal -->
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title" id="createProdutoModalLabel">Novo Produto</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
+
                 <div class="modal-body">
+
                     <form id="productForm" action="{{ url_for('produtos_bp.set_produtos') }}" method="POST">
-                        <div class="modal-section-header">Informações Básicas</div>
-                        <div class="row g-3 mb-4">
-                            <div class="col-md-2">
-                                <label class="form-label">Código</label>
-                                <input type="text" class="form-control" id="codigo" name="codigo" readonly>
+
+                        <!-- CARD -->
+                        <div class="card mb-3 section-card">
+
+                            <!-- CABEÇALHO DO CARD -->
+                            <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                                 data-bs-toggle="collapse"
+                                 data-bs-target="#basicInfoPopupPlanosCollapse"
+                                 aria-expanded="true"
+                                 aria-controls="basicInfoPopupPlanosCollapse"
+                                 style="cursor: pointer;">
+                                <span>Informações Básicas</span>
+                                <i class="bi bi-chevron-down"></i>
                             </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Nome Produto</label>
-                                <input type="text" class="form-control" id="nome" name="nome">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Descrição</label>
-                                <input type="text" class="form-control" id="descricao" name="descricao">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Preço</label>
-                                <input type="number" class="form-control" id="preco_base" name="preco_base">
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Status</label>
-                                <select class="form-select" id="status" name="status">
-                                    <option value="Ativo">Ativo</option>
-                                    <option value="Inativo">Inativo</option>
-                                    <option value="Suspenso">Suspenso</option>
-                                </select>
+
+                            <!-- COLLAPSE DO CARD -->
+                            <div id="basicInfoPopupPlanosCollapse" class="collapse show">
+                                <div class="card-body">
+
+                                    <div class="row g-3 mb-2">
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Código</label>
+                                            <input type="text" class="form-control" id="codigo" name="codigo" readonly>
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Nome Produto</label>
+                                            <input type="text" class="form-control" id="nome" name="nome">
+                                        </div>
+
+                                        <div class="col-md-4">
+                                            <label class="form-label">Descrição</label>
+                                            <input type="text" class="form-control" id="descricao" name="descricao">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Preço</label>
+                                            <input type="number" class="form-control" id="preco_base" name="preco_base">
+                                        </div>
+
+                                        <div class="col-md-2">
+                                            <label class="form-label">Status</label>
+                                            <select class="form-select" id="status" name="status">
+                                                <option value="Ativo">Ativo</option>
+                                                <option value="Inativo">Inativo</option>
+                                                <option value="Suspenso">Suspenso</option>
+                                            </select>
+                                        </div>
+
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
-                        
+
+                        <!-- Rodapé do Modal -->
                         <div class="modal-footer d-flex justify-content-end">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                                Cancelar
-                            </button>
-                            <button type="submit" class="btn btn-primary" id="saveProductBtn">
-                                Criar
-                            </button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary" id="saveProductBtn">Criar</button>
                         </div>
+
                     </form>
+
                 </div>
+
             </div>
         </div>
     </div>
 
+
 {% include 'extensions/links_popup.html' %}
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const produtoModal = document.getElementById('createProdutoModal');
-        produtoModal.addEventListener('show.bs.modal', function () {
-            fetch('/proximo_codigo_produto')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.proximo_codigo_produto) {
-                        document.getElementById('codigo').value = data.proximo_codigo_produto;
-                    } else {
-                        console.warn("Código não retornado pela API.");
-                    }
-                })
-                .catch(error => {
-                    console.error("Erro ao buscar código do produto:", error);
-                });
-        });
-    });
-</script>
+<script src="{{ url_for('static', filename='js/produto/produto.js') }}"></script>
+
 
     
 </body>

@@ -564,7 +564,7 @@ def listar_clientes():
         error = "Não foi possível carregar os clientes. Por favor, tente novamente mais tarde."
 
     # Todas as variáveis esperadas pelo template são passadas, garantindo que 'total' sempre exista.
-    return render_template('listar_clientes.html', 
+    return render_template('/listar/listar_clientes.html', 
                            clientes=clientes, 
                            page=page, 
                            per_page=per_page, 
@@ -832,3 +832,38 @@ def buscar_proximo_cliente(sequencia):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@cliente_bp.route('/clientes/buscar-instalacao-listagem/<codigo>', methods=['GET'])
+def buscar_instalacao_listagem(codigo):
+    empresa_id = session.get('empresa')
+    try:
+        instalacao = (
+            Instalacao.query
+            .filter(
+                Instalacao.codigo_instalacao == codigo,
+                Instalacao.empresa_id == empresa_id,
+            )
+            .first()
+        )
+
+        if not instalacao:
+            return jsonify({'error': f'Instalação {codigo} não encontrada'}), 404
+
+        data = {
+            'codigo': instalacao.codigo_instalacao,
+            'cadastramento': format_date(instalacao.cadastramento),
+            'endereco': instalacao.endereco,
+            'status': instalacao.status,
+            'observacao': instalacao.observacao,
+            'cep': instalacao.cep,
+            'bairro': instalacao.bairro,
+            'uf': instalacao.uf,
+            'id_portal': instalacao.id_portal,
+            'razao_social': instalacao.razao_social,
+        }
+
+        return render_template('instalacoes.html',
+                               instalacoes = data,
+                               )
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

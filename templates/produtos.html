@@ -46,7 +46,7 @@
                         <td class="py-3 px-4">{{ produto.descricao }}</td>
                         <td class="py-3 px-4">{{ produto.preco_base }}</td>
                         <td class="py-3 px-4">{{ produto.ativo }}</td>
-                        <td class="py-3 px-4">{{ produto.created_at }}</td>   
+                        <td class="py-3 px-4">{{ produto.created_at.strftime('%d/%m/%Y') }}</td>   
                     </tr>
                     {% endfor %}
                 </tbody>

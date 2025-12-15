@@ -21,6 +21,10 @@ function renderInstalacoesPage() {
         return;
     }
 
+    function createLink(url, label) {
+        return `<a href="${url}" class="text-primary" style="text-decoration:none; font-weight:600;">${label}</a>`;
+    }
+
     const totalPages = Math.ceil(instalacoesData.length / instalacoesPerPage);
     const start = (currentInstalacaoPage - 1) * instalacoesPerPage;
     const end = start + instalacoesPerPage;
@@ -36,7 +40,7 @@ function renderInstalacoesPage() {
 
         tbody.append(`
             <tr>
-                <td>${inst.codigo_instalacao || ''}</td>
+                <td>${createLink((`/clientes/buscar-instalacao-listagem/${inst.codigo_instalacao}`), inst.codigo_instalacao)}</td>
                 <td>${inst.endereco || ''}</td>
                 <td>${inst.bairro || ''}</td>
                 <td>${statusBadge}</td>
@@ -91,7 +95,6 @@ function buscarDadosCliente(numeroSequencia) {
                     return;
                 }
 
-                // Mapear campos do cliente
                 const fieldMap = {
                     'numero': '#numeroContrato',
                     'sequencia': '#sequencia',
@@ -163,7 +166,7 @@ function buscarDadosCliente(numeroSequencia) {
                     data.contratos.forEach(contrato => {
                         const tr = $('<tr>').addClass('text');
                         tr.html(`
-                            <td>${createLink(`/contratos/buscar-por-numero/${contrato.numero}`, contrato.numero)}</td>
+                            <td>${createLink(`/contratos/buscar-por-numero-listagem/${contrato.numero}`, contrato.numero)}</td>
                             <td>${contrato.razao_social || contrato.nome_fantasia || '-'}</td>
                             <td>${contrato.plano_nome || ''}</td>
                             <td>${contrato.produto_nome || ''}</td>
@@ -215,38 +218,49 @@ function buscarProximoCliente() {
         method: 'GET',
         success: function(data) {
 
-            if (!data || data.error || data.message) {
+            if (data.error) {
                 Swal.fire({
-                    icon: 'info',
-                    title: 'Aviso',
-                    text: data?.message || 'Nenhum próximo cliente encontrado.',
+                    icon: 'error',
+                    title: 'Erro',
+                    text: data.error,
                     toast: true,
                     position: 'top-end',
                     timer: 3000,
                     showConfirmButton: false
                 });
-                $('#loadingCliente').addClass('d-none');
                 return;
             }
 
-            // Agora utilizamos a mesma função padrão do fluxo normal!
-            if (data.sequencia) {
-                buscarDadosCliente(data.sequencia);
-            } else {
-                // fallback caso a API retorne o objeto completo diretamente
-                preencherCamposCliente(data);
+            if (!data || !data.sequencia) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Aviso',
+                    text: 'Nenhum próximo cliente encontrado.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                return;
             }
 
-            $('#loadingCliente').addClass('d-none');
+            buscarDadosCliente(data.sequencia);
         },
         error: function() {
             Swal.fire({
                 icon: 'error',
-                title: 'Erro',
-                text: 'Não foi possível buscar o próximo cliente.',
+                title: 'Erro ao buscar próximo cliente',
+                text: 'Ocorreu um problema na busca.',
+                toast: true,
+                position: 'top-end',
+                timer: 3000,
+                showConfirmButton: false
             });
+        },
+        complete: function() {
             $('#loadingCliente').addClass('d-none');
         }
     });
 }
+
 

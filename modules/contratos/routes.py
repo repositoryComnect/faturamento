@@ -66,9 +66,6 @@ def delete_contrato():
 
         contrato_id = contrato[0]
 
-        # ----------------------------------------------------------------------
-        # CHECK — Obtém informações completas do cliente (sequencia + fantasia + CNPJ)
-        # ----------------------------------------------------------------------
         if action == 'check':
 
             contrato_info = db.session.execute(text("""
@@ -314,7 +311,7 @@ def listar_contratos():
             text("SELECT COUNT(*) FROM contratos WHERE empresa_id = :empresa_id"),
             {'empresa_id': empresa_id}).scalar()
         
-        return render_template('listar_contratos.html', 
+        return render_template('/listar/listar_contratos.html', 
                                contratos=contratos,
                                page=page,
                                per_page=per_page,
@@ -322,7 +319,7 @@ def listar_contratos():
         
     except Exception as e:
         print(f"Erro ao listar contratos: {str(e)}")
-        return render_template('listar_contratos.html', 
+        return render_template('/listar/listar_contratos.html', 
                                error=f"Não foi possível carregar os contratos: {str(e)}")
 
 @contratos_bp.route('/contratos/buscar-por-numero/<numero>', methods=['GET'])
@@ -830,7 +827,6 @@ def contratos_ativos():
     if not empresa_id:
         return jsonify({'erro': 'Empresa não definida na sessão'}), 401
 
-    # Filtra os contratos da empresa logada
     contratos = Contrato.query.filter_by(empresa_id=empresa_id).order_by(Contrato.numero).all()
 
     resultado = [
@@ -939,7 +935,6 @@ def set_cliente_popup_contrato():
         flash("Ocorreu um erro ao criar o cliente. Por favor, tente novamente.", "error")
         return redirect(request.referrer or url_for('home_bp.render_contratos'))
 
-# Redirecionamento template de contrato listar todos    
 @contratos_bp.route('/contratos/buscar-por-numero-listagem/<numero>', methods=['GET'])
 def buscar_contrato_listagem(numero):
     empresa_id = session.get('empresa')
@@ -1040,14 +1035,12 @@ def buscar_contrato_listagem(numero):
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
-# Redirecionamento template de relação de clientes vinculados
 @contratos_bp.route('/clientes/<sequencia>')
 def render_cliente(sequencia):
     empresa_id = session.get('empresa')
     cliente = Cliente.query.filter_by(sequencia=sequencia, empresa_id=empresa_id).first()
     return render_template('clientes.html', cliente=cliente)
 
-# Redirecionamento template de relação de clientes vinculados
 @contratos_bp.route('/planos/<codigo>', methods=['GET'])
 def render_planos_codigo(codigo):
     empresa_id = session.get('empresa')

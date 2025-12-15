@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, render_template, request, session, redirect, url_for, flash
-from application.models.models import db, Contrato, Cliente, Plano, Produto, Vendedor, Empresa
+from application.models.models import db, Contrato, Cliente, Plano, Produto, Vendedor, Empresa, Instalacao
 from modules.utils.utils import formatar_cpf_cnpj
 from flask_login import login_required
 from sqlalchemy import text, extract, func
@@ -124,7 +124,18 @@ def render_titulos():
 @home_bp.route('/instalacoes', methods=['GET'])
 @login_required
 def render_instalacoes():
-    return render_template('instalacoes.html')
+
+    instalacao = (
+        Instalacao.query
+        .order_by(Instalacao.id.asc())
+        .first()
+    )
+
+    return render_template(
+        'instalacoes.html',
+        instalacoes=instalacao
+    )
+
 
 @home_bp.route('/trocar_empresa', methods=['POST'])
 @login_required

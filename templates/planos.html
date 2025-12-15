@@ -46,33 +46,25 @@
                 <div class="collapse show" id="basicInfoCollapse">
                     <div class="card-body">
                         <div class="row">
-
-                            <!-- CÓDIGO DO PLANO (alinhado como o de contrato) -->
                             <div class="col-md-2">
                                 <label class="form-label">Código Plano:</label>
                                 <div class="d-flex gap-2">
-
-                                    <!-- Campo Código -->
                                     <input type="text" class="form-control" id="codigo_plano"
                                         value="{{ plano.codigo if plano else '' }}"
                                         onchange="buscarPlanoPorCodigo(this.value)">
 
-                                    <!-- Buscar -->
                                     <button class="btn btn-secondary" type="button" onclick="buscarPlanoPorCodigo(codigo_plano.value)">
                                         <i class="bi bi-search"></i>
                                     </button>
 
-                                    <!-- Listagem -->
                                     <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#listarPlanosModal">
                                         <i class="bi bi-card-list"></i>
                                     </button>
 
-                                    <!-- Próximo -->
                                     <button class="btn btn-secondary" type="button" onclick="proximoCodigoPlano()">
                                         <i class="bi bi-arrow-right"></i>
                                     </button>
 
-                                    <!-- Spinner -->
                                     <span id="loadingCodigoPlano" class="input-group-text d-none">
                                         <div class="spinner-border spinner-border-sm" role="status"></div>
                                     </span>

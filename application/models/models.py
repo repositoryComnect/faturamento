@@ -303,20 +303,21 @@ class Instalacao(db.Model):
     cidade = db.Column(db.String(100))
     uf = db.Column(db.String(2))
     cadastramento = db.Column(db.Date)
+    atualizacao = db.Column(db.Date)
     id_portal = db.Column(db.Integer)
     status = db.Column(db.String(20), default='ativo')
     observacao = db.Column(db.Text)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
 
-    # 🔹 Relacionamento com Empresa (nome de backref ajustado)
+    # Relacionamento com Empresa (nome de backref ajustado)
     empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
     empresa = db.relationship('Empresa', backref=db.backref('instalacoes', lazy=True))
 
-    # 🔹 Relacionamento com Cliente
+    #  Relacionamento com Cliente
     cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'), nullable=False)
     cliente = db.relationship('Cliente', back_populates='instalacoes')
 
-    # 🔹 Relacionamento com títulos
+    #  Relacionamento com títulos
     titulos = db.relationship('TituloInstalacao', backref='instalacao', lazy=True)
 
 class NotaFiscal(db.Model):
@@ -368,26 +369,24 @@ class Plano(db.Model):
     
     # Dados Básicos
     id = db.Column(db.Integer, primary_key=True)
-    codigo = db.Column(db.String(20), nullable=False)  # name="codigo"
-    nome = db.Column(db.String(200), nullable=False)  # name="nome"
-    valor = db.Column(db.Numeric(10, 2), nullable=False)  # name="valor"
-    id_portal = db.Column(db.Integer)  # name="id_produto"
+    codigo = db.Column(db.String(20), nullable=False)  
+    nome = db.Column(db.String(200), nullable=False)  
+    valor = db.Column(db.Numeric(10, 2), nullable=False)  
+    id_portal = db.Column(db.Integer)  
     produto = db.Column(db.String(20))
     qtd_produto = db.Column(db.Integer)
     valor_base_produto = db.Column(db.Numeric(10, 2))
 
     # ===== SEÇÃO LICENÇA =====
-    desc_boleto_licenca = db.Column(db.String(200))  # name="desc_boleto_licenca"
-    licenca_valor = db.Column(db.Numeric(10, 2))  # (já existia)
-    aliquota_sp_licenca = db.Column(db.Numeric(5, 2))  # name="aliquota_sp_licenca"
-    cod_servico_sp_licenca = db.Column(db.String(20))  # name="cod_servico_sp_licenca"
-    desc_nf_licenca = db.Column(db.String(200))  # name="desc_nf_licenca" (novo)
+    desc_boleto_licenca = db.Column(db.String(200))  
+    licenca_valor = db.Column(db.Numeric(10, 2))  
+    aliquota_sp_licenca = db.Column(db.Numeric(5, 2))  
+    cod_servico_sp_licenca = db.Column(db.String(20))  
+    desc_nf_licenca = db.Column(db.String(200))  
     status = db.Column(db.String(15))
     empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
     empresa = db.relationship('Empresa', backref=db.backref('planos', lazy=True))
     
-
-    # Datas
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     data_atualizacao = db.Column(db.DateTime, onupdate=datetime.utcnow)
     

@@ -1,0 +1,181 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_contratos.css') }}">
+</head>
+<body>
+<!-- Create Contract Modal -->
+<div class="modal fade" id="createInstalacoesModal" tabindex="-1" aria-labelledby="createInstalacoesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="createInstalacoesModalLabel">Nova Instalação</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body bg-light">
+                <form id="createInstalacoesForm" action="" method="POST">
+
+                    <!-- CARD: Informações Básicas -->
+                    <div class="card mb-3 ">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                             data-bs-toggle="collapse" data-bs-target="#basicInfoInstalacoes" aria-expanded="true"
+                             aria-controls="basicInfoInstalacoes" style="cursor:pointer;">
+                            <span>Informações Básicas</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div class="collapse show" id="basicInfoInstalacaoCollapse">
+                            <div class="card-body">
+                                <div class="row g-3">
+
+                                    <div class="col-md-2">
+                                        <label for="codigo_instalacao">Código Instalação:</label>
+                                        <input type="text"
+                                            id="codigo_atualizacao_instalacao"
+                                            name="codigo_atualizacao_instalacao"
+                                            value="{{ instalacoes.codigo_atualizacao_instalacao }}"
+                                            class="form-control"
+                                            readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label for="razao_social">Razão Social:</label>
+                                        <input type="text"
+                                            id="razao_social"
+                                            name="razao_social"
+                                            value="{{ instalacoes.razao_social }}"
+                                            class="form-control"
+                                            readonly>
+                                    </div>
+
+                                    <div class="col-md-1">
+                                        <label for="id_portal">ID Portal:</label>
+                                        <input type="text"
+                                            id="id_portal"
+                                            name="id_portal"
+                                            value="{{ instalacoes.id_portal }}"
+                                            class="form-control">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="cadastramento">Cadastramento:</label>
+                                        <input type="text"
+                                            id="cadastramento_instalacao"
+                                            name="cadastramento_instalacao"
+                                            value="{{ instalacoes.cadastramento }}"
+                                            class="form-control"
+                                            readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="atualizacao">Atualização:</label>
+                                        <input type="text"
+                                            id="atualizacao_instalacao"
+                                            name="atualizacao_instalacao"
+                                            value="{{ instalacoes.atualizacao }}"
+                                            class="form-control"
+                                            readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label for="status">Status:</label>
+                                        <select class="form-select" name="status" id="status">
+                                            <option value="ativo" {{ 'selected' if instalacoes.status == 'ativo' }}>Ativo</option>
+                                            <option value="cancelado" {{ 'selected' if instalacoes.status == 'cancelado' }}>Cancelado</option>
+                                            <option value="suspenso" {{ 'selected' if instalacoes.status == 'suspenso' }}>Suspenso</option>
+                                        </select>
+                                    </div>
+                            </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENDEREÇO -->
+        <div class="card mb-3">
+            <div class="card-header "
+                 data-bs-toggle="collapse"
+                 data-bs-target="#addressInstalacaoCollapse">
+                <h5 class="mb-0">Endereço de Instalação</h5>
+            </div>
+
+            <div class="collapse" id="addressInstalacaoCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+
+                        <div class="col-md-2">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" name="cep" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="endereco">Endereço:</label>
+                            <input type="text" id="endereco" name="endereco" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="bairro">Bairro:</label>
+                            <input type="text" id="bairro" name="bairro" class="form-control">
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" name="cidade" class="form-control">
+                        </div>
+
+                        <div class="col-md-1">
+                            <label for="uf">UF:</label>
+                            <select class="form-select" id="uf" name="uf">
+                                <option value=""></option>
+                                {% for estado in ['RJ','SP','MG','DF','SC','ES','AC','CE','AL','BA','AM','SE','TO','RR','PI','RN','RS','PB','PR'] %}
+                                <option value="{{ estado }}">{{ estado }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- OBSERVAÇÕES -->
+        <div class="card mb-2">
+            <div class="card-header "
+                 data-bs-toggle="collapse"
+                 data-bs-target="#observacaoInstalacaoCollapse">
+                <h5 class="mb-0">Observações</h5>
+            </div>
+
+            <div class="collapse" id="observacaoInstalacaoCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="observacao">Observações:</label>
+                            <textarea class="form-control"
+                                      rows="3"
+                                      id="observacao"
+                                      name="observacao"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER / AÇÕES -->
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" class="btn btn-secondary px-2" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary px-2" id="saveContractBtn">Salvar</button>
+        </div>
+
+        </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_contratos.js') }}"></script>
+</body>
+</html>
