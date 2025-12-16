@@ -31,8 +31,6 @@
 
         // Executa uma vez ao carregar a página
         carregarContratosDisponiveis();
-
-        // Máscara para CNPJ/CPF
         const cnpjField = document.getElementById('numero_documento');
         cnpjField.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -67,8 +65,7 @@
     });
 
 
-//<!-- Bloco responsável pelo PopUp Delete -->
-
+// Bloco responsável pelo PopUp Delete 
     document.addEventListener('DOMContentLoaded', function() {
         const deleteModal = document.getElementById('deleteClientModal');
         const validateBtn = document.getElementById('validateBtn');
@@ -487,22 +484,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // Bloco buscar contrato set cliente -->
-
 document.addEventListener('DOMContentLoaded', function () {
-    console.log("✅ Script buscarContrato ativo");
+    console.log("Script buscarContrato ativo");
 
     let timeoutId;
 
-    // Função para formatar datas
     function formatarData(data) {
         const d = new Date(data);
         if (isNaN(d)) return '';
         return `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')}`;
     }
 
-    // Função principal de busca
     function buscarContrato(termo) {
-        console.log("🔎 Buscando contrato com termo:", termo);
+        console.log("Buscando contrato com termo:", termo);
 
         if (!termo) {
             Swal.fire({
@@ -527,7 +521,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 contentType: 'application/json',
                 data: JSON.stringify({ termo: termo }),
                 success: function (data) {
-                    console.log("📦 Dados recebidos:", data);
+                    console.log("Dados recebidos:", data);
 
                     if (data.success) {
                         const contrato = data.contrato;
@@ -609,14 +603,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Clique no botão de busca
     $('#btnBuscarContrato').on('click', function () {
-        console.log("🖱️ Clique no botão de busca de contrato");
+        console.log("Clique no botão de busca de contrato");
         buscarContrato($('#search_contract').val());
     });
 
     // Pressionar Enter no campo
     $('#search_contract').on('keypress', function (e) {
         if (e.which === 13) {
-            console.log("⌨️ Enter pressionado no campo de busca de contrato");
+            console.log("Enter pressionado no campo de busca de contrato");
             e.preventDefault();
             buscarContrato($(this).val());
         }

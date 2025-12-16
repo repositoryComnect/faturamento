@@ -1,0 +1,199 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_clientes.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+</head>
+
+<body>
+<!-- Create Instalacao Modal -->
+<div class="modal fade" id="createInstalacaoModal" tabindex="-1" aria-labelledby="createInstalacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="createInstalacaoModalLabel">Nova Instalação</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="instalacaoForm"
+                      action="{{ url_for('cliente_bp.insert_instalacoes_cliente') }}"
+                      method="POST">
+
+                    <!-- Flash Messages -->
+                    <div id="flash-messages">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+
+                    <!-- CARD 1 - Informações Básicas -->
+                    <div class="card mb-3 section-card">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#cardInfoBasicaInstalacao"
+                             style="cursor:pointer;">
+                            Informações Básicas
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div id="cardInfoBasicaInstalacao" class="collapse show">
+                            <div class="card-body">
+                                <div class="row g-3">
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Código Instalação:</label>
+                                        <input type="text" class="form-control" id="codigo_instalacao"
+                                               name="codigo_instalacao" readonly>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Cliente:</label>
+                                        <select id="cliente_selecionado_instalacao"
+                                                name="cliente_selecionado_instalacao"
+                                                class="form-select">
+                                            <option value="">Vincule um cliente</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Razão Social:</label>
+                                        <input type="text" class="form-control" id="company"
+                                               name="company" readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">ID Portal:</label>
+                                        <input type="text" class="form-control" id="id_portal"
+                                               name="id_portal">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Cadastramento:</label>
+                                        <input type="text" class="form-control" id="cadastramento_instalacao"
+                                               name="cadastramento_instalacao" readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Status:</label>
+                                        <select class="form-select" name="status" id="status">
+                                            <option value="Ativo">Ativo</option>
+                                            <option value="Suspenso">Suspenso</option>
+                                            <option value="Cancelado">Cancelado</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD 2 - Endereço de Instalação -->
+                    <div class="card mb-3 section-card">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#cardEnderecoInstalacao"
+                             style="cursor:pointer;">
+                            Endereço de Instalação
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div id="cardEnderecoInstalacao" class="collapse show">
+                            <div class="card-body">
+                                <div class="row g-3">
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">CEP:</label>
+                                        <input type="text" class="form-control" id="cep" name="cep">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Endereço:</label>
+                                        <input type="text" class="form-control" id="endereco" name="endereco">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Bairro:</label>
+                                        <input type="text" class="form-control" id="bairro" name="bairro">
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label">Cidade:</label>
+                                        <input type="text" class="form-control" id="cidade" name="cidade">
+                                    </div>
+
+                                    <div class="col-md-1">
+                                        <label class="form-label">UF:</label>
+                                        <select class="form-select" id="uf" name="uf">
+                                            <option value=""></option>
+                                                <option>RJ</option>
+                                                <option>SP</option>
+                                                <option>MG</option>
+                                                <option>DF</option>
+                                                <option>SC</option>
+                                                <option>ES</option>
+                                                <option>AC</option>
+                                                <option>CE</option>
+                                                <option>AL</option>
+                                                <option>BA</option>
+                                                <option>AM</option>
+                                                <option>SE</option>
+                                                <option>TO</option>
+                                                <option>RR</option>
+                                                <option>PI</option>
+                                                <option>RN</option>
+                                                <option>RS</option>
+                                                <option>PB</option>
+                                                <option>PR</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CARD 3 - Observações -->
+                    <div class="card mb-3 section-card">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#cardObsInstalacao"
+                             style="cursor:pointer;">
+                            Observações
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div id="cardObsInstalacao" class="collapse">
+                            <div class="card-body">
+                                <textarea class="form-control" id="observacao"
+                                          name="observacao" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Salvar 
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/clientes/popup_js/clientes_popup.js') }}"></script>
+<script src="{{ url_for('static', filename='js/instalacoes/instalacoes.js') }}"></script>
+<script src="{{ url_for('static', filename='js/instalacoes/popup_instalacoes.js') }}"></script>
+</body>

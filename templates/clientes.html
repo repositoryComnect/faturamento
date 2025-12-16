@@ -5,6 +5,7 @@
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/styles_clientes.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -20,10 +21,10 @@
         {% endif %}
     {% endwith %}
     
-    <div class="container-fluid mt-5 mb-4">
+    <div class="container-fluid mt-4 mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <h2>Clientes</h2>
-            <div class="d-flex gap-2"> <!-- Adicionei a classe gap-2 para espaçamento uniforme -->
+            <div class="d-flex gap-1"> <!-- Adicionei a classe gap-2 para espaçamento uniforme -->
                 <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createClientModal">
                     <i class="bi bi-plus-circle me-2"></i>Criar Cliente
                 </button>
@@ -247,7 +248,7 @@
                             <div class="container mt-5 mb-4">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularContratoModal">
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularContractModal">
                                             <i class="bi bi-diagram-2"></i> Vincular Contrato
                                         </button>
                                     </div>
@@ -325,7 +326,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -362,11 +362,11 @@
 
     <!-- Popup Contratos -->
     {% include 'popup/contratos/popup_contratos.html' %}
-
-
-
-    {% include 'popup/clientes/popup_vincular_instalacao.html' %}
+    {% include 'popup/clientes/popup_criar_instalacao.html' %}
     {% include 'popup/clientes/popup_desvincular_instalacoes.html' %}
     
+    <!-- Popup vinculos-->
+    {% include 'popup/clientes/popup_vincular_contrato.html' %}
+
     {% include 'extensions/links_popup.html' %}
 {% endblock %}

@@ -3,7 +3,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const select = document.getElementById('cliente_selecionado');
         const numeroSerieInput = document.getElementById('company') || document.getElementById('razao_social');
-;
+
 
         fetch('/get/list/clientes')
             .then(response => response.json())

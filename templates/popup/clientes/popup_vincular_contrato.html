@@ -1,0 +1,37 @@
+<!-- Modal de Vinculação de Clientes ao Contrato -->
+<div class="modal fade" id="vincularContractModal" tabindex="-1" aria-labelledby="vincularContractModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('cliente_bp.vincular_contratos_ao_cliente') }}">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="vincularContractModalLabel">Vincular Contrato ao Cliente</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Seletor de contrato -->
+          <div class="mb-3">
+            <label for="selecione_cliente" class="form-label">Selecione um Cliente:</label>
+            <select class="form-select" name="selecione_cliente" id="selecione_cliente" required>
+            </select>
+          </div>
+
+          <!-- Seletor múltiplo de clientes -->
+          <div class="mb-3">
+            <label for="contrato_id" class="form-label">Selecione Contratos:</label>
+            <select class="form-select" name="contrato_id" id="contrato_id" multiple required size="10">
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Vincular</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/clientes/popup_js/popup_clientes_vincular.js') }}"></script>

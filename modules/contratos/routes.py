@@ -522,6 +522,7 @@ def get_id_contratos():
 
     except Exception as e:
         return jsonify({'erro': str(e), 'sucesso': False}), 500
+    
 
 @contratos_bp.route('/revendas_ativas', methods=['GET'])
 def get_revendas_ativas():
@@ -540,6 +541,7 @@ def get_revendas_ativas():
     except Exception as e:
         print("Erro ao buscar revendas:", e)
         return jsonify({'error': 'Erro ao buscar revendas'}), 500
+    
 
 @contratos_bp.route('/get/list/clientes', methods=['GET'])
 def get_list_clientes():

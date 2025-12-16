@@ -179,7 +179,7 @@ class Cliente(db.Model):
     empresa_id = db.Column(db.Integer, db.ForeignKey('empresa.id'), nullable=False)
     empresa = db.relationship('Empresa', backref=db.backref('clientes', lazy=True))
     
-    # 🔥 AJUSTE — Relacionamento 1 Cliente → N Contratos
+    # AJUSTE — Relacionamento 1 Cliente → N Contratos
     contratos = db.relationship(
         'Contrato',
         back_populates='cliente',

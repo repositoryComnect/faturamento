@@ -359,10 +359,8 @@ def set_cliente():
                 continue
 
             if contrato.cliente_id is None:
-                # Atualiza FK direta
                 contrato.cliente_id = novo_cliente.id
 
-                # INSERE TAMBÉM NA TABELA AUXILIAR
                 db.session.execute(
                     cliente_contrato.insert().values(
                         cliente_id=novo_cliente.id,
@@ -378,10 +376,8 @@ def set_cliente():
                 f"{', '.join(contratos_nao_encontrados)}"
             )
 
-        # Commit final
         db.session.commit()
 
-        # Ajuste do AUTO_INCREMENT
         try:
             db.session.execute(
                 text("ALTER TABLE clientes AUTO_INCREMENT = :id"),
@@ -638,6 +634,60 @@ def get_revendas_ativas():
     revendas = Revenda.query.filter_by(status='Ativo').order_by(Revenda.nome).all()
     resultado = [r.nome for r in revendas]
     return jsonify(resultado)
+
+@cliente_bp.route('/vincular-contratos-ao-cliente', methods=['POST'])
+def vincular_contratos_ao_cliente():
+    try:
+        db.session.begin()
+
+        # 1. Cliente selecionado
+        cliente_id = request.form.get('selecione_cliente')
+        cliente = Cliente.query.get(cliente_id)
+
+        if not cliente:
+            raise ValueError("Cliente não encontrado.")
+
+        # 2. Contratos selecionados (multiple)
+        contrato_ids = request.form.getlist('contrato_id')
+
+        if not contrato_ids:
+            raise ValueError("Nenhum contrato selecionado.")
+
+        contratos_nao_encontrados = []
+
+        # 3. Vincular contratos ao cliente
+        for contrato_id in contrato_ids:
+            try:
+                contrato_id = int(contrato_id)  # Garantir que o id seja um inteiro
+                contrato = Contrato.query.get(contrato_id)
+
+                if contrato:
+                    contrato.cliente_id = cliente.id
+                else:
+                    contratos_nao_encontrados.append(contrato_id)
+            except ValueError:
+                contratos_nao_encontrados.append(contrato_id)
+
+        if contratos_nao_encontrados:
+            raise ValueError(
+                f"Contratos não encontrados: {', '.join(map(str, contratos_nao_encontrados))}"
+            )
+
+        db.session.commit()
+        flash('Contratos vinculados ao cliente com sucesso.', 'success')
+        return redirect(url_for('home_bp.render_contratos'))
+
+    except ValueError as ve:
+        db.session.rollback()
+        flash(str(ve), 'danger')
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao vincular contratos ao cliente.', 'danger')
+        print(f"Erro: {e}")
+        return redirect(request.referrer or url_for('home_bp.render_contratos'))
+
 
 @cliente_bp.route('/clientes/<sequencia>')
 def render_cliente(sequencia):
