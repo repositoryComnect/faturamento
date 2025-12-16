@@ -16,11 +16,11 @@
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRevendaModal">
                     <i class="bi bi-plus-circle me-2"></i>Criar Revenda
                 </button>
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#updateRevendaModal">
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editRevendaModal">
                     <i class="bi bi-gear-wide-connected me-2"></i>Editar Revenda
                 </button>
             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRevendaModal">
-                <i class="bi bi-trash me-2"></i>Excluir
+                <i class="bi bi-trash me-2"></i>Excluir Revenda
             </button>
             <button class="btn btn-secondary" onclick="window.location.href=this.getAttribute('action')" 
                     action="{{ url_for('revendas_bp.get_revendas') }}">
@@ -43,32 +43,37 @@
         </div>
         <div class="collapse show" id="basicInfoCollapse">
             <div class="card-body">
-                <form method="POST" action="{{ url_for('revendas_bp.set_revendas') }}">
+                <form method="POST" action="">
                     <div class="row g-3">
                         <div class="col-md-2">
                             <label for="nome">Código:</label>
                             <input type="text" id="codigo_revenda" name="codigo_revenda" class="form-control" readonly>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-2">
                             <label for="nome">Nome da Revenda:</label>
-                            <input type="text" id="nome_revenda" name="nome_revenda" class="form-control" required>
+                            <input type="text" id="nome_revenda" name="nome_revenda" class="form-control" readonly>
                         </div>
                         <div class="col-md-2">
                             <label for="cnpj">CNPJ:</label>
-                            <input type="text" id="cnpj" name="cnpj" class="form-control" required>
+                            <input type="text" id="cnpj" name="cnpj" class="form-control" readonly>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label for="cadastramento_revenda">Cadastramento:</label>
+                            <input type="text" id="cadastramento_revenda" name="cadastramento_revenda" class="form-control" readonly>
                         </div>
                         
                         <div class="col-md-2">
-                            <label for="status">Status:</label>
-                            <select id="status" name="status" class="form-select">
-                                <option value="Ativo" selected>Ativo</option>
-                                <option value="Inativo">Inativo</option>
-                            </select>
+                            <label for="atualizacao_revenda">Atualização:</label>
+                            <input type="text" id="atualizacao_revenda" name="atualizacao_revenda" class="form-control" readonly>
                         </div>
+
                         <div class="col-md-2">
-                            <label for="id_conta">ID Conta Portal:</label>
-                            <input type="text" id="id_conta" name="id_conta" class="form-control"required>
+                            <label for="status">Status:</label>
+                            <input type="text" id="status_revenda" name="status_revenda" class="form-control" readonly>
+
                         </div>
+                        
                     </div>
             </div>
         </div>
@@ -86,23 +91,24 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label for="tipo_conta">Tipo de Conta Portal:</label>
-                        <select id="tipo_conta" name="tipo_conta" class="form-select">
-                            <option value="Nenhum" selected>Nenhum</option>
-                            <option value="Distribuidor" >Distribuidor</option>
-                            <option value="Revenda">Revenda</option>
-                        </select>
+                            <input type="tipo_conta" id="tipo_conta" name="tipo_conta" class="form-control" readonly>
                     </div>
                     <div class="col-md-3">
                         <label for="email">E-mail:</label>
-                        <input type="email" id="email" name="email" class="form-control">
+                        <input type="email" id="email" name="email" class="form-control" readonly>
                     </div>
                     <div class="col-md-2">
                         <label for="ie">IE:</label>
-                        <input type="text" id="ie" name="ie" class="form-control">
+                        <input type="text" id="ie" name="ie" class="form-control" readonly>
                     </div>
                     <div class="col-md-2">
                         <label for="telefone">Telefone:</label>
-                        <input type="text" id="telefone" name="telefone" class="form-control">
+                        <input type="text" id="telefone" name="telefone" class="form-control" readonly>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label for="id_conta">ID Conta Portal:</label>
+                        <input type="text" id="id_conta" name="id_conta" class="form-control" readonly>
                     </div>
                 </div>
             </div>
@@ -112,28 +118,28 @@
     <!-- Seção de Endereço -->
     <div class="card mb-2">
         <div class="card-header section-header d-flex justify-content-between align-items-center" 
-             data-bs-toggle="collapse" data-bs-target="#addressCollapse" 
-             aria-expanded="true" aria-controls="addressCollapse">
-            <h5 class="mb-0">Endereço</h5>
+             data-bs-toggle="collapse" data-bs-target="#addressRevendaCollapse" 
+             aria-expanded="true" aria-controls="addressRevendaCollapse">
+            <h5 class="mb-0">Endereço Revenda</h5>
         </div>
-        <div class="collapse" id="addressCollapse">
+        <div class="collapse" id="addressRevendaCollapse">
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-2">
                         <label for="cep">CEP:</label>
-                        <input type="text" id="cep" name="cep" class="form-control">
+                        <input type="text" id="cep" name="cep" class="form-control" readonly>
                     </div>
                     <div class="col-md-4">
                         <label for="endereco">Endereço:</label>
-                        <input type="text" id="endereco" name="endereco" class="form-control">
+                        <input type="text" id="endereco" name="endereco" class="form-control" readonly>
                     </div>
                     <div class="col-md-3">
                         <label for="bairro">Bairro:</label>
-                        <input type="text" id="bairro" name="bairro" class="form-control">
+                        <input type="text" id="bairro" name="bairro" class="form-control" readonly>
                     </div>
                     <div class="col-md-3">
                         <label for="cidade">Cidade:</label>
-                        <input type="text" id="cidade" name="cidade" class="form-control">
+                        <input type="text" id="cidade" name="cidade" class="form-control" readonly>
                     </div>
                 </div>
             </div>
@@ -143,33 +149,20 @@
     <!-- Seção de Vendedores -->
     <div class="card mb-2">
         <div class="card-header section-header d-flex justify-content-between align-items-center" 
-             data-bs-toggle="collapse" data-bs-target="#vendedoresCollapse" 
-             aria-expanded="true" aria-controls="vendedoresCollapse">
+             data-bs-toggle="collapse" data-bs-target="#vendedoresRevendaCollapse" 
+             aria-expanded="true" aria-controls="vendedoresRevendaCollapse">
             <h5 class="mb-0">Distribuidores</h5>
         </div>
-        <div class="collapse" id="vendedoresCollapse">
+        <div class="collapse" id="vendedoresRevendaCollapse">
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label for="vendedor_selecionado">Selecionar Distribuidor</label>
-                        <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
-                            <option value="">Selecione um distribuidor</option>
-                            {% for vendedor in vendedores %}
-                                <option value="{{ vendedor.id }}">{{ vendedor.nome }}</option>
-                            {% endfor %}
-                        </select>
+                        <label for="vendedor_selecionado">Distribuidor</label>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Botões de ação -->
-    <div class="d-flex justify-content-end mt-3 gap-2">
-        <button type="submit" class="btn btn-primary">Salvar</button>
-        <a href="/revendas" class="btn btn-secondary">Cancelar</a>
-    </div>
-    </form>
 </div>
 
 
@@ -179,6 +172,8 @@
 {% endblock %}
 
 {% block scripts %}
-{% include 'js/revendas/revendas_js.html' %}
+<script src="{{ url_for('static', filename='js/revendas/revendas.js') }}"></script>
 {% include 'popup/revenda/popup_delete_revenda.html' %}
+{% include 'popup/revenda/popup_revenda.html' %}
+{% include 'popup/revenda/popup_editar_revenda.html' %}
 {% endblock %}

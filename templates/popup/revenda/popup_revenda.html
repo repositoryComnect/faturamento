@@ -1,0 +1,163 @@
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_contratos.css') }}">
+</head>
+<body>
+<!-- Create Contract Modal -->
+<div class="modal fade" id="createRevendaModal" tabindex="-1" aria-labelledby="createRevendaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg">
+
+            <!-- HEADER -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="createRevendaModalLabel">Nova Revenda</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <!-- BODY -->
+            <div class="modal-body bg-light">
+                <form id="createContractForm" action="" method="POST">
+
+                    <!-- Seção de Informações Básicas -->
+            <div class="card mb-2">
+            <div class="card-header  d-flex justify-content-between align-items-center" 
+                    data-bs-toggle="collapse" data-bs-target="#basicInfoRevendaCollapse" 
+                    aria-expanded="true" aria-controls="basicInfoRevendaCollapse">
+                    <h5 class="mb-0">Informações Básicas</h5>
+                </div>
+                <div class="collapse show" id="basicInfoRevendaCollapse">
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('revendas_bp.set_revendas') }}">
+                            <div class="row g-3">
+                                <div class="col-md-2">
+                                    <label for="nome">Código:</label>
+                                    <input type="text" id="codigo_revenda" name="codigo_revenda" class="form-control" readonly>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="nome">Nome da Revenda:</label>
+                                    <input type="text" id="nome_revenda" name="nome_revenda" class="form-control" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="cnpj">CNPJ:</label>
+                                    <input type="text" id="cnpj" name="cnpj" class="form-control" required>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <label for="status">Status:</label>
+                                    <select id="status" name="status" class="form-select">
+                                        <option value="Ativo" selected>Ativo</option>
+                                        <option value="Inativo">Inativo</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="id_conta">ID Conta Portal:</label>
+                                    <input type="text" id="id_conta" name="id_conta" class="form-control"required>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Dados da Conta -->
+            <div class="card mb-2">
+            <div class="card-header  d-flex justify-content-between align-items-center" 
+                    data-bs-toggle="collapse" data-bs-target="#accountInfoRevendaCollapse" 
+                    aria-expanded="true" aria-controls="accountInfoRevendaCollapse">
+                <h5 class="mb-0">Dados da Conta</h5>
+            </div>
+            <div class="collapse" id="accountInfoRevendaCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label for="tipo_conta">Tipo de Conta Portal:</label>
+                            <select id="tipo_conta" name="tipo_conta" class="form-select">
+                                <option value="Nenhum" selected>Nenhum</option>
+                                <option value="Distribuidor" >Distribuidor</option>
+                                <option value="Revenda">Revenda</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="email">E-mail:</label>
+                            <input type="email" id="email" name="email" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="ie">IE:</label>
+                            <input type="text" id="ie" name="ie" class="form-control">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="telefone">Telefone:</label>
+                            <input type="text" id="telefone" name="telefone" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Seção de Endereço -->
+            <div class="card mb-2">
+            <div class="card-header  d-flex justify-content-between align-items-center" 
+                    data-bs-toggle="collapse" data-bs-target="#addressCollapse" 
+                    aria-expanded="true" aria-controls="addressCollapse">
+                <h5 class="mb-0">Endereço</h5>
+            </div>
+            <div class="collapse" id="addressCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-2">
+                            <label for="cep">CEP:</label>
+                            <input type="text" id="cep" name="cep" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="endereco">Endereço:</label>
+                            <input type="text" id="endereco" name="endereco" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="bairro">Bairro:</label>
+                            <input type="text" id="bairro" name="bairro" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="cidade">Cidade:</label>
+                            <input type="text" id="cidade" name="cidade" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Seção de Vendedores -->
+            <div class="card mb-2">
+            <div class="card-header  d-flex justify-content-between align-items-center" 
+                    data-bs-toggle="collapse" data-bs-target="#vendedoresCollapse" 
+                    aria-expanded="true" aria-controls="vendedoresCollapse">
+                <h5 class="mb-0">Distribuidores</h5>
+            </div>
+            <div class="collapse" id="vendedoresCollapse">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="vendedor_selecionado">Selecionar Distribuidor</label>
+                            <select id="vendedor_selecionado" name="vendedor_selecionado" class="form-select">
+                                <option value="">Selecione um distribuidor</option>
+                                {% for vendedor in vendedores %}
+                                    <option value="{{ vendedor.id }}">{{ vendedor.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Botões de ação -->
+            <div class="d-flex justify-content-end mt-3 gap-2">
+                <a href="/revendas" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">Salvar</button>
+            </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_contratos.js') }}"></script>
+</body>
+</html>

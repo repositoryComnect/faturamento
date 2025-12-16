@@ -1,0 +1,37 @@
+document.addEventListener('DOMContentLoaded', function () {
+        fetch('/api/vendedores')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('vendedor_selecionado');
+                select.innerHTML = '<option value="">Selecione um vendedor</option>';
+
+                data.forEach(vendedor => {
+                    // Criação de um novo <option> para cada vendedor
+                    const option = document.createElement('option');
+                    option.value = vendedor.id;  // Usando 'id' para associar o vendedor
+                    option.textContent = vendedor.nome;  // Exibindo o 'nome' do vendedor
+                    select.appendChild(option);  // Adiciona a opção ao select
+                });
+            })
+            .catch(error => {
+                console.error('Erro ao buscar vendedores:', error);
+                const select = document.getElementById('vendedor_selecionado');
+                select.innerHTML = '<option value="">Erro ao carregar vendedores</option>';
+            });
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/proximo_codigo_revenda')
+            .then(response => response.json())
+            .then(data => {
+                if (data.proximo_codigo_revenda) {
+                    document.getElementById('codigo_revenda').value = data.proximo_codigo_revenda;
+                } else {
+                    console.warn("Código de revenda não retornado pela API.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao buscar código de revenda:", error);
+            });
+    });

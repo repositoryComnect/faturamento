@@ -1,0 +1,14 @@
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/proximo_codigo_vendedor')
+            .then(response => response.json())
+            .then(data => {
+                if (data.proximo_codigo_vendedor) {
+                    document.getElementById('codigo').value = data.proximo_codigo_vendedor;
+                } else {
+                    console.warn("Código de vendedor não retornado pela API.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao buscar código de vendedor:", error);
+            });
+    });

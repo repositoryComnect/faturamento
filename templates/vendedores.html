@@ -84,6 +84,7 @@
 {% endblock %}
 
 {% block scripts %}
-{% include 'js/vendedores/vendedores_js.html' %}
+<script src="{{ url_for('static', filename='js/vendedores/vendedores.js') }}"></script>
+
 {% include 'popup/vendedores/popup_delete_vendedores.html' %}
 {% endblock %}
