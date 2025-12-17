@@ -136,7 +136,6 @@ def render_instalacoes():
         instalacoes=instalacao
     )
 
-
 @home_bp.route('/trocar_empresa', methods=['POST'])
 @login_required
 def trocar_empresa():

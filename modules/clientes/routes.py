@@ -640,54 +640,27 @@ def vincular_contratos_ao_cliente():
     try:
         db.session.begin()
 
-        # 1. Cliente selecionado
         cliente_id = request.form.get('selecione_cliente')
-        cliente = Cliente.query.get(cliente_id)
+        numero_contrato = request.form.get('contrato_id')  # "C0005"
 
-        if not cliente:
-            raise ValueError("Cliente não encontrado.")
+        if not cliente_id or not numero_contrato:
+            raise ValueError("Cliente ou contrato não informado.")
 
-        # 2. Contratos selecionados (multiple)
-        contrato_ids = request.form.getlist('contrato_id')
+        contrato = Contrato.query.filter_by(numero=numero_contrato).first()
 
-        if not contrato_ids:
-            raise ValueError("Nenhum contrato selecionado.")
+        if not contrato:
+            raise ValueError(f"Contrato {numero_contrato} não encontrado.")
 
-        contratos_nao_encontrados = []
-
-        # 3. Vincular contratos ao cliente
-        for contrato_id in contrato_ids:
-            try:
-                contrato_id = int(contrato_id)  # Garantir que o id seja um inteiro
-                contrato = Contrato.query.get(contrato_id)
-
-                if contrato:
-                    contrato.cliente_id = cliente.id
-                else:
-                    contratos_nao_encontrados.append(contrato_id)
-            except ValueError:
-                contratos_nao_encontrados.append(contrato_id)
-
-        if contratos_nao_encontrados:
-            raise ValueError(
-                f"Contratos não encontrados: {', '.join(map(str, contratos_nao_encontrados))}"
-            )
+        contrato.cliente_id = int(cliente_id)
 
         db.session.commit()
-        flash('Contratos vinculados ao cliente com sucesso.', 'success')
+        flash('Contrato vinculado ao cliente com sucesso.', 'success')
         return redirect(url_for('home_bp.render_contratos'))
-
-    except ValueError as ve:
-        db.session.rollback()
-        flash(str(ve), 'danger')
-        return redirect(request.referrer or url_for('home_bp.render_contratos'))
 
     except Exception as e:
         db.session.rollback()
-        flash('Erro ao vincular contratos ao cliente.', 'danger')
-        print(f"Erro: {e}")
-        return redirect(request.referrer or url_for('home_bp.render_contratos'))
-
+        flash(str(e), 'danger')
+        return redirect(request.referrer)
 
 @cliente_bp.route('/clientes/<sequencia>')
 def render_cliente(sequencia):
@@ -881,6 +854,60 @@ def buscar_proximo_cliente(sequencia):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@cliente_bp.route('/get/contratos_por_clientes/<int:cliente_id>', methods=['GET'])
+def clientes_por_contrato(cliente_id):
+
+    cliente = Cliente.query.get(cliente_id)
+
+    if not cliente:
+        return jsonify([]), 404
+
+    contratos = Contrato.query.filter_by(cliente_id=cliente.id).all()
+
+    return jsonify([
+        {
+            'id': contrato.id,
+            'numero': contrato.numero,
+            'razao_social': contrato.razao_social or cliente.razao_social
+        }
+        for contrato in contratos
+    ])
+
+@cliente_bp.route('/desvincular-contratos', methods=['POST'])
+def desvincular_contratos():
+    try:
+        db.session.begin()
+
+        contratos_ids = request.form.getlist('contratos_vinculados')
+
+        if not contratos_ids:
+            raise ValueError("Nenhum contrato selecionado para desvincular.")
+
+        contratos_nao_encontrados = []
+
+        for contrato_id in contratos_ids:
+            contrato = Contrato.query.get(contrato_id)
+
+            if contrato:
+                contrato.cliente_id = None  
+            else:
+                contratos_nao_encontrados.append(contrato_id)
+
+        if contratos_nao_encontrados:
+            raise ValueError(
+                f"Contratos não encontrados: {', '.join(map(str, contratos_nao_encontrados))}"
+            )
+
+        db.session.commit()
+        flash('Contrato(s) desvinculado(s) com sucesso.', 'success')
+        return redirect(request.referrer)
+
+    except Exception as e:
+        db.session.rollback()
+        flash(str(e), 'danger')
+        return redirect(request.referrer)
+
 
 @cliente_bp.route('/clientes/buscar-instalacao-listagem/<codigo>', methods=['GET'])
 def buscar_instalacao_listagem(codigo):

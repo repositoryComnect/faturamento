@@ -1,0 +1,37 @@
+<div class="modal fade" id="desvincularContractModal" tabindex="-1"
+     aria-labelledby="desvincularContractModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="desvincularContractModalLabel">
+            Desvincular Contratos dos Clientes
+          </h5>
+          <button type="button" class="btn-close btn-close-white"
+                  data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="desvincular_contrato_id" class="form-label">Selecione um Cliente:</label>
+            <select class="form-select" name="desvincular_contrato_id" id="desvincular_contrato_id" required>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="contratos_vinculados" class="form-label">Contratos Vinculados:</label>
+            <select class="form-select" name="contratos_vinculados" id="contratos_vinculados" multiple required size="10">
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Desvincular</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+    
+<script src="{{ url_for('static', filename='js/clientes/popup_js/popup_contratos_desvincular.js') }}"></script>

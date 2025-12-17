@@ -523,7 +523,6 @@ def get_id_contratos():
     except Exception as e:
         return jsonify({'erro': str(e), 'sucesso': False}), 500
     
-
 @contratos_bp.route('/revendas_ativas', methods=['GET'])
 def get_revendas_ativas():
     try:
@@ -542,7 +541,6 @@ def get_revendas_ativas():
         print("Erro ao buscar revendas:", e)
         return jsonify({'error': 'Erro ao buscar revendas'}), 500
     
-
 @contratos_bp.route('/get/list/clientes', methods=['GET'])
 def get_list_clientes():
     empresa_id = session.get('empresa')
@@ -1047,10 +1045,7 @@ def render_cliente(sequencia):
 def render_planos_codigo(codigo):
     empresa_id = session.get('empresa')
 
-    # Pega o plano específico
     plano_selecionado = Plano.query.filter_by(codigo=codigo, empresa_id=empresa_id).first()
-
-    # Pega todos os planos para listar na tabela
     planos = Plano.query.filter_by(empresa_id=empresa_id).all()
 
     return render_template(

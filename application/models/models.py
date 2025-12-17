@@ -5,14 +5,14 @@ from datetime import datetime
 # Inicializa o db, que será importado no app.py
 db = SQLAlchemy()
 
-# Tabelas associativas N:N entre Cliente : (Contrato, Plano Produto e Instalações)
+# Tabelas associativas N:N entre Cliente 
 cliente_contrato = db.Table(
     'cliente_contrato',
     db.Column('cliente_id', db.Integer, db.ForeignKey('clientes.id'), primary_key=True),
     db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id'), primary_key=True)
 )
 
-# Tabelas associativas N:N entre Contrato : (Plano, Clientes, Produto)
+# Tabelas associativas N:N entre Contrato 
 contrato_plano = db.Table(
     'contrato_plano',
     db.Column('contrato_id', db.Integer, db.ForeignKey('contratos.id', ondelete='CASCADE'), primary_key=True),
