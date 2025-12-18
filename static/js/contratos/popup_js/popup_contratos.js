@@ -63,7 +63,7 @@
                     const option = document.createElement('option');
                     option.value = plano.id;
                     option.textContent = `${plano.nome} - R$ ${parseFloat(plano.valor).toFixed(2)}`;
-                    option.dataset.valor = plano.valor;  // <- Aqui guardamos o valor
+                    option.dataset.valor = plano.valor;  
                     planoSelect.appendChild(option);
                 });
             })
@@ -105,14 +105,11 @@
 
 
 //<!-- Módulo onde eu pego a data atual do Modal de Cadastro-->
-
     document.addEventListener('DOMContentLoaded', function () {
         const modalElement = document.getElementById('createContractModal');
 
-        // Se Bootstrap não estiver disponível, evita erro
         if (!modalElement || typeof bootstrap === 'undefined') return;
 
-        // Usa Bootstrap 5 Modal API para garantir que está funcionando corretamente
         modalElement.addEventListener('shown.bs.modal', function () {
             const hoje = new Date();
             const dia = String(hoje.getDate()).padStart(2, '0');
@@ -131,14 +128,11 @@
 
 
 //<!-- Módulo onde eu pego a data atual do Modal de Editar-->
-
     document.addEventListener('DOMContentLoaded', function () {
         const modalElement = document.getElementById('updateContractModal');
 
-        // Se Bootstrap não estiver disponível, evita erro
         if (!modalElement || typeof bootstrap === 'undefined') return;
 
-        // Usa Bootstrap 5 Modal API para garantir que está funcionando corretamente
         modalElement.addEventListener('shown.bs.modal', function () {
             const hoje = new Date();
             const dia = String(hoje.getDate()).padStart(2, '0');
@@ -157,7 +151,6 @@
 
 
 //<!-- Módulo que encontra o plano e o valor do plano para o edição de contrato -->
-
     document.addEventListener('DOMContentLoaded', function() {
         const planoSelect = document.getElementById('plan_name_edit');
         const valorInput = document.getElementById('plan_value_edit');
@@ -170,7 +163,7 @@
                     const option = document.createElement('option');
                     option.value = plano.id;
                     option.textContent = `${plano.nome} - R$ ${parseFloat(plano.valor).toFixed(2)}`;
-                    option.dataset.valor = plano.valor;  // <- Aqui guardamos o valor
+                    option.dataset.valor = plano.valor;  
                     planoSelect.appendChild(option);
                 });
             })
@@ -187,7 +180,6 @@
 
 
 //<!-- Bloco que me tras os vendedores cadastrados -->
-
     document.addEventListener('DOMContentLoaded', function () {
     fetch('/api/vendedores')
         .then(response => response.json())
@@ -202,7 +194,7 @@
 
                 const option = document.createElement('option');
                 option.value = codigo;
-                option.textContent = `${codigo} - ${nome}`; // CONCATENA ID + NOME
+                option.textContent = `${codigo} - ${nome}`; 
 
                 select.appendChild(option);
             });
@@ -216,7 +208,6 @@
 
 
 //<!-- Bloco que me tras as revendas cadastradas -->
-
   document.addEventListener('DOMContentLoaded', function () {
     fetch('/revendas_ativas')
         .then(response => response.json())
@@ -244,10 +235,6 @@
             select.innerHTML = '<option value="">Erro ao carregar revendas</option>';
         });
 });
-
-
-
-
 
 
 $(document).ready(function () {
@@ -318,7 +305,6 @@ $(document).ready(function () {
             }
           }
 
-          // Popup de sucesso
           Swal.fire({
             icon: 'success',
             title: 'Contrato encontrado!',
@@ -330,7 +316,6 @@ $(document).ready(function () {
           });
 
         } else {
-          // Popup de aviso (não encontrado)
           Swal.fire({
             icon: 'warning',
             title: 'Contrato não encontrado',
@@ -357,14 +342,12 @@ $(document).ready(function () {
       },
 
       complete: function() {
-        // Reabilita o campo e oculta o spinner
         $input.prop('disabled', false);
         $spinner.addClass('d-none');
       }
     });
   }
 
-  // Função para formatar data (yyyy-mm-dd)
   function formatarData(data) {
     const d = new Date(data);
     return !isNaN(d)
@@ -372,15 +355,13 @@ $(document).ready(function () {
       : '';
   }
 
-  // Clique no botão de busca
   $('#btnBuscarContrato').on('click', function() {
     console.log(" Botão de busca clicado");
     buscarContrato($('#fetch_contract').val());
   });
 
-  // Pressionar Enter no campo
   $('#fetch_contract').on('keypress', function(e) {
-    if (e.which === 13) { // tecla Enter
+    if (e.which === 13) { 
       e.preventDefault();
       buscarContrato($(this).val());
     }

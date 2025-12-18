@@ -1,68 +1,68 @@
-    document.addEventListener('DOMContentLoaded', function() {
-        let contratosCarregados = false;
+document.addEventListener('DOMContentLoaded', function() {
+    let contratosCarregados = false;
 
-        // Função para carregar os contratos disponíveis
-        function carregarContratosDisponiveis() {
-            if (contratosCarregados) return;
+    // Função para carregar os contratos disponíveis
+    function carregarContratosDisponiveis() {
+        if (contratosCarregados) return;
 
-            fetch('/api/contratos/numeros')
-                .then(response => {
-                    if (!response.ok) throw new Error('Erro ao carregar contratos');
-                    return response.json();
-                })
-                .then(contratos => {
-                    const select = document.getElementById('contratos_associados');
-                    select.innerHTML = ''; // Limpa opções duplicadas
+        fetch('/api/contratos/numeros')
+            .then(response => {
+                if (!response.ok) throw new Error('Erro ao carregar contratos');
+                return response.json();
+            })
+            .then(contratos => {
+                const select = document.getElementById('contratos_associados');
+                select.innerHTML = ''; 
 
-                    contratos.forEach(contrato => {
-                        const option = document.createElement('option');
-                        option.value = contrato.numero;
-                        option.textContent = `${contrato.numero} - ${contrato.razao_social || contrato.nome_fantasia || ''}`;
-                        select.appendChild(option);
-                    });
-
-                    contratosCarregados = true;
-                })
-                .catch(error => {
-                    console.error('Erro:', error);
-                    alert('Erro ao carregar lista de contratos. Por favor, recarregue a página.');
+                contratos.forEach(contrato => {
+                    const option = document.createElement('option');
+                    option.value = contrato.numero;
+                    option.textContent = `${contrato.numero} - ${contrato.razao_social || contrato.nome_fantasia || ''}`;
+                    select.appendChild(option);
                 });
+
+                contratosCarregados = true;
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao carregar lista de contratos. Por favor, recarregue a página.');
+            });
+    }
+
+    // Executa uma vez ao carregar a página
+    carregarContratosDisponiveis();
+    const cnpjField = document.getElementById('numero_documento');
+    cnpjField.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+
+        if (value.length > 11) { // CNPJ
+            value = value.replace(/^(\d{2})(\d)/, '$1.$2');
+            value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
+            value = value.replace(/(\d{4})(\d)/, '$1-$2');
+        } else { // CPF
+            value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1.$2');
+            value = value.replace(/\.(\d{3})(\d)/, '.$1-$2');
         }
 
-        // Executa uma vez ao carregar a página
-        carregarContratosDisponiveis();
-        const cnpjField = document.getElementById('numero_documento');
-        cnpjField.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-
-            if (value.length > 11) { // CNPJ
-                value = value.replace(/^(\d{2})(\d)/, '$1.$2');
-                value = value.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
-                value = value.replace(/\.(\d{3})(\d)/, '.$1/$2');
-                value = value.replace(/(\d{4})(\d)/, '$1-$2');
-            } else { // CPF
-                value = value.replace(/^(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/\.(\d{3})(\d)/, '.$1.$2');
-                value = value.replace(/\.(\d{3})(\d)/, '.$1-$2');
-            }
-
-            e.target.value = value;
-        });
-
-        // Validação do formulário antes de enviar
-        document.getElementById('clientForm').addEventListener('submit', function(e) {
-            const razaoSocial = document.getElementById('razao_social').value.trim();
-            const cnpj = document.getElementById('numero_documento').value.trim();
-
-            if (!razaoSocial || !cnpj) {
-                e.preventDefault();
-                alert('Por favor, preencha a Razão Social e CNPJ/CPF corretamente.');
-                return false;
-            }
-
-            return true;
-        });
+        e.target.value = value;
     });
+
+    // Validação do formulário antes de enviar
+    document.getElementById('clientForm').addEventListener('submit', function(e) {
+        const razaoSocial = document.getElementById('razao_social').value.trim();
+        const cnpj = document.getElementById('numero_documento').value.trim();
+
+        if (!razaoSocial || !cnpj) {
+            e.preventDefault();
+            alert('Por favor, preencha a Razão Social e CNPJ/CPF corretamente.');
+            return false;
+        }
+
+        return true;
+    });
+});
 
 
 // Bloco responsável pelo PopUp Delete 
@@ -181,12 +181,10 @@
                         confirmDeleteBtn.classList.remove('btn-warning');
                         confirmDeleteBtn.classList.add('btn-danger');
     
-                        // 👉 Aqui é o principal:
-                        confirmDeleteBtn.dataset.nextAction = 'delete';  // Prepara o próximo clique para excluir
+                        confirmDeleteBtn.dataset.nextAction = 'delete';  
                         
                         confirmDeleteBtn.disabled = false;
                     } else {
-                        // Excluiu de fato: fecha modal e recarrega
                         const modal = bootstrap.Modal.getInstance(deleteModal);
                         modal.hide();
                         setTimeout(() => window.location.reload(), 1000);
@@ -286,22 +284,20 @@
     });
 
 
-// 🔹 Buscar cliente manualmente (clique ou Enter)
+//  Buscar cliente manualmente (clique ou Enter)
 document.addEventListener('DOMContentLoaded', function () {
-    console.log("✅ DOM totalmente carregado — script ativo.");
+    console.log(" DOM totalmente carregado — script ativo.");
 
     let timeoutSeguenceEditId;
 
-    // Função de formatação de data
     function formatarData(data) {
         const date = new Date(data);
         if (isNaN(date)) return '';
-        return date.toISOString().split('T')[0]; // yyyy-mm-dd
+        return date.toISOString().split('T')[0]; 
     }
 
-    // Função principal de busca
     function buscarCliente(termo) {
-        console.log("🔎 Função buscarCliente chamada com termo:", termo);
+        console.log("Função buscarCliente chamada com termo:", termo);
 
         if (!termo) {
             Swal.fire({
@@ -320,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
         clearTimeout(timeoutSeguenceEditId);
 
         timeoutSeguenceEditId = setTimeout(() => {
-            console.log("📡 Enviando requisição AJAX para /buscar_cliente ...");
+            console.log("Enviando requisição AJAX para /buscar_cliente ...");
 
             $.ajax({
                 url: '/buscar_cliente',
@@ -397,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
 
                 error: function (xhr, status, error) {
-                    console.error("❌ Erro na requisição:", status, error);
+                    console.error("Erro na requisição:", status, error);
                     Swal.fire({
                         icon: 'error',
                         title: 'Erro ao buscar cliente',
@@ -413,16 +409,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 500);
     }
 
-    // 🔹 Clique do botão
+    // Clique do botão
     $('#btnBuscarCliente').on('click', function () {
-        console.log("🖱️ Botão de busca clicado!");
+        console.log("Botão de busca clicado!");
         buscarCliente($('#search_edit_client').val());
     });
 
-    // 🔹 Pressionar Enter no campo
+    //  Pressionar Enter no campo
     $('#search_edit_client').on('keypress', function (e) {
         if (e.which === 13) {
-            console.log("⌨️ Enter pressionado!");
+            console.log("Enter pressionado!");
             e.preventDefault();
             buscarCliente($(this).val());
         }
@@ -435,52 +431,52 @@ document.addEventListener('DOMContentLoaded', function () {
 
 //<!-- Bloco que me tras as revendas cadastradas -->
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/revendas_ativas/cliente')
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('revenda_selecionada_client');
-                select.innerHTML = '<option value="">Selecione uma revenda</option>';
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('/revendas_ativas/cliente')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('revenda_selecionada_client');
+            select.innerHTML = '<option value="">Selecione uma revenda</option>';
 
-                data.forEach(nome => {
-                    const option = document.createElement('option');
-                    option.value = nome;       // Usando o nome como valor
-                    option.textContent = nome; // Mostrando o nome
-                    select.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao buscar revendas:', error);
-                const select = document.getElementById('revenda_selecionada_client');
-                select.innerHTML = '<option value="">Erro ao carregar revendas</option>';
+            data.forEach(nome => {
+                const option = document.createElement('option');
+                option.value = nome;       // Usando o nome como valor
+                option.textContent = nome; // Mostrando o nome
+                select.appendChild(option);
             });
-    });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar revendas:', error);
+            const select = document.getElementById('revenda_selecionada_client');
+            select.innerHTML = '<option value="">Erro ao carregar revendas</option>';
+        });
+});
 
 
 
 //<!-- Bloco que me tras os vendedores cadastrados -->
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/api/vendedores')
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('vendedor_selecionado_client');
-                select.innerHTML = '<option value="">Selecione um vendedor</option>';
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('/api/vendedores')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('vendedor_selecionado_client');
+            select.innerHTML = '<option value="">Selecione um vendedor</option>';
 
-                data.forEach(vendedor => {
-                    // Criação de um novo <option> para cada vendedor
-                    const option = document.createElement('option');
-                    option.value = vendedor.id;  // Usando 'id' para associar o vendedor
-                    option.textContent = vendedor.nome;  // Exibindo o 'nome' do vendedor
-                    select.appendChild(option);  // Adiciona a opção ao select
-                });
-            })
-            .catch(error => {
-                console.error('Erro ao buscar vendedores:', error);
-                const select = document.getElementById('vendedor_selecionado_client');
-                select.innerHTML = '<option value="">Erro ao carregar vendedores</option>';
+            data.forEach(vendedor => {
+                // Criação de um novo <option> para cada vendedor
+                const option = document.createElement('option');
+                option.value = vendedor.id;  // Usando 'id' para associar o vendedor
+                option.textContent = vendedor.nome;  // Exibindo o 'nome' do vendedor
+                select.appendChild(option);  // Adiciona a opção ao select
             });
-    });
+        })
+        .catch(error => {
+            console.error('Erro ao buscar vendedores:', error);
+            const select = document.getElementById('vendedor_selecionado_client');
+            select.innerHTML = '<option value="">Erro ao carregar vendedores</option>';
+        });
+});
 
 
 // Bloco buscar contrato set cliente -->
@@ -583,7 +579,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     $('#loadingContrato').addClass('d-none');
                 },
                 error: function (xhr, status, error) {
-                    console.error("❌ Erro ao buscar contrato:", status, error);
+                    console.error(" Erro ao buscar contrato:", status, error);
 
                     Swal.fire({
                         icon: 'error',

@@ -1,0 +1,38 @@
+<!-- Modal de Vinculação de Clientes ao Contrato -->
+<div class="modal fade" id="vincularInstalacaoModal" tabindex="-1" aria-labelledby="vincularInstalacaoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="{{ url_for('instalacoes_bp.vincular_instalacoes_cliente') }}">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="vincularInstalacaoModalLabel">Vincular Instalação ao Cliente</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Seletor de contrato -->
+          <div class="mb-3">
+            <label for="cliente_selecionado_instalacao_vinculo" class="form-label">Selecione um Cliente:</label>
+            <select class="form-select" name="cliente_selecionado_instalacao_vinculo" id="cliente_selecionado_instalacao_vinculo" required>
+            </select>
+          </div>
+
+          <!-- Seletor múltiplo de clientes -->
+          <div class="mb-3">
+            <label for="instalacao_id" class="form-label">Selecione a Instalação:</label>
+            <select class="form-select" name="instalacao_id" id="instalacao_id" multiple required size="10">
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-success">Vincular</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/instalacoes/popup_instalacoes.js') }}"></script>
+

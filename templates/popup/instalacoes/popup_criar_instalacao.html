@@ -16,24 +16,8 @@
 
             <div class="modal-body">
                 <form id="instalacaoForm"
-                      action="{{ url_for('cliente_bp.insert_instalacoes_cliente') }}"
-                      method="POST">
-
-                    <!-- Flash Messages -->
-                    <div id="flash-messages">
-                        {% with messages = get_flashed_messages(with_categories=true) %}
-                            {% if messages %}
-                                {% for category, message in messages %}
-                                    <div class="alert alert-{{ category }} alert-dismissible fade show">
-                                        {{ message }}
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-
-                    <!-- CARD 1 - Informações Básicas -->
+                    action="{{ url_for('instalacoes_bp.insert_instalacoes') }}"
+                    method="POST">
                     <div class="card mb-3 section-card">
                         <div class="card-header d-flex justify-content-between fw-bold"
                              data-bs-toggle="collapse"
@@ -49,8 +33,8 @@
 
                                     <div class="col-md-2">
                                         <label class="form-label">Código Instalação:</label>
-                                        <input type="text" class="form-control" id="codigo_instalacao"
-                                               name="codigo_instalacao" readonly>
+                                        <input type="text" class="form-control" id="cod_instalacao"
+                                               name="cod_instalacao" readonly>
                                     </div>
 
                                     <div class="col-md-3">
@@ -88,13 +72,11 @@
                                             <option value="Cancelado">Cancelado</option>
                                         </select>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- CARD 2 - Endereço de Instalação -->
                     <div class="card mb-3 section-card">
                         <div class="card-header d-flex justify-content-between fw-bold"
                              data-bs-toggle="collapse"
@@ -153,7 +135,6 @@
                                                 <option>PR</option>
                                         </select>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
@@ -193,7 +174,5 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/clientes/popup_js/clientes_popup.js') }}"></script>
-<script src="{{ url_for('static', filename='js/instalacoes/instalacoes.js') }}"></script>
 <script src="{{ url_for('static', filename='js/instalacoes/popup_instalacoes.js') }}"></script>
 </body>

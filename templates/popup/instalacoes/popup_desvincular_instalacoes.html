@@ -1,0 +1,38 @@
+<div class="modal fade" id="desvincularInstalacaoModal" tabindex="-1"
+     aria-labelledby="desvincularInstalacaoModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <form method="POST" action="">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="desvincularInstalacaoModalLabel">
+            Desvincular Instalação do Cliente
+          </h5>
+          <button type="button" class="btn-close btn-close-white"
+                  data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="desvincular_cliente_id" class="form-label">Selecione um Cliente:</label>
+            <select class="form-select" name="desvincular_cliente_id" id="desvincular_cliente_id" required>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="instalacoes_vinculadas" class="form-label">Instalações Vinculadas:</label>
+            <select class="form-select" name="instalacoes_vinculadas" id="instalacoes_vinculadas" multiple required size="10">
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Desvincular</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+    
+
+<script src="{{ url_for('static', filename='js/instalacoes/popup_instalacoes.js') }}"></script>

@@ -314,7 +314,7 @@ class Instalacao(db.Model):
     empresa = db.relationship('Empresa', backref=db.backref('instalacoes', lazy=True))
 
     #  Relacionamento com Cliente
-    cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'), nullable=False)
+    cliente_id = db.Column(db.Integer, db.ForeignKey('clientes.id'), nullable=True)
     cliente = db.relationship('Cliente', back_populates='instalacoes')
 
     #  Relacionamento com títulos

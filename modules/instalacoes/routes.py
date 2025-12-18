@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request, redirect, url_for, flash, render_
 from application.models.models import Instalacao, db
 from datetime import datetime, date
 import re
+from modules.instalacoes.utils import parse_date
 from sqlalchemy import text
 
 
@@ -12,28 +13,13 @@ def insert_instalacoes():
     empresa_id = session.get('empresa')
     form_data = request.form.to_dict()
 
-    def parse_date(date_str):
-        if not date_str:
-            return None
-        for fmt in ('%d/%m/%Y', '%Y-%m-%d', '%d-%m-%Y', '%m/%d/%Y'):
-            try:
-                return datetime.strptime(date_str, fmt).date()
-            except ValueError:
-                continue
-        return None
-
-    cliente_id = form_data.get('cliente_selecionado')
-    if not cliente_id:
-        return jsonify({
-            'success': False,
-            'message': 'Cliente é obrigatório para vincular à instalação.'
-        }), 400
+    cliente_id = form_data.get('cliente_selecionado_instalacao')
 
     instalacao_data = {
-        'codigo_instalacao': form_data.get('codigo_instalacao'),
-        'razao_social': form_data.get('razao_social'),
+        'codigo_instalacao': form_data.get('cod_instalacao'),
+        'razao_social': form_data.get('company'),  
         'id_portal': form_data.get('id_portal'),
-        'cadastramento': parse_date(form_data.get('cadastramento')),
+        'cadastramento': parse_date(form_data.get('cadastramento_instalacao')),  
         'status': form_data.get('status'),
         'cep': form_data.get('cep'),
         'cidade': form_data.get('cidade'),
@@ -42,11 +28,12 @@ def insert_instalacoes():
         'uf': form_data.get('uf'),
         'observacao': form_data.get('observacao'),
         'cliente_id': int(cliente_id),
-        'empresa_id' : empresa_id
+        'empresa_id': empresa_id
     }
 
-    # Verifica se instalação já existe
-    if Instalacao.query.filter_by(codigo_instalacao=instalacao_data['codigo_instalacao']).first():
+    if Instalacao.query.filter_by(
+        codigo_instalacao=instalacao_data['codigo_instalacao']
+    ).first():
         return jsonify({
             'success': False,
             'message': 'Já existe uma instalação com este código.'
@@ -60,7 +47,6 @@ def insert_instalacoes():
 
 @instalacoes_bp.route('/proximo_codigo_instalacao', methods=['GET'])
 def proximo_codigo_instalacao():
-    # Busca todas as instalações
     instalacoes = Instalacao.query.all()
     
     numeros = []
@@ -99,7 +85,6 @@ def delete_instalacao():
     
     return redirect(request.referrer or url_for('instalacoes_bp.listar_instalacoes'))
 
-
 @instalacoes_bp.route('/get/instalacoes', methods=['GET'])
 def get_instalacoes():
     empresa_id = session.get('empresa')
@@ -128,11 +113,9 @@ def get_instalacoes():
         for row in result:
             inst = dict(row._mapping)
             
-            # Formata a data corretamente
             if isinstance(inst.get("cadastramento"), (date, datetime)):
                 inst["cadastramento"] = inst["cadastramento"].strftime("%d/%m/%Y")
 
-            
             instalacoes.append(inst)
 
         if not instalacoes:
@@ -149,8 +132,83 @@ def get_instalacoes():
             'sucesso': False
         }), 500
 
+@instalacoes_bp.route('/get/instalacoes/vinculo', methods=['GET'])
+def get_instalacoes_vinculo():
+    empresa_id = session.get('empresa')
 
+    try:
+        instalacoes = (
+            Instalacao.query
+            .filter(
+                Instalacao.empresa_id == empresa_id,
+                Instalacao.status == 'ativo'
+            )
+            .order_by(Instalacao.codigo_instalacao)
+            .all()
+        )
 
+        dados = [
+            {
+                'id': inst.id,
+                'codigo_instalacao': inst.codigo_instalacao,
+                'razao_social': inst.razao_social
+            }
+            for inst in instalacoes
+        ]
+
+        return jsonify({
+            'sucesso': True,
+            'instalacoes': dados
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            'sucesso': False,
+            'erro': str(e)
+        }), 500
+
+@instalacoes_bp.route('/vincular/instalacoes-cliente', methods=['POST'])
+def vincular_instalacoes_cliente():
+    try:
+        cliente_id = request.form.get('cliente_selecionado_instalacao_vinculo')
+        instalacoes_ids = request.form.getlist('instalacao_id')
+        empresa_id = session.get('empresa')
+
+        if not cliente_id or not instalacoes_ids:
+            return jsonify({
+                'sucesso': False,
+                'erro': 'Cliente ou instalações não informados'
+            }), 400
+
+        instalacoes = (
+            Instalacao.query
+            .filter(
+                Instalacao.id.in_(instalacoes_ids),
+                Instalacao.empresa_id == empresa_id
+            )
+            .all()
+        )
+
+        if not instalacoes:
+            return jsonify({
+                'sucesso': False,
+                'erro': 'Instalações não encontradas'
+            }), 404
+
+        for inst in instalacoes:
+            inst.cliente_id = cliente_id
+
+        db.session.commit()
+
+        return redirect(url_for('home_bp.render_instalacoes'))
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            'sucesso': False,
+            'erro': str(e)
+        }), 500
+    
 @instalacoes_bp.route('/listar/instalacoes')
 def listar_instalacoes():
     empresa_id = session.get('empresa')

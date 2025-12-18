@@ -670,8 +670,10 @@ def render_cliente(sequencia):
 
 @cliente_bp.route('/insert/instalacoes/cliente', methods=['POST'])
 def insert_instalacoes_cliente():
+    empresa_id = session.get('empresa')
     form_data = request.form.to_dict()
-    cliente_id = form_data.get('cliente_selecionado')
+
+    cliente_id = form_data.get('cliente_selecionado_instalacao')
     if not cliente_id:
         return jsonify({
             'success': False,
@@ -679,10 +681,10 @@ def insert_instalacoes_cliente():
         }), 400
 
     instalacao_data = {
-        'codigo_instalacao': form_data.get('codigo_instalacao'),
-        'razao_social': form_data.get('company'),
+        'codigo_instalacao': form_data.get('cod_instalacao'),
+        'razao_social': form_data.get('company'),  
         'id_portal': form_data.get('id_portal'),
-        'cadastramento': parse_date(form_data.get('registry')),
+        'cadastramento': parse_date(form_data.get('cadastramento_instalacao')),  
         'status': form_data.get('status'),
         'cep': form_data.get('cep'),
         'cidade': form_data.get('cidade'),
@@ -690,11 +692,13 @@ def insert_instalacoes_cliente():
         'bairro': form_data.get('bairro'),
         'uf': form_data.get('uf'),
         'observacao': form_data.get('observacao'),
-        'cliente_id': int(cliente_id)
+        'cliente_id': int(cliente_id),
+        'empresa_id': empresa_id
     }
 
-    # Verifica se instalação já existe
-    if Instalacao.query.filter_by(codigo_instalacao=instalacao_data['codigo_instalacao']).first():
+    if Instalacao.query.filter_by(
+        codigo_instalacao=instalacao_data['codigo_instalacao']
+    ).first():
         return jsonify({
             'success': False,
             'message': 'Já existe uma instalação com este código.'
@@ -704,7 +708,7 @@ def insert_instalacoes_cliente():
     db.session.add(nova_instalacao)
     db.session.commit()
 
-    return redirect(url_for('home_bp.render_clientes'))
+    return redirect(url_for('home_bp.render_instalacoes'))
 
 @cliente_bp.route('/clientes/buscar-por-numero-listagem/<sequencia>', methods=['GET'])
 def buscar_cliente_listagem(sequencia):
@@ -907,7 +911,6 @@ def desvincular_contratos():
         db.session.rollback()
         flash(str(e), 'danger')
         return redirect(request.referrer)
-
 
 @cliente_bp.route('/clientes/buscar-instalacao-listagem/<codigo>', methods=['GET'])
 def buscar_instalacao_listagem(codigo):

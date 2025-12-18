@@ -9,19 +9,8 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Mensagens Flash -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }} alert-dismissible fade show">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
     
-    <div class="container-fluid mt-4 mb-4">
+<div class="container-fluid mt-4 mb-4">
         <div class="d-flex justify-content-between align-items-center">
             <h2>Clientes</h2>
             <div class="d-flex gap-1"> <!-- Adicionei a classe gap-2 para espaçamento uniforme -->
@@ -260,7 +249,7 @@
                                     </div>
 
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularContractModal">
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desvincularContractModal">
                                             <i class="bi bi-trash me-2"></i> Desvincular Contrato
                                         </button>
                                     </div>
@@ -308,7 +297,7 @@
                             <div class="container mt-5 mb-4">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularInstalacaoModal">
                                             <i class="bi bi-diagram-2"></i> Vincular Instalação
                                         </button>
                                     </div>
@@ -320,7 +309,7 @@
                                     </div>
 
                                     <div class="d-flex gap-2">
-                                        <button type="button" class="btn btn-danger me-2 btn-sm" data-bs-toggle="modal" data-bs-target="#desvincularInstalacaoModal">
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desvincularInstalacaoModal">
                                             <i class="bi bi-trash me-2"></i> Desvincular Instalação
                                         </button>
                                     </div>
@@ -360,10 +349,11 @@
     {% include 'popup/clientes/popup_delete_cliente.html' %}
     {% include 'popup/clientes/popup_listar_cliente.html' %}
 
-    <!-- Popup Contratos -->
     {% include 'popup/contratos/popup_contratos.html' %}
-    {% include 'popup/clientes/popup_criar_instalacao.html' %}
-    {% include 'popup/clientes/popup_desvincular_instalacoes.html' %}
+
+    {% include 'popup/instalacoes/popup_vincular_instalacao.html' %}
+    {% include 'popup/instalacoes/popup_criar_instalacao.html' %}
+    {% include 'popup/instalacoes/popup_desvincular_instalacoes.html' %}
     
     <!-- Popup vinculos-->
     {% include 'popup/clientes/popup_vincular_contrato.html' %}

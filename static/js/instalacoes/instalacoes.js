@@ -3,7 +3,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         const select = document.getElementById('cliente_selecionado');
         const numeroSerieInput = document.getElementById('company') || document.getElementById('razao_social');
-
+;
 
         fetch('/get/list/clientes')
             .then(response => response.json())
@@ -43,19 +43,6 @@
         }
     });
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetch('/proximo_codigo_instalacao')
-            .then(response => response.json())
-            .then(data => {
-                const campoCodigo = document.getElementById('codigo_atualizacao_instalacao');
-                if (campoCodigo && data.proximo_codigo_instalacao) {
-                    campoCodigo.value = data.proximo_codigo_instalacao;
-                }
-            })
-            .catch(error => {
-                console.error('Erro ao buscar próximo código de instalação:', error);
-            });
-    });
     
 
 // Search Instalações

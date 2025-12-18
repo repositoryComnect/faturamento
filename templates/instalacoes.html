@@ -15,7 +15,7 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Instalações</h2>
         <div class="d-flex gap-1 flex-wrap align-items-center">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacoesModal">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
                 <i class="bi bi-plus-circle me-2"></i>Criar Instalação
             </button>
 
@@ -61,9 +61,7 @@
 
                         <div class="col-md-2">
                             <label for="codigo_instalacao" class="form-label">Código Instalação:</label>
-
                             <div class="d-flex gap-2">
-
                                 <input type="text"
                                     id="codigo_instalacao"
                                     name="codigo_instalacao"
@@ -235,7 +233,9 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/instalacoes/instalacoes.js') }}"></script>
+
 {% include 'extensions/links_popup.html' %}
-{% include 'popup/instalacoes/popup_instalacoes.html' %}
+
+{% include 'popup/instalacoes/popup_criar_instalacao.html' %}
 {% include 'popup/instalacoes/popup_delete_instalacoes.html' %}
 {% endblock %}
