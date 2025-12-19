@@ -59,7 +59,7 @@
                 <div class="card-body">
                     <div class="row g-3">
 
-                        <div class="col-md-2">
+                        <div class="col-md-3">
                             <label for="codigo_instalacao" class="form-label">Código Instalação:</label>
                             <div class="d-flex gap-2">
                                 <input type="text"
@@ -70,14 +70,14 @@
 
                                 <button class="btn btn-secondary"
                                         type="button"
-                                        onclick="buscarProximaInstalacao(document.getElementById('codigo').value)">
+                                        onclick="buscarDadosInstalacao(document.getElementById('codigo_instalacao').value)">
                                     <i class="bi bi-search"></i>
                                 </button>
 
                                 <button class="btn btn-secondary"
                                         type="button"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#listarClientesModal">
+                                        data-bs-target="#listarInstalacoesModal">
                                     <i class="bi bi-card-list"></i>
                                 </button>
 
@@ -110,7 +110,8 @@
                                    id="id_portal"
                                    name="id_portal"
                                    value="{{ instalacoes.id_portal }}"
-                                   class="form-control">
+                                   class="form-control"
+                                   readonly>
                         </div>
 
                         <div class="col-md-2">
@@ -135,11 +136,12 @@
 
                         <div class="col-md-1">
                             <label for="status">Status:</label>
-                            <select class="form-select" name="status" id="status">
-                                <option value="ativo" {{ 'selected' if instalacoes.status == 'ativo' }}>Ativo</option>
-                                <option value="cancelado" {{ 'selected' if instalacoes.status == 'cancelado' }}>Cancelado</option>
-                                <option value="suspenso" {{ 'selected' if instalacoes.status == 'suspenso' }}>Suspenso</option>
-                            </select>
+                            <input type="text"
+                                   id="status"
+                                   name="status"
+                                   value="{{ instalacoes.status }}"
+                                   class="form-control"
+                                   readonly>
                         </div>
 
                     </div>
@@ -161,34 +163,28 @@
 
                         <div class="col-md-1">
                             <label for="cep">CEP:</label>
-                            <input type="text" id="cep" name="cep" class="form-control">
+                            <input type="text" id="cep" name="cep" class="form-control" readonly>
                         </div>
 
                         <div class="col-md-4">
                             <label for="endereco">Endereço:</label>
-                            <input type="text" id="endereco" name="endereco" class="form-control">
+                            <input type="text" id="endereco" name="endereco" class="form-control" readonly>
                         </div>
 
                         <div class="col-md-3">
                             <label for="bairro">Bairro:</label>
-                            <input type="text" id="bairro" name="bairro" class="form-control">
+                            <input type="text" id="bairro" name="bairro" class="form-control" readonly>
                         </div>
 
                         <div class="col-md-3">
                             <label for="cidade">Cidade:</label>
-                            <input type="text" id="cidade" name="cidade" class="form-control">
+                            <input type="text" id="cidade" name="cidade" class="form-control" readonly>
                         </div>
 
                         <div class="col-md-1">
                             <label for="uf">UF:</label>
-                            <select class="form-select" id="uf" name="uf">
-                                <option value=""></option>
-                                {% for estado in ['RJ','SP','MG','DF','SC','ES','AC','CE','AL','BA','AM','SE','TO','RR','PI','RN','RS','PB','PR'] %}
-                                <option value="{{ estado }}">{{ estado }}</option>
-                                {% endfor %}
-                            </select>
+                            <input type="text" id="uf" name="uf" class="form-control" readonly>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -221,7 +217,8 @@
                             <textarea class="form-control"
                                       rows="3"
                                       id="observacao"
-                                      name="observacao"></textarea>
+                                      name="observacao"
+                                      readonly></textarea>
                         </div>
                     </div>
                 </div>
@@ -238,4 +235,6 @@
 
 {% include 'popup/instalacoes/popup_criar_instalacao.html' %}
 {% include 'popup/instalacoes/popup_delete_instalacoes.html' %}
+
+{% include 'popup/instalacoes/popup_listar_instalacoes.html' %}
 {% endblock %}

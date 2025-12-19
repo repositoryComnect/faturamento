@@ -17,7 +17,7 @@ def buscar_cliente_por_contrato(sequencia):
             .filter(
                 Cliente.sequencia == sequencia,
                 Cliente.empresa_id == empresa_id,
-                Cliente.estado_atual != 'Arquivado'
+                #Cliente.estado_atual != 'Arquivado'
             )
             .first()
         )

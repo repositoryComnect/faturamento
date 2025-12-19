@@ -1,4 +1,4 @@
-// Script: carrega clientes e preenche nome no campo 'numero_serie' -->
+// Script: carrega clientes e preenche nome no campo 'numero_serie' 
 
     document.addEventListener('DOMContentLoaded', function () {
         const select = document.getElementById('cliente_selecionado');
@@ -29,7 +29,7 @@
     });
 
 
-// Script: define data atual no campo 'cadastramento' -->
+// Script: define data atual no campo 'cadastramento' 
     document.addEventListener('DOMContentLoaded', function () {
         const hoje = new Date();
         const dia = String(hoje.getDate()).padStart(2, '0');
@@ -106,7 +106,7 @@ function preencherCamposInstalacao(inst) {
 }
 
 
-//<!-- Módulo para trazer a data atual para poder realizar o cadastro -->
+// Módulo para trazer a data atual para poder realizar o cadastro 
 
     document.addEventListener('DOMContentLoaded', function () {
         const createModal = document.getElementById('createInstalacoesModal');
@@ -129,3 +129,83 @@ function preencherCamposInstalacao(inst) {
             });
         }
     });
+
+
+let timeoutSequenciaInstalacao;
+function buscarDadosInstalacao(codigoInstalacao) {
+    if (!codigoInstalacao) return;
+
+    $('#loadingCliente').removeClass('d-none');
+    clearTimeout(timeoutSequenciaInstalacao);
+
+    timeoutSequenciaInstalacao = setTimeout(() => {
+        $.ajax({
+            url: '/instalacao/buscar-por-numero/' + codigoInstalacao,
+            method: 'GET',
+            success: function (data) {
+                console.log("Dados da instalação recebidos:", data);
+
+                if (!data || Object.keys(data).length === 0 || data.error) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Instalação não encontrada',
+                        text: 'Verifique se o código informado está correto.',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 6000,
+                        timerProgressBar: true,
+                        showConfirmButton: true
+                    });
+                    $('#loadingCliente').addClass('d-none');
+                    return;
+                }
+
+                // Mapeamento APENAS dos campos retornados pela rota
+                const fieldMap = {
+                    'codigo_instalacao': '#codigo_instalacao',
+                    'razao_social': '#razao_social',
+                    'cadastramento': '#cadastramento',
+                    'id_portal': '#id_portal',
+                    'endereco': '#endereco',
+                    'bairro': '#bairro',
+                    'cidade': '#cidade',
+                    'cep': '#cep',
+                    'uf': '#uf',
+                    'status': '#status',
+                    'observacao': '#observacao'
+                };
+
+                for (const key in fieldMap) {
+                    const selector = fieldMap[key];
+                    const value = data[key];
+
+                    if (value !== null && value !== undefined) {
+                        $(selector).val(value);
+                    }
+                }
+
+                $('#loadingCliente').addClass('d-none');
+            },
+            error: function (xhr) {
+                console.error("Erro na requisição:", xhr);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro ao buscar a instalação',
+                    text: 'Não foi possível localizar a instalação.',
+                    toast: true,
+                    position: 'top-end',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+
+                $('#loadingCliente').addClass('d-none');
+            }
+        });
+    }, 500);
+}
+
+// Disparo ao alterar o código da instalação
+$('#codigo_instalacao').on('change', function () {
+    buscarDadosInstalacao(this.value);
+});

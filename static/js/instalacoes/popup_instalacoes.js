@@ -139,29 +139,67 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-  // Script: carrega clientes para desvinculo
-document.addEventListener('DOMContentLoaded', function () {
-    const select = document.getElementById('desvincular_cliente_id');
-    const numeroSerieInput = document.getElementById('company') || document.getElementById('razao_social');
-    fetch('/get/list/clientes')
-        .then(response => response.json())
-        .then(data => {
-            select.innerHTML = '<option value="">Vincule um cliente</option>';
-            data.forEach(cliente => {
-                const option = document.createElement('option');
-                option.value = cliente.id;  
-                option.textContent = `${cliente.codigo} - ${cliente.razao_social}`;
-                option.setAttribute('data-nome', cliente.razao_social);  
-                select.appendChild(option);
-            });
-        })
-        .catch(error => {
-            console.error('Erro ao buscar clientes:', error);
-            select.innerHTML = '<option value="">Erro ao carregar clientes</option>';
-        });
 
-    select.addEventListener('change', function () {
-        const nome = select.options[select.selectedIndex].getAttribute('data-nome');
-        numeroSerieInput.value = nome || '';
+// Script que traz os dados do popup de desvinculo 
+document.addEventListener("DOMContentLoaded", function () {
+    const clienteSelect = document.getElementById("desvincular_cliente_id");
+    const instalacaoSelect = document.getElementById("instalacoes_vinculadas");
+    const modal = document.getElementById("desvincularInstalacaoModal");
+
+    modal.addEventListener("show.bs.modal", function () {
+        fetch("/get/list/clientes")
+            .then(response => response.json())
+            .then(data => {
+                clienteSelect.innerHTML =
+                    "<option disabled selected value=''>Selecione um cliente</option>";
+
+                data.forEach(cliente => {
+                    const option = document.createElement("option");
+                    option.value = cliente.id;
+                    option.text = `${cliente.codigo} - ${cliente.razao_social}`;
+                    clienteSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error("Erro ao carregar clientes:", error);
+                clienteSelect.innerHTML =
+                    "<option disabled>Erro ao carregar clientes</option>";
+            });
+    });
+
+    clienteSelect.addEventListener("change", function () {
+        const clienteId = this.value;
+
+        instalacaoSelect.innerHTML = "";
+
+        if (!clienteId) return;
+
+        fetch(`/get/instalacoes/por-cliente/${clienteId}`)
+            .then(response => response.json())
+            .then(data => {
+                instalacaoSelect.innerHTML = "";
+
+                if (!data.sucesso || data.instalacoes.length === 0) {
+                    const option = document.createElement("option");
+                    option.disabled = true;
+                    option.text = "Nenhuma instalação vinculada.";
+                    instalacaoSelect.appendChild(option);
+                } else {
+                    data.instalacoes.forEach(instalacao => {
+                        const option = document.createElement("option");
+                        option.value = instalacao.id;
+                        option.text =
+                            `${instalacao.codigo_instalacao} - ${instalacao.razao_social}`;
+                        instalacaoSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error("Erro ao carregar instalações vinculadas:", error);
+                const option = document.createElement("option");
+                option.disabled = true;
+                option.text = "Erro ao carregar instalações.";
+                instalacaoSelect.appendChild(option);
+            });
     });
 });

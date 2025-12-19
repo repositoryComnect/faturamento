@@ -11,10 +11,8 @@ contratos_bp = Blueprint('contratos_bp', __name__)
 
 @contratos_bp.route('/proximo_numero_contrato', methods=['GET'])
 def proximo_numero_contrato():
-    # Busca o último número de contrato ordenado por valor numérico
     contratos = Contrato.query.all()
     
-    # Extraí apenas os números válidos (ex: "C0001", "C0023")
     numeros = []
     for c in contratos:
         match = re.search(r'\d+', c.numero)
@@ -358,10 +356,8 @@ def set_contrato():
         db.session.rollback()
         form_data = request.form.to_dict()
 
-        # Cliente selecionado
         cliente_id = form_data.get('cliente_selecionado')
 
-        # Dados principais do contrato
         contrato_data = {
             'numero': form_data.get('numero_contrato'),
             'cadastramento': parse_date(form_data.get('current_datetime')),

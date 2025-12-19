@@ -1,0 +1,40 @@
+<!-- Modal de Listagem de Contratos -->
+<div class="modal fade" id="listarInstalacoesModal" tabindex="-1" aria-labelledby="listarInstalacoesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header bg-secondary text-white">
+        <h5 class="modal-title" id="listarInstalacoesModalLabel">Selecionar Instalação</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-hover" id="instalacoesModalTable">
+            <thead>
+              <tr class="text-center">
+                <th>Código Instalação</th>
+                <th>Razão Social</th>
+                <th>Ação</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="5" class="text-center text-muted">Carregando instalações...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <nav>
+          <ul class="pagination justify-content-center" id="instalacoesModalPagination"></ul>
+        </nav>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/instalacoes/popup_listar_instalacoes.js') }}"></script>

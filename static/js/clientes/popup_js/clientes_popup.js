@@ -115,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.success) {
                     currentClient = data.cliente;
                     clientNameDisplay.textContent = currentClient.razao_social;
-                    clientNumberDisplay.textContent = currentClient.numero_contrato;  // Garantindo que o número do contrato seja exibido
+                    clientNumberDisplay.textContent = currentClient.numero_contrato;  
                     clientInfo.classList.remove('d-none');
                     
                     if (data.hasContracts) {
@@ -140,7 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     
-        // Botão de confirmação
         confirmDeleteBtn.addEventListener('click', async function() {
             if (!currentClient) return;
             
@@ -157,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: new URLSearchParams({
-                        'numero': currentClient.sequencia,  // Usando a SEQUENCIA do cliente
+                        'numero': currentClient.sequencia,  
                         'action': action
                     })
                 });

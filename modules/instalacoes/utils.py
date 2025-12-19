@@ -9,3 +9,6 @@ def parse_date(date_str):
             except ValueError:
                 continue
         return None
+
+def format_date(date):
+    return date.strftime('%d/%m/%Y') if date else None

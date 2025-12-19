@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request, redirect, url_for, flash, render_
 from application.models.models import Instalacao, db
 from datetime import datetime, date
 import re
-from modules.instalacoes.utils import parse_date
+from modules.instalacoes.utils import parse_date, format_date
 from sqlalchemy import text
 
 
@@ -51,7 +51,6 @@ def proximo_codigo_instalacao():
     
     numeros = []
     for inst in instalacoes:
-        # Extrai o número do código instalacao, assumindo padrão com dígitos
         match = re.search(r'\d+', inst.codigo_instalacao)
         if match:
             numeros.append(int(match.group()))
@@ -208,7 +207,96 @@ def vincular_instalacoes_cliente():
             'sucesso': False,
             'erro': str(e)
         }), 500
-    
+
+@instalacoes_bp.route('/get/instalacoes/por-cliente/<int:cliente_id>', methods=['GET'])
+def get_instalacoes_por_cliente(cliente_id):
+    try:
+        instalacoes = (
+            Instalacao.query
+            .filter(Instalacao.cliente_id == cliente_id)
+            .order_by(Instalacao.codigo_instalacao)
+            .all()
+        )
+
+        resultado = [
+            {
+                "id": inst.id,
+                "codigo_instalacao": inst.codigo_instalacao,
+                "razao_social": inst.razao_social
+            }
+            for inst in instalacoes
+        ]
+
+        return jsonify({
+            "sucesso": True,
+            "instalacoes": resultado
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "sucesso": False,
+            "mensagem": str(e),
+            "instalacoes": []
+        }), 500
+
+@instalacoes_bp.route('/desvincular/instalacoes-cliente', methods=['POST'])
+def desvincular_instalacoes_cliente():
+    try:
+        db.session.begin()
+
+        cliente_id = request.form.get('desvincular_cliente_id')
+        instalacao_id = request.form.get('instalacoes_vinculadas')
+
+        instalacao = Instalacao.query.get(instalacao_id)
+
+        if instalacao:
+            instalacao.cliente_id = None
+
+        db.session.commit()
+        flash('Contrato(s) desvinculado(s) com sucesso.', 'success')
+        return redirect(request.referrer)
+
+    except Exception as e:
+        db.session.rollback()
+        flash(str(e), 'danger')
+        return redirect(request.referrer)
+
+@instalacoes_bp.route('/instalacao/buscar-por-numero/<codigo>', methods=['GET'])
+def buscar_cliente_por_contrato(codigo):
+    empresa_id = session.get('empresa')
+    try:
+        instalacao = (
+            Instalacao.query
+            .filter(
+                Instalacao.codigo_instalacao == codigo,
+                Instalacao.empresa_id == empresa_id,
+            )
+            .first()
+        )
+
+        if not instalacao:
+            return jsonify({'error': f'Instalação {codigo} não encontrado'}), 404
+
+        data = {
+            'codigo_instalacao': instalacao.codigo_instalacao,
+            'razao_social': instalacao.razao_social,
+            'cadastramento': format_date(instalacao.cadastramento),
+            #'atualizacao': instalacao.atualizacao,
+            'id_portal': instalacao.id_portal,
+            'endereco': instalacao.endereco,
+            'cidade': instalacao.cidade,
+            'bairro': instalacao.bairro,
+            'cep': instalacao.cep,
+            'uf': instalacao.uf,
+            'status': instalacao.status,
+            'observacao': instalacao.observacao,
+        }
+
+        return jsonify(data)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @instalacoes_bp.route('/listar/instalacoes')
 def listar_instalacoes():
     empresa_id = session.get('empresa')

@@ -2,7 +2,7 @@
      aria-labelledby="desvincularInstalacaoModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <form method="POST" action="">
+      <form method="POST" action="{{ url_for('instalacoes_bp.desvincular_instalacoes_cliente') }}">
         <div class="modal-header bg-danger text-white">
           <h5 class="modal-title" id="desvincularInstalacaoModalLabel">
             Desvincular Instalação do Cliente

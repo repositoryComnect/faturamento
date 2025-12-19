@@ -143,7 +143,6 @@ function buscarDadosCliente(numeroSequencia) {
                     }
                 }
 
-                // Renderizar instalações
                 if (Array.isArray(data.instalacoes)) {
                     instalacoesData = data.instalacoes;
                     currentInstalacaoPage = 1;
@@ -158,7 +157,6 @@ function buscarDadosCliente(numeroSequencia) {
                 }
 
 
-                // Renderizar contratos
                 const contratoTbody = $('.contrato-table tbody');
                 contratoTbody.empty();
 

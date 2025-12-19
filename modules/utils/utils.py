@@ -39,10 +39,6 @@ def parse_date(date_str):
             
 
 def formatar_cep(cep):
-    """
-    Formata um CEP brasileiro no padrão XXXXX-XXX.
-    Retorna string vazia se o CEP for inválido ou None.
-    """
     if not cep:
         return ''
     
@@ -61,14 +57,6 @@ def formatar_cep(cep):
 
 
 def formatar_cpf_cnpj(valor):
-    """
-    Formata um CPF ou CNPJ automaticamente.
-
-    - CPF (11 dígitos): 000.000.000-00
-    - CNPJ (14 dígitos): 00.000.000/0000-00
-
-    Retorna string vazia se o valor for None ou inválido.
-    """
     if not valor:
         return ''
 
