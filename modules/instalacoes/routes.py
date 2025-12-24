@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, render_template, session
-from application.models.models import Instalacao, db
+from application.models.models import Instalacao, db, Cliente
 from datetime import datetime, date
 import re
 from modules.instalacoes.utils import parse_date, format_date
@@ -277,6 +277,10 @@ def buscar_cliente_por_contrato(codigo):
         if not instalacao:
             return jsonify({'error': f'Instalação {codigo} não encontrado'}), 404
 
+        cliente_instalacao = instalacao.cliente_id
+
+        cliente = Cliente.query.get(cliente_instalacao)
+
         data = {
             'codigo_instalacao': instalacao.codigo_instalacao,
             'razao_social': instalacao.razao_social,
@@ -290,8 +294,19 @@ def buscar_cliente_por_contrato(codigo):
             'uf': instalacao.uf,
             'status': instalacao.status,
             'observacao': instalacao.observacao,
+            'cliente': [
+                {
+                    'sequencia' : cliente.sequencia,
+                    'nome_fantasia': cliente.nome_fantasia,
+                    'razao_social': cliente.razao_social,
+                    'cnpj_cpf': cliente.cnpj_cpf,
+                    'cidade': cliente.cidade, 
+                    'status': cliente.estado_atual,
+                }
+            ]
         }
 
+        print(data)
         return jsonify(data)
 
     except Exception as e:

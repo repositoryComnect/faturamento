@@ -537,22 +537,21 @@
 
     <!-- Popups clientes-->
     {% include 'popup/contratos/popup_contratos_clientes.html' %}
+    {% include 'popup/clientes/popup_vincular_cliente.html' %}
+    {% include 'popup/clientes/popup_desvincular_cliente.html' %}
 
     <!-- Popups produtos-->
     {% include 'popup/produto/popup_produto.html' %}
 
     <!--Popus planos-->
     {% include 'popup/contratos/popup_contratos_planos.html' %}
+    {% include 'popup/planos/popup_desvincular_plano.html' %}
+    {% include 'popup/planos/popup_vincular_plano.html' %}
 
-     <!--Popus vinculos-->
-    {% include 'popup/contratos/popup_vincular_produto.html' %}
-    {% include 'popup/contratos/popup_vincular_plano.html' %}
-    {% include 'popup/contratos/popup_vincular_cliente.html' %}
-    {% include 'popup/contratos/popup_desvincular_cliente.html' %}
-    {% include 'popup/contratos/popup_desvincular_produto.html' %}
-    {% include 'popup/contratos/popup_desvincular_plano.html' %}
-
-
+    <!--Popus vinculos-->
+    {% include 'popup/produto/popup_vincular_produto.html' %}
+    {% include 'popup/produto/popup_desvincular_produto.html' %}
+    
     <!-- Links úteis -->
     {% include 'extensions/links_popup.html' %}
         

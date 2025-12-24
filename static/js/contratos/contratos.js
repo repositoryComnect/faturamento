@@ -9,7 +9,6 @@
     let currentPlanoPage = 1;
     const planoRowsPerPage = 5;
 
-        // ----------------- UTIL -----------------
         function createLink(url, text) {
             return `<a href="${url}" class="text-decoration-none">${text || ''}</a>`;
         }
@@ -18,13 +17,11 @@
             return `R$ ${value.toFixed(2)}`;
         }
 
-        // ----------------- PAGINAÇÃO -----------------
         function updatePaginationButtons(prevBtn, nextBtn, currentPage, totalPages) {
             $(prevBtn).prop('disabled', currentPage === 1);
             $(nextBtn).prop('disabled', currentPage === totalPages);
         }
 
-        // ----------------- RENDER CLIENTES -----------------
         function renderClientesPage() {
             const tbody = $('.clientes-table tbody');
             tbody.empty();
@@ -91,7 +88,6 @@
             updatePaginationButtons('#planos-prevPage', '#planos-nextPage', currentPlanoPage, totalPages);
         }
 
-        // ----------------- RENDER PRODUTOS -----------------
         function renderProdutos(produtos) {
             const tbody = $('.produtos-table tbody');
             if (!produtos || !produtos.length) {
@@ -111,7 +107,6 @@
             tbody.html(linhas);
         }
 
-        // ----------------- FUNÇÕES AUXILIARES -----------------
         function noDataRow(colspan, message) {
             return `
                 <tr>
@@ -171,7 +166,6 @@
             });
         }
 
-        // ----------------- BUSCA CONTRATO -----------------
         function buscarDadosContrato(numeroContrato) {
             if (!numeroContrato) return;
             $('#loadingContrato').removeClass('d-none');
@@ -204,7 +198,6 @@
                         renderPlanosPage();
                         renderProdutos(data.produtos);
 
-                        // Soma de valores
                         const totalPlanos = (data.planos || []).reduce((acc, p) => acc + (p.valor || 0), 0);
                         const totalProdutos = (data.produtos || []).reduce((acc, p) => acc + ((p.quantidade || 0) * (p.valor_unitario || 0)), 0);
                         $('#valor_contrato').val((totalPlanos + totalProdutos).toFixed(2));
@@ -227,7 +220,6 @@
             }, 500);
         }
 
-        // ----------------- EVENTOS -----------------
         $(document).ready(function () {
             $('#prevPage').click(() => { if (currentPage > 1) { currentPage--; renderClientesPage(); } });
             $('#nextPage').click(() => { if (currentPage < Math.ceil(clientesData.length / rowsPerPage)) { currentPage++; renderClientesPage(); } });

@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const pagination = document.getElementById('instalacoesModalPagination');
     const inputInstalacao = document.getElementById('codigo_instalacao');
 
-    const perPage = 10; // instalações por página
+    const perPage = 10; 
     let instalacoes = [];
     let currentPage = 1;
     let totalPages = 1;
@@ -87,19 +87,16 @@ document.addEventListener("DOMContentLoaded", function () {
             return li;
         };
 
-        // Anterior
         pagination.appendChild(
             createPageItem(currentPage - 1, 'Anterior', currentPage === 1)
         );
 
-        // Páginas
         for (let i = 1; i <= totalPages; i++) {
             pagination.appendChild(
                 createPageItem(i, null, false, i === currentPage)
             );
         }
 
-        // Próximo
         pagination.appendChild(
             createPageItem(currentPage + 1, 'Próximo', currentPage === totalPages)
         );

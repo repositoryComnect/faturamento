@@ -34,9 +34,7 @@
     </div>
     
 
-    <!-- FORMULÁRIO DE PLANOS -->
     <div class="planos-form">
-            <!-- Informações Básicas -->
             <div class="card mb-1">
                 <div class="card-header section-header d-flex justify-content-between align-items-center" 
                         data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" 
@@ -72,14 +70,12 @@
                                 </div>
                             </div>
 
-                            <!-- NOME DO PLANO -->
                             <div class="col-md-2">
                                 <label class="form-label">Nome do Plano:</label>
                                 <input type="text" id="nome_plano" name="nome_plano" class="form-control"
                                     value="{{ plano.nome if plano else '' }}" readonly>
                             </div>
 
-                            <!-- VALOR DO PLANO -->
                             <div class="col-md-1">
                                 <label class="form-label">Valor Base:</label>
                                 <input type="text" id="valor_plano" name="valor_plano" class="form-control"
@@ -92,7 +88,6 @@
                                     value="{{ plano.valor if plano else '' }}" readonly>
                             </div>
 
-                            <!-- ID PRODUTO PORTAL -->
                             <div class="col-md-1">
                                 <label class="form-label">Id Produto Portal:</label>
                                 <input type="text" id="id_produto_plano" name="id_produto_plano" class="form-control" value="{{ plano.id_produto_portal if plano else '' }}" readonly>
@@ -114,13 +109,11 @@
                                     readonly>
                             </div>
 
-                            <!-- VINCULAR PRODUTO -->
                             <div class="col-md-1">
                                 <label class="form-label">Produto:</label>
                                 <input id="produto_id_plano" name="produto_id_plano" class="form-control" value="{{ plano.produto_id if plano else '' }}" readonly>
                             </div>
 
-                            <!-- QUANTIDADE DO PRODUTO -->
                             <div class="col-md-1">
                                 <label class="form-label">Quantidade Produto:</label>
                                 <input type="number" id="qtd_produto_plano" name="qtd_produto_plano" class="form-control" value="{{ plano.qtd_produto if plano else '' }}" readonly>
@@ -137,9 +130,6 @@
                 </div>
             </div>
 
-            
-
-            <!-- Informações Fiscais -->
             <div class="card mb-1">
                 <div class="card-header section-header d-flex justify-content-between align-items-center" 
                     data-bs-toggle="collapse" data-bs-target="#sec-licenca" 
@@ -151,7 +141,6 @@
                     <div class="card-body">
                         <div class="row">
 
-                            <!-- Primeira linha -->
                             <div class="col-md-4">
                                 <label for="desc_boleto">Descrição Boleto:</label>
                                 <input type="text" id="desc_boleto_licenca_plano" name="desc_boleto_licenca_plano" 
@@ -170,7 +159,6 @@
                                     class="form-control" readonly>
                             </div>
 
-                            <!-- Segunda linha — Descrição NF -->
                             <div class=" col-md-12">
                                 <label for="desc_nf">Descrição para NF:</label>
                                 <textarea name="desc_nf_licenca_plano" id="desc_nf_licenca_plano" 
@@ -182,7 +170,6 @@
                 </div>
             </div>
 
-                    <!-- Seção de Planos Associadas -->
             <div class="card mb-2">
                 <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#contratosCollapse">
                     <h5 class="mb-0">Contratos Associadas ao Plano</h5>
@@ -211,18 +198,16 @@
                                     </tbody>
                                 </table>
 
-                                <!-- Paginação para instalações -->
                                 <div id="contrato-pagination" class="d-flex justify-content-center mt-3">
                                     <button id="contrato-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
                                     <span id="contrato-pageInfo" class="align-self-center"></span>
                                     <button id="contrato-nextPage" class="btn btn-outline-primary btn-sm ms-2" disabled>Próxima</button>
                                 </div>
 
-                                <!-- Botões de ação -->
                                 <div class="container mt-5 mb-4">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div class="d-flex gap-2">
-                                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularContratoModal">
+                                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularContractPlanoModal">
                                                 <i class="bi bi-diagram-2"></i> Vincular Contrato
                                             </button>
                                         </div>
@@ -234,7 +219,7 @@
                                         </div>
 
                                         <div class="d-flex gap-2">
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desvincularContratoModal">
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desvincularContractPlanoModal">
                                                 <i class="bi bi-trash me-2"></i> Desvincular Contrato
                                             </button>
                                         </div>
@@ -247,7 +232,6 @@
                 </div>
             </div>
 
-            <!-- Seção de Produtos Associados -->
         <div class="card mb-2">
             <div class="card-header section-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#productsCollapse">
                 <h5 class="mb-0">Produtos Associados ao Plano</h5>
@@ -267,7 +251,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                
                                         <tr>
                                             <td colspan="5" class="text-center">
                                                 <i class="bi bi-exclamation-circle me-2"></i>
@@ -276,7 +259,7 @@
                                         </tr>
                                 </tbody>
                             </table>
-                            <!-- Paginação específica para Planos -->
+
                             <div id="produto-pagination" class="d-flex justify-content-center mt-3">
                                 <button id="produto-prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
                                 <span id="produto-pageInfo" class="align-self-center"></span>
@@ -330,7 +313,9 @@
 
     <!-- Bloco criar contrato -->
     {% include 'popup/contratos/popup_contratos.html' %}
-
+    {% include 'popup/contratos/popup_vincular_contratos_planos.html' %}
+    {% include 'popup/contratos/popup_desvincular_contratos_planos.html' %}
+   
     <!-- Bloco criar produto-->
     {% include 'popup/produto/popup_produto.html' %}
 

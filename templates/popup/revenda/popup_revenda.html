@@ -1,5 +1,6 @@
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_contratos.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
 </head>
 <body>
 <!-- Create Contract Modal -->
@@ -18,8 +19,8 @@
                 <form id="createContractForm" action="" method="POST">
 
                     <!-- Seção de Informações Básicas -->
-            <div class="card mb-2">
-            <div class="card-header  d-flex justify-content-between align-items-center" 
+            <div class="card mb-2 section-card">
+            <div class="card-header section-card d-flex justify-content-between align-items-center" 
                     data-bs-toggle="collapse" data-bs-target="#basicInfoRevendaCollapse" 
                     aria-expanded="true" aria-controls="basicInfoRevendaCollapse">
                     <h5 class="mb-0">Informações Básicas</h5>
@@ -58,8 +59,8 @@
             </div>
 
             <!-- Seção de Dados da Conta -->
-            <div class="card mb-2">
-            <div class="card-header  d-flex justify-content-between align-items-center" 
+            <div class="card mb-2 section-card">
+            <div class="card-header section-card  d-flex justify-content-between align-items-center" 
                     data-bs-toggle="collapse" data-bs-target="#accountInfoRevendaCollapse" 
                     aria-expanded="true" aria-controls="accountInfoRevendaCollapse">
                 <h5 class="mb-0">Dados da Conta</h5>
@@ -93,7 +94,7 @@
             </div>
 
             <!-- Seção de Endereço -->
-            <div class="card mb-2">
+            <div class="card mb-2 section-card">
             <div class="card-header  d-flex justify-content-between align-items-center" 
                     data-bs-toggle="collapse" data-bs-target="#addressCollapse" 
                     aria-expanded="true" aria-controls="addressCollapse">
@@ -124,7 +125,7 @@
             </div>
 
             <!-- Seção de Vendedores -->
-            <div class="card mb-2">
+            <div class="card mb-2 section-card">
             <div class="card-header  d-flex justify-content-between align-items-center" 
                     data-bs-toggle="collapse" data-bs-target="#vendedoresCollapse" 
                     aria-expanded="true" aria-controls="vendedoresCollapse">

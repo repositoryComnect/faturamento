@@ -1,5 +1,4 @@
-//<!-- Módulo que busca o próximo número de Contrato disponível -->
-
+// Módulo que busca o próximo número de Contrato disponível -->
    document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('createContractModal');
 
@@ -17,9 +16,7 @@
 });
 
 
-
-//<!-- Módulo que busca dinâmicamente os produtos disponíveis -->
-
+// Módulo que busca dinâmicamente os produtos disponíveis -->
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('createContractModal');
     
@@ -49,8 +46,7 @@
     });
 
 
-//<!-- Módulo que encontra o plano e o valor do plano para o cadastro de contrato -->
-
+// Módulo que encontra o plano e o valor do plano para o cadastro de contrato 
     document.addEventListener('DOMContentLoaded', function() {
         const planoSelect = document.getElementById('plano');
         const valorInput = document.getElementById('plan_value');
@@ -79,7 +75,7 @@
     });
 
 
-//<!-- Módulo para trazer a data atual para poder realizar o cadastro -->
+// Módulo para trazer a data atual para poder realizar o cadastro 
 
     document.addEventListener('DOMContentLoaded', function () {
         const createModal = document.getElementById('createContractModal');
@@ -368,7 +364,7 @@ $(document).ready(function () {
   });
 });
 
-//<!-- Bloco que traz os clientes cadastrados -->
+//  Bloco que traz os clientes cadastrados 
 
    document.addEventListener('DOMContentLoaded', function () {
     fetch('/get/list/clientes')
@@ -384,9 +380,8 @@ $(document).ready(function () {
                 const documento = cliente.cnpj_cpf ?? "";
 
                 const option = document.createElement('option');
-                option.value = cliente.id; // backend recebe ID
+                option.value = cliente.id; 
 
-                // TEXTO EXIBIDO CONCATENADO
                 option.textContent = `${codigo} - ${nome} (${documento})`;
 
                 select.appendChild(option);
@@ -399,7 +394,7 @@ $(document).ready(function () {
         });
 });
     
-//<!-- Bloco do popup de Delete contratos -->
+// Bloco do popup de Delete contratos 
 
     document.addEventListener('DOMContentLoaded', function () {
         const deleteModal = document.getElementById('deleteContractModal');
@@ -415,7 +410,6 @@ $(document).ready(function () {
     
         let currentContract = null;
     
-        // Verificação
         validateBtn.addEventListener('click', async function () {
             const numeroContrato = contractNumberInput.value.trim();
     
@@ -496,7 +490,6 @@ $(document).ready(function () {
                     })
                 });
     
-                // Fecha o modal e recarrega a página após 1 segundo
                 const modal = bootstrap.Modal.getInstance(deleteModal);
                 modal.hide();
                 setTimeout(() => window.location.reload(), 1000);
@@ -507,7 +500,6 @@ $(document).ready(function () {
             }
         });
     
-        // Reset do modal
         deleteModal.addEventListener('hidden.bs.modal', function () {
             contractNumberInput.value = '';
             validationResults.innerHTML = '';

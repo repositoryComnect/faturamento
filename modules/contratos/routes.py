@@ -93,9 +93,6 @@ def delete_contrato():
                 }
             })
 
-        # ----------------------------------------------------------------------
-        # UNLINK — agora opcional — caso ainda deseje manter a funcionalidade
-        # ----------------------------------------------------------------------
         elif action == 'unlink':
 
             # Caso não deseje mais essa opção, basta remover o bloco acima
@@ -107,12 +104,8 @@ def delete_contrato():
 
             return jsonify({'success': True, 'message': f'Contrato {numero} desvinculado com sucesso'})
 
-        # ----------------------------------------------------------------------
-        # DELETE — Soft delete real (apenas arquiva, sem desvincular)
-        # ----------------------------------------------------------------------
         elif action == 'delete':
 
-            # 🔥 Soft delete → mantém TUDO, só atualiza estado
             db.session.execute(
                 text("""
                     UPDATE contratos 
@@ -127,7 +120,6 @@ def delete_contrato():
 
             return jsonify({'success': True, 'message': f'Contrato {numero} arquivado com sucesso'})
 
-        # ----------------------------------------------------------------------
         return jsonify({'error': True, 'message': 'Ação inválida'}), 400
 
     except Exception as e:
@@ -655,22 +647,18 @@ def desvincular_clientes():
 def vincular_planos():
     try:
         db.session.begin()
-
-        # 1. Obter o contrato pelo ID
         contrato_id = request.form.get('contrato_id_vincular_plano')
         contrato = Contrato.query.get(contrato_id)
 
         if not contrato:
             raise ValueError("Contrato não encontrado.")
 
-        # 2. Obter lista de IDs dos planos a serem associados
         plano_ids = request.form.getlist('plano_ids')
         planos_nao_encontrados = []
 
         for plano_id in plano_ids:
             plano = Plano.query.get(plano_id)
             if plano:
-                # Verifica se já está associado
                 if plano not in contrato.planos:
                     contrato.planos.append(plano)
             else:

@@ -367,7 +367,6 @@ class TituloInstalacao(db.Model):
 class Plano(db.Model):
     __tablename__ = 'planos'
     
-    # Dados Básicos
     id = db.Column(db.Integer, primary_key=True)
     codigo = db.Column(db.String(20), nullable=False)  
     nome = db.Column(db.String(200), nullable=False)  
@@ -377,7 +376,6 @@ class Plano(db.Model):
     qtd_produto = db.Column(db.Integer)
     valor_base_produto = db.Column(db.Numeric(10, 2))
 
-    # ===== SEÇÃO LICENÇA =====
     desc_boleto_licenca = db.Column(db.String(200))  
     licenca_valor = db.Column(db.Numeric(10, 2))  
     aliquota_sp_licenca = db.Column(db.Numeric(5, 2))  
@@ -390,7 +388,6 @@ class Plano(db.Model):
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     data_atualizacao = db.Column(db.DateTime, onupdate=datetime.utcnow)
     
-    # Relacionamento N:N com Contratos
     contratos = db.relationship(
         'Contrato',
         secondary=contrato_plano,

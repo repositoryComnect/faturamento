@@ -160,7 +160,6 @@ function buscarDadosInstalacao(codigoInstalacao) {
                     return;
                 }
 
-                // Mapeamento APENAS dos campos retornados pela rota
                 const fieldMap = {
                     'codigo_instalacao': '#codigo_instalacao',
                     'razao_social': '#razao_social',
@@ -205,7 +204,6 @@ function buscarDadosInstalacao(codigoInstalacao) {
     }, 500);
 }
 
-// Disparo ao alterar o código da instalação
 $('#codigo_instalacao').on('change', function () {
     buscarDadosInstalacao(this.value);
 });

@@ -3,7 +3,6 @@ from application.models.models import db, Plano, Contrato, Produto, Cliente, con
 from sqlalchemy import text
 from datetime import datetime
 from modules.utils.utils import formatar_telefone, safe_float, safe_date, parse_date, formatar_cep, formatar_cpf_cnpj
-
 from modules.planos.utils import montar_dict_plano, parse_float
 import re
 
@@ -279,10 +278,8 @@ def delete_planos():
 
 @planos_bp.route('/proximo_codigo_plano', methods=['GET'])
 def proximo_codigo_plano():
-    # Busca o último número de contrato ordenado por valor numérico
     planos = Plano.query.all()
     
-    # Extraí apenas os números válidos (ex: "C0001", "C0023")
     numeros = []
     for p in planos:
         match = re.search(r'\d+', p.codigo)
@@ -381,7 +378,6 @@ def buscar_plano_por_codigo(codigo):
         if not plano:
             return jsonify({'error': 'Plano não encontrado'}), 404
 
-        # BUSCAR CONTRATOS VINCULADOS AO PLANO
         contratos = (
             db.session.query(Contrato)
             .join(contrato_plano, Contrato.id == contrato_plano.c.contrato_id)
@@ -434,7 +430,6 @@ def planos_listagem_ativos():
     if not empresa_id:
         return jsonify({'erro': 'Empresa não definida na sessão'}), 401
 
-    # Filtra planos da empresa
     planos = Plano.query.filter_by(empresa_id=empresa_id).order_by(Plano.codigo).all()
 
     resultado = [
@@ -448,6 +443,37 @@ def planos_listagem_ativos():
     ]
 
     return jsonify(resultado)
+
+@planos_bp.route('/vincular/contratos/planos', methods=['POST'])
+def vincular_contratos_planos():
+    try:
+        plano_id = request.form.get('selecione_plano')
+        contratos_ids = request.form.getlist('contrato_id_vincular_plano')
+
+        print('Plano recebido:', plano_id)
+        print('Contratos recebidos:', contratos_ids)
+
+        if not plano_id or not contratos_ids:
+            raise ValueError('Plano ou contratos não informados.')
+
+        plano = Plano.query.get(int(plano_id))
+        if not plano:
+            raise ValueError('Plano não encontrado.')
+
+        for contrato_id in contratos_ids:
+            contrato = Contrato.query.get(int(contrato_id))
+            if contrato and contrato not in plano.contratos:
+                plano.contratos.append(contrato)
+
+        db.session.commit()
+        flash('Contrato(s) vinculados com sucesso.', 'success')
+        return redirect(url_for('home_bp.render_planos'))
+
+    except Exception as e:
+        db.session.rollback()
+        print('ERRO:', e)
+        flash('Erro ao vincular contrato ao plano.', 'danger')
+        return redirect(request.referrer)
 
 @planos_bp.route('/buscar_plano', methods=['POST'])
 def buscar_plano():
@@ -489,4 +515,97 @@ def buscar_plano():
     else:
         return jsonify({'success': False, 'error': 'Plano não encontrado'})
 
-    
+@planos_bp.route('/planos_ativos/contratos', methods=['GET'])
+def planos_ativos_contratos():
+    empresa_id = session.get('empresa')
+
+    planos = Plano.query.filter_by(empresa_id=empresa_id).order_by(Plano.nome).all()
+    resultado = [{'id': p.id, 'codigo': p.codigo, 'nome': p.nome, 'valor': str(p.valor)} for p in planos]
+
+    return jsonify(resultado)
+
+@planos_bp.route('/get/contratos_por_plano/<int:plano_id>', methods=['GET'])
+def contratos_por_plano(plano_id):
+    empresa_id = session.get('empresa')
+
+    plano = (
+        Plano.query
+        .filter_by(id=plano_id, empresa_id=empresa_id)
+        .first()
+    )
+
+    if not plano:
+        return jsonify([])
+
+    contratos = plano.contratos
+
+    resultado = [
+        {
+            'id': c.id,
+            'numero': c.numero,
+            'razao_social': c.razao_social
+        }
+        for c in contratos
+    ]
+
+    return jsonify(resultado)
+
+@planos_bp.route('/planos/desvincular/contratos', methods=['POST'])
+def planos_desvincular_contrato():
+    try:
+        empresa_id = session.get('empresa')
+
+        plano_id = request.form.get('plano_desvincular_contrato')
+        contratos_ids = request.form.getlist('contratos_vinculados_planos')
+
+        if not plano_id:
+            raise ValueError("Plano não informado.")
+
+        if not contratos_ids:
+            raise ValueError("Nenhum contrato selecionado para desvincular.")
+
+        plano = (
+            Plano.query
+            .filter_by(id=plano_id, empresa_id=empresa_id)
+            .first()
+        )
+
+        if not plano:
+            raise ValueError("Plano não encontrado.")
+
+        contratos_nao_encontrados = []
+
+        for contrato_id in contratos_ids:
+            contrato = Contrato.query.filter_by(
+                id=contrato_id,
+                empresa_id=empresa_id
+            ).first()
+
+            if contrato and contrato in plano.contratos:
+                plano.contratos.remove(contrato)
+            else:
+                contratos_nao_encontrados.append(str(contrato_id))
+
+        db.session.commit()
+
+        if contratos_nao_encontrados:
+            flash(
+                f"Alguns contratos não estavam vinculados ao plano: {', '.join(contratos_nao_encontrados)}",
+                "warning"
+            )
+        else:
+            flash("Contratos desvinculados com sucesso.", "success")
+
+        return redirect(request.referrer or url_for('home_bp.render_planos'))
+
+    except ValueError as ve:
+        db.session.rollback()
+        flash(str(ve), "danger")
+        return redirect(request.referrer or url_for('home_bp.render_planos'))
+
+    except Exception as e:
+        db.session.rollback()
+        print("Erro ao desvincular contratos do plano:", e)
+        flash("Erro interno ao desvincular contratos do plano.", "danger")
+        return redirect(request.referrer or url_for('home_bp.render_planos'))
+   
