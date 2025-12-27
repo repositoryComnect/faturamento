@@ -252,7 +252,7 @@
                                 </thead>
                                 <tbody>
                                         <tr>
-                                            <td colspan="5" class="text-center">
+                                            <td colspan="5" class="text-center" id="">
                                                 <i class="bi bi-exclamation-circle me-2"></i>
                                                 Nenhum produto associado encontrado
                                             </td>
@@ -269,7 +269,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     
                                         <div class="d-flex gap-2">    
-                                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularProdutoContractModal">
+                                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#vincularProdutoPlanoModal">
                                                 <i class="bi bi-shop"></i>  Vincular Produto
                                             </button>
                                         </div>
@@ -280,7 +280,7 @@
                                             </button>
                                         </div>
                                         <div class="d-flex gap-2">    
-                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desvincularProdutoContractModal">
+                                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#desvincularProdutoPlanoModal">
                                                 <i class="bi bi-trash me-2"></i>Desvincular Produto
                                             </button>
                                         </div>
@@ -318,6 +318,8 @@
    
     <!-- Bloco criar produto-->
     {% include 'popup/produto/popup_produto.html' %}
+    {% include 'popup/produto/popup_vincular_produto_planos.html' %}
+    {% include 'popup/produto/popup_desvincular_produto_planos.html' %}
 
 
 {% endblock %}

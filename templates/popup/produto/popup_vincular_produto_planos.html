@@ -1,22 +1,22 @@
-<div class="modal fade" id="vincularContractPlanoModal" tabindex="-1" aria-labelledby="vincularContractPlanoModalLabel" aria-hidden="true">
+<div class="modal fade" id="vincularProdutoPlanoModal" tabindex="-1" aria-labelledby="vincularProdutoPlanoModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
-      <form method="POST" action="">
+      <form method="POST" action="{{ url_for('produtos_bp.vincular_produto_planos') }}">
         <div class="modal-header bg-success text-white">
-          <h5 class="modal-title" id="vincularContractPlanoModalLabel">Vincular Produto ao Plano</h5>
+          <h5 class="modal-title" id="vincularProdutoPlanoModalLabel">Vincular Produto(s) ao Plano</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
         </div>
 
         <div class="modal-body">
           <div class="mb-3">
-            <label for="selecione_plano" class="form-label">Selecione um Plano:</label>
-            <select class="form-select" name="selecione_plano" id="selecione_plano" required>
+            <label for="plano_vincular_produto" class="form-label">Selecione um Plano:</label>
+            <select class="form-select" name="plano_vincular_produto" id="plano_vincular_produto" required>
             </select>
           </div>
 
           <div class="mb-3">
-            <label for="contrato_id_vincular_plano" class="form-label">Selecione o Produto:</label>
-            <select class="form-select" name="contrato_id_vincular_plano" id="contrato_id_vincular_plano" multiple required size="10">
+            <label for="vincular_produto_id" class="form-label">Selecione Produto(s):</label>
+            <select class="form-select" name="vincular_produto_id" id="vincular_produto_id" multiple required size="10">
             </select>
           </div>
         </div>
@@ -30,5 +30,4 @@
   </div>
 </div>
 
-
-<!--<script src="{{ url_for('static', filename='js/planos/popup_js/popup_vincular_contratos_planos.js') }}"></script>-->
+<script src="{{ url_for('static', filename='js/contratos/popup_js/popup_vincular_produto.js') }}"></script>
