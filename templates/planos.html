@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-5 mb-4">
+<div class="container-fluid mt-3 mb-4">
     <div class="d-flex justify-content-between align-items-center">
         <h2>Planos</h2>
         <div class="d-flex gap-1">
@@ -50,7 +50,6 @@
                                     <input type="text" class="form-control" id="codigo_plano"
                                         value="{{ plano.codigo if plano else '' }}"
                                         onchange="buscarPlanoPorCodigo(this.value)">
-
                                     <button class="btn btn-secondary" type="button" onclick="buscarPlanoPorCodigo(codigo_plano.value)">
                                         <i class="bi bi-search"></i>
                                     </button>
@@ -66,7 +65,6 @@
                                     <span id="loadingCodigoPlano" class="input-group-text d-none">
                                         <div class="spinner-border spinner-border-sm" role="status"></div>
                                     </span>
-
                                 </div>
                             </div>
 
@@ -248,11 +246,12 @@
                                         <th>Descrição</th>
                                         <th>Quantidade</th>
                                         <th>Preço Unitário</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id='produtosPlanoTbody'>
                                         <tr>
-                                            <td colspan="5" class="text-center" id="">
+                                            <td colspan="6" class="text-center" id="">
                                                 <i class="bi bi-exclamation-circle me-2"></i>
                                                 Nenhum produto associado encontrado
                                             </td>
@@ -291,7 +290,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 

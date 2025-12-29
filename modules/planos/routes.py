@@ -52,13 +52,12 @@ def insert_planos():
         db.session.rollback()
         form_data = request.form.to_dict()
 
-        def parse_float(valor):
+        '''def parse_float(valor):
             try:
                 return float(str(valor).replace(',', '.'))
             except (ValueError, TypeError):
-                return 0.0
+                return 0.0'''
 
-        # Pega dados do formulário
         codigo = form_data.get('codigo')
         nome = form_data.get('nome')
         valor_base = parse_float(form_data.get('valor', 0))
@@ -68,7 +67,6 @@ def insert_planos():
         contrato_id = form_data.get('contrato_id')
         status_plano = form_data.get('status_plano')
 
-        # Cálculo do valor com base na quantidade e produto vinculado (se preço já não foi calculado no front)
         produto = None  
         base_valor_produto = None
 
@@ -78,16 +76,13 @@ def insert_planos():
             if produto and produto.preco_base and qtd_produto > 0:
                 valor_base = float(produto.preco_base) * qtd_produto
 
-        # Aliquota
         aliquota_sp = parse_float(form_data.get('aliquota_sp_licenca'))
         cod_servico_sp = form_data.get('cod_servico_sp_licenca')
         desc_nf_licenca = form_data.get('desc_nf_licenca')
         desc_boleto_licenca = form_data.get('desc_boleto_licenca')
 
-        # Cálculo de imposto (caso deseje expandir futuramente com outras alíquotas)
         valor_com_imposto = valor_base + (valor_base * aliquota_sp / 100) if aliquota_sp > 0 else valor_base
 
-        # Criação do plano
         plano_data = {
             'codigo': codigo,
             'nome': nome,
@@ -111,7 +106,6 @@ def insert_planos():
         db.session.add(novo_plano)
         db.session.commit()
 
-        # Vincular contrato (muitos-para-muitos)
         if contrato_id:
             contrato = Contrato.query.get(int(contrato_id))
             if contrato:
@@ -304,7 +298,6 @@ def proximo_plano(codigo_atual):
         return jsonify({'error': 'Empresa não selecionada'}), 400
 
     try:
-        # Localizar o plano atual
         plano_atual = (
             Plano.query
             .filter_by(codigo=codigo_atual, empresa_id=empresa_id)
@@ -314,7 +307,6 @@ def proximo_plano(codigo_atual):
         if not plano_atual:
             return jsonify({'error': 'Plano atual não encontrado'}), 404
 
-        # Buscar o próximo
         plano = (
             Plano.query
             .filter(
@@ -328,52 +320,81 @@ def proximo_plano(codigo_atual):
         if not plano:
             return jsonify({}), 200
 
-        # BUSCAR CONTRATOS VINCULADOS AO PLANO (MESMA LÓGICA DO buscar-por-codigo)
         contratos = (
             db.session.query(Contrato)
             .join(contrato_plano, Contrato.id == contrato_plano.c.contrato_id)
-            .filter(contrato_plano.c.plano_id == plano.id)
-            .filter(Contrato.empresa_id == empresa_id)
+            .filter(
+                contrato_plano.c.plano_id == plano.id,
+                Contrato.empresa_id == empresa_id
+            )
             .all()
         )
 
-        contratos_json = []
-        for c in contratos:
-            contratos_json.append({
-                'id': c.id,
-                'numero': c.numero,
-                'razao_social': c.razao_social,
-                'nome_fantasia': c.nome_fantasia,
-                'contato': c.contato,
-                'email': c.email,
-                'telefone': c.telefone,
-                'cnpj_cpf': formatar_cpf_cnpj(c.cnpj_cpf),
-                'cidade': c.cidade,
-                'estado': c.estado,
-                'tipo': c.tipo,
-                'status': c.estado_contrato,
-                'dia_vencimento': c.dia_vencimento,
-                'plano_codigo': plano.codigo
-            })
+        contratos_json = [{
+            'id': c.id,
+            'numero': c.numero,
+            'razao_social': c.razao_social,
+            'nome_fantasia': c.nome_fantasia,
+            'contato': c.contato,
+            'email': c.email,
+            'telefone': c.telefone,
+            'cnpj_cpf': formatar_cpf_cnpj(c.cnpj_cpf),
+            'cidade': c.cidade,
+            'estado': c.estado,
+            'tipo': c.tipo,
+            'status': c.estado_contrato,
+            'dia_vencimento': c.dia_vencimento,
+            'plano_codigo': plano.codigo
+        } for c in contratos]
+
+        produtos_json = []
+
+        if plano.produto:
+            produto = (
+                db.session.query(Produto)
+                .filter(
+                    Produto.nome == plano.produto,
+                    Produto.empresa_id == empresa_id
+                )
+                .first()
+            )
+
+            if produto:
+                produtos_json.append({
+                    'codigo': produto.codigo,
+                    'nome': produto.nome,
+                    'descricao': produto.descricao,
+                    'quantidade': plano.qtd_produto,
+                    'preco_base': float(produto.preco_base or 0.0), 
+                    'status': produto.status
+                })
 
         retorno = montar_dict_plano(plano)
         retorno['contratos'] = contratos_json
+        retorno['produtos'] = produtos_json
 
         return jsonify(retorno)
 
     except Exception as e:
         import traceback
-        traceback.print_exc()   
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+
+
 
 @planos_bp.route('/planos/buscar-por-codigo/<codigo>', methods=['GET'])
 def buscar_plano_por_codigo(codigo):
     empresa_id = session.get('empresa')
 
     try:
-        plano = db.session.execute(
-            db.select(Plano).filter_by(codigo=codigo, empresa_id=empresa_id)
-        ).scalar_one_or_none()
+        plano = (
+            db.session.execute(
+                db.select(Plano)
+                .filter_by(codigo=codigo, empresa_id=empresa_id)
+            )
+            .scalars()
+            .first()
+        )
 
         if not plano:
             return jsonify({'error': 'Plano não encontrado'}), 404
@@ -381,40 +402,54 @@ def buscar_plano_por_codigo(codigo):
         contratos = (
             db.session.query(Contrato)
             .join(contrato_plano, Contrato.id == contrato_plano.c.contrato_id)
-            .filter(contrato_plano.c.plano_id == plano.id)
-            .filter(Contrato.empresa_id == empresa_id)
+            .filter(
+                contrato_plano.c.plano_id == plano.id,
+                Contrato.empresa_id == empresa_id
+            )
             .all()
         )
 
-        contratos_json = []
-        for c in contratos:
-            contratos_json.append({
-                'id': c.id,
-                
-                # CAMPOS REAIS EXISTENTES NA TABELA
-                'numero': c.numero,
-                'razao_social': c.razao_social,
-                'nome_fantasia': c.nome_fantasia,
-                'contato': c.contato,
-                'email': c.email,
-                'telefone': c.telefone,
-                'cnpj_cpf': formatar_cpf_cnpj(c.cnpj_cpf),
-                'cidade': c.cidade,
-                'estado': c.estado,
-                'tipo': c.tipo,
-                'status': c.estado_contrato,
-                'dia_vencimento': c.dia_vencimento,
+        contratos_json = [{
+            'id': c.id,
+            'numero': c.numero,
+            'razao_social': c.razao_social,
+            'nome_fantasia': c.nome_fantasia,
+            'contato': c.contato,
+            'email': c.email,
+            'telefone': c.telefone,
+            'cnpj_cpf': formatar_cpf_cnpj(c.cnpj_cpf),
+            'cidade': c.cidade,
+            'estado': c.estado,
+            'tipo': c.tipo,
+            'status': c.estado_contrato,
+            'dia_vencimento': c.dia_vencimento
+        } for c in contratos]
 
-                # VALOR DO CONTRATO
-                #'valor': float(getattr(c, 'valor_total', 0)) if getattr(c, 'valor_total', None) not in (None, "") else 0,
+        produtos_json = []
 
-                # INFO DO PLANO
-                'plano_codigo': plano.codigo
-            })
+        if plano.produto:
+            produto = (
+                db.session.query(Produto)
+                .filter(
+                    Produto.nome == plano.produto,
+                    Produto.empresa_id == empresa_id
+                )
+                .first()
+            )
 
-        # RETORNAR O PLANO (JÁ COM OS CONTRATOS)
-        retorno = montar_dict_plano(plano)       
-        retorno['contratos'] = contratos_json                
+            if produto:
+                produtos_json.append({
+                    'codigo': produto.codigo,
+                    'nome': produto.nome,
+                    'descricao': produto.descricao,
+                    'quantidade': plano.qtd_produto,
+                    'preco_unitario': float(produto.preco_base or 0.0),
+                    'status': produto.status
+                })
+
+        retorno = montar_dict_plano(plano)
+        retorno['contratos'] = contratos_json
+        retorno['produtos'] = produtos_json
 
         return jsonify(retorno)
 

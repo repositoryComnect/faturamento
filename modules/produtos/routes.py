@@ -15,7 +15,7 @@ def set_produtos():
             'nome': request.form.get('nome'),
             'descricao': request.form.get('descricao'),
             'preco_base': request.form.get('preco_base'),
-            'ativo': request.form.get('status'),
+            'status': request.form.get('status'),
             'empresa_id' : empresa_id,    
             }
         

@@ -5,11 +5,18 @@ function proximoCodigoPlano() {
     $('#loadingCodigoPlano').removeClass('d-none');
 
     fetch(`/planos/proximo/${codigoAtual}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro HTTP');
+            }
+            return response.json();
+        })
         .then(data => {
             $('#loadingCodigoPlano').addClass('d-none');
 
-            // Caso seja o último plano
+            console.log('Plano retornado:', data);
+            console.log('Contratos:', data.contratos);
+
             if (!data || Object.keys(data).length === 0) {
                 Swal.fire({
                     icon: 'info',
@@ -24,7 +31,6 @@ function proximoCodigoPlano() {
                 return;
             }
 
-            // CAMPOS
             document.getElementById('codigo_plano').value = data.codigo ?? "";
             document.getElementById('nome_plano').value = data.nome ?? "";
             document.getElementById('valor_plano').value = data.valor ?? "";
@@ -39,35 +45,72 @@ function proximoCodigoPlano() {
             document.getElementById('atualizacao_plano').value = data.atualizacao ?? "";
             document.getElementById('status_plano').value = data.status ?? "";
 
-            // LISTA DE CONTRATOS
-            const tabela = document.querySelector(".contrato-table tbody");
-            tabela.innerHTML = ""; 
+            const tabelaProdutos = document.getElementById('produtosPlanoTbody');
+            tabelaProdutos.innerHTML = "";
 
-            if (!data.contratos || data.contratos.length === 0) {
-                tabela.innerHTML = `
-                   <tr>
-                      <td colspan="5" class="text-center">
-                         Nenhum contrato associado
-                      </td>
-                   </tr>`;
+            if (!Array.isArray(data.produtos) || data.produtos.length === 0) {
+                tabelaProdutos.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            Nenhum produto vinculado
+                        </td>
+                    </tr>`;
+            } else {
+                data.produtos.forEach(produto => {
+                    const tr = document.createElement("tr");
+                    tr.classList.add("text-center");
+
+                    tr.innerHTML = `
+                        <td>${produto.codigo ?? '-'}</td>
+                        <td>${produto.nome ?? '-'}</td>
+                        <td>${produto.descricao ?? '-'}</td>
+                        <td>${produto.quantidade ?? '-'}</td>
+                        <td>
+                            R$ ${Number(produto.preco_base ?? 0)
+                                .toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                        </td>
+                        <td>${produto.status ?? '-'}</td>
+                    `;
+                    tabelaProdutos.appendChild(tr);
+                });
+            }
+
+            const tabelaContratos = document.querySelector('.contrato-table tbody');
+
+            if (!tabelaContratos) {
+                console.error('Tabela de contratos não encontrada');
                 return;
             }
 
-            data.contratos.forEach(contrato => {
-                const tr = document.createElement("tr");
+            tabelaContratos.innerHTML = "";
 
-                tr.innerHTML = `
-                    <td>${contrato.numero ?? '-'}</td>
-                    <td>${contrato.razao_social ?? contrato.nome_fantasia ?? '-'}</td>
-                    <td>${contrato.cnpj_cpf ?? '-'}</td>
-                    <td>
-                        <span class="badge rounded-pill px-3 py-2 ${getStatusBadgeClass(contrato.status)}">
-                            ${contrato.status ?? 'N/A'}
-                        </span>
-                    </td>
-                `;
-                tabela.appendChild(tr);
-            });
+            if (!Array.isArray(data.contratos) || data.contratos.length === 0) {
+                tabelaContratos.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center">
+                            <i class="bi bi-exclamation-circle me-2"></i>
+                            Nenhum contrato associado encontrado
+                        </td>
+                    </tr>`;
+            } else {
+                data.contratos.forEach(contrato => {
+                    const tr = document.createElement("tr");
+
+                    tr.innerHTML = `
+                        <td class="text-center">${contrato.numero ?? '-'}</td>
+                        <td>${contrato.razao_social ?? contrato.nome_fantasia ?? '-'}</td>
+                        <td class="text-center">${contrato.cnpj_cpf ?? '-'}</td>
+                        <td class="text-center">
+                            <span class="badge ${contrato.status === 'Ativo' ? 'bg-success' : 'bg-secondary'}">
+                                ${contrato.status ?? 'N/A'}
+                            </span>
+                        </td>
+                    `;
+
+                    tabelaContratos.appendChild(tr);
+                });
+            }
         })
         .catch(err => {
             $('#loadingCodigoPlano').addClass('d-none');
@@ -86,7 +129,9 @@ function proximoCodigoPlano() {
 }
 
 
-// Buscar planos por código 
+
+
+
 
 function buscarPlanoPorCodigo(codigo) {
     if (!codigo) return;
@@ -103,6 +148,9 @@ function buscarPlanoPorCodigo(codigo) {
         .then(data => {
             $('#loadingCodigoPlano').addClass('d-none');
 
+            console.log('RETORNO PLANO:', data);
+            console.log('PRODUTOS:', data.produtos);
+
             if (data.error) {
                 Swal.fire({
                     icon: 'warning',
@@ -112,56 +160,15 @@ function buscarPlanoPorCodigo(codigo) {
                 return;
             }
 
-            // PREENCHER CAMPOS DO PLANO
             document.getElementById('codigo_plano').value = data.codigo ?? "";
             document.getElementById('nome_plano').value = data.nome ?? "";
             document.getElementById('valor_plano').value = data.valor ?? "";
-            document.getElementById('id_produto_plano').value = data.id_produto_portal ?? "";
-            document.getElementById('produto_id_plano').value = data.produto ?? "";
             document.getElementById('qtd_produto_plano').value = data.qtd_produto ?? "";
-            document.getElementById('desc_boleto_licenca_plano').value = data.desc_boleto_licenca ?? "";
-            document.getElementById('aliquota_sp_licenca_plano').value = data.aliquota_sp_licenca ?? "";
-            document.getElementById('cod_servico_sp_licenca_plano').value = data.cod_servico_sp_licenca ?? "";
-            document.getElementById('desc_nf_licenca_plano').value = data.desc_nf_licenca ?? "";
-            document.getElementById('cadastramento_plano').value = data.cadastramento ?? "";
-            document.getElementById('atualizacao_plano').value = data.atualizacao ?? "";
             document.getElementById('status_plano').value = data.status ?? "";
 
-            // ====================
-            // PREENCHER CONTRATOS
-            // ====================
-            const tabela = document.querySelector(".contrato-table tbody");
-            tabela.innerHTML = ""; 
+            preencherContratosPlano(data.contratos);
 
-            if (!data.contratos || data.contratos.length === 0) {
-                tabela.innerHTML = `
-                   <tr>
-                      <td colspan="5" class="text-center">
-                         Nenhum contrato associado
-                      </td>
-                   </tr>`;
-                return;
-            }
-
-            data.contratos.forEach(contrato => {
-                const tr = document.createElement("tr");
-
-                tr.innerHTML = `
-                    <td>${contrato.numero ?? '-'}</td>
-                    <td>${contrato.razao_social ?? contrato.nome_fantasia ?? '-'}</td>
-                    <td>${contrato.cnpj_cpf ?? '-'}</td>
-                    <td>
-                        <span class="badge rounded-pill px-3 py-2 ${getStatusBadgeClass(contrato.status)}">
-                            ${contrato.status ?? 'N/A'}
-                        </span>
-                    </td>
-
-
-                    
-                `;
-                
-                tabela.appendChild(tr);
-            });
+            preencherProdutosPlano(data.produtos);
         })
         .catch(err => {
             console.error("Erro ao buscar plano:", err);
@@ -170,16 +177,83 @@ function buscarPlanoPorCodigo(codigo) {
 }
 
 
-function getStatusBadgeClass(status) {
-    if (!status) return "bg-secondary";
+function preencherProdutosPlano(produtos) {
+    const tbody = document.getElementById('produtosPlanoTbody');
 
-    status = status.toLowerCase();
+    if (!tbody) {
+        console.error(' tbody produtosPlanoTbody não encontrado');
+        return;
+    }
 
-    if (status.includes("ativo")) return "bg-success";          // VERDE
-    if (status.includes("suspenso")) return "bg-warning text-dark"; // AMARELO
-    if (status.includes("arquivado")) return "bg-orange text-white"; // LARANJA
-    if (status.includes("cancelado")) return "bg-danger";       // VERMELHO
+    tbody.innerHTML = "";
 
-    return "bg-secondary"; // fallback
+    if (!Array.isArray(produtos) || produtos.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    Nenhum produto associado encontrado
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    produtos.forEach(produto => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+            <td class="text-center">${produto.codigo ?? '-'}</td>
+            <td>${produto.nome ?? '-'}</td>
+            <td>${produto.descricao ?? '-'}</td>
+            <td class="text-center">${produto.quantidade ?? 0}</td>
+            <td class="text-end">${formatarMoeda(produto.preco_base)}</td>
+            <td>${produto.status ?? '-'}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+
+function preencherContratosPlano(contratos) {
+    const tabela = document.querySelector(".contrato-table tbody");
+    tabela.innerHTML = "";
+
+    if (!contratos || contratos.length === 0) {
+        tabela.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center">
+                    Nenhum contrato associado
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    contratos.forEach(c => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${c.numero}</td>
+            <td>${c.razao_social ?? c.nome_fantasia}</td>
+            <td>${c.cnpj_cpf}</td>
+            <td>
+                <span class="badge bg-success">
+                    ${c.status}
+                </span>
+            </td>
+        `;
+
+        tabela.appendChild(tr);
+    });
+}
+
+
+function formatarMoeda(valor) {
+    return Number(valor ?? 0).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
 }
 

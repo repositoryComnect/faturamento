@@ -196,7 +196,7 @@ class Produto(db.Model):
     nome = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text)
     preco_base = db.Column(db.Numeric(10, 2), default=0.00)
-    ativo = db.Column(db.String(20))
+    status = db.Column(db.String(20))
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
 
     # Relacionamento com Empresa (padronizado)

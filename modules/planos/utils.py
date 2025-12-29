@@ -7,23 +7,20 @@ def montar_dict_plano(plano, contratos=[]):
         'nome': plano.nome or "",
         'valor': float(plano.valor) if plano.valor else 0.0,
 
-        # campos produto
         'id_produto_portal': plano.id_portal or "",
         'produto': plano.produto or "",
         'produto_id': plano.produto or "",
         'qtd_produto': plano.qtd_produto or 0,
 
-        # boleto/licença
+
         'licenca_valor': plano.licenca_valor or "",
         'valor_base_produto': plano.valor_base_produto or "",
         'desc_boleto_licenca': plano.desc_boleto_licenca or "",
         'desc_nf_licenca': plano.desc_nf_licenca or "",
 
-        # tributos
         'aliquota_sp_licenca': plano.aliquota_sp_licenca or "",
         'cod_servico_sp_licenca': plano.cod_servico_sp_licenca or "",
 
-        # datas
         'cadastramento': plano.data_criacao.strftime("%d/%m/%Y") if plano.data_criacao else "",
         'atualizacao': plano.data_atualizacao.strftime("%d/%m/%Y") if plano.data_atualizacao else "",
 
@@ -34,8 +31,6 @@ def montar_dict_plano(plano, contratos=[]):
         'ativo': getattr(plano, 'ativo', True),
         
     }
-
-
 
 
 def parse_float(valor):
