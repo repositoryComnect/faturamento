@@ -12,24 +12,21 @@ planos_bp = Blueprint('planos_bp', __name__)
 def get_planos():
     empresa_id = session.get('empresa')
     page = request.args.get('page', 1, type=int)
-    per_page = 5  # Itens por página
+    per_page = 20  
     offset = (page - 1) * per_page
 
-    # Consulta paginada
     resultado = db.session.execute(
         text("SELECT * FROM planos WHERE empresa_id = :empresa_id ORDER BY id LIMIT :limit OFFSET :offset"),
         {"empresa_id": empresa_id,"limit": per_page, "offset": offset}
     )
     planos = [dict(row._mapping) for row in resultado]
 
-    # Total de registros
     total = db.session.execute(text("SELECT COUNT(*) FROM planos")).scalar()
 
-    # Criar dicionário de paginação
     pagination = {
         'page': page,
         'per_page': per_page,
-        'pages': (total + per_page - 1) // per_page,  # arredonda para cima
+        'pages': (total + per_page - 1) // per_page,  
         'has_prev': page > 1,
         'has_next': page * per_page < total,
         'prev_num': page - 1,
@@ -42,7 +39,7 @@ def get_planos():
         page=page,
         per_page=per_page,
         total=total,
-        pagination=pagination  # <-- ENVIA PARA O TEMPLATE
+        pagination=pagination  
     )
 
 @planos_bp.route('/insert/planos', methods=['POST'])
@@ -379,8 +376,6 @@ def proximo_plano(codigo_atual):
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
-
-
 
 @planos_bp.route('/planos/buscar-por-codigo/<codigo>', methods=['GET'])
 def buscar_plano_por_codigo(codigo):

@@ -75,7 +75,8 @@ def delete_instalacao():
         return redirect(request.referrer or url_for('instalacoes_bp.listar_instalacoes'))
     
     try:
-        db.session.delete(instalacao)
+        instalacao.status = 'Arquivado'
+        instalacao.atualizacao = datetime.now()
         db.session.commit()
         flash(f"Instalação {codigo} excluída com sucesso!", "success")
     except Exception as e:
@@ -285,7 +286,7 @@ def buscar_cliente_por_contrato(codigo):
             'codigo_instalacao': instalacao.codigo_instalacao,
             'razao_social': instalacao.razao_social,
             'cadastramento': format_date(instalacao.cadastramento),
-            #'atualizacao': instalacao.atualizacao,
+            'atualizacao': format_date(instalacao.atualizacao),
             'id_portal': instalacao.id_portal,
             'endereco': instalacao.endereco,
             'cidade': instalacao.cidade,
@@ -317,7 +318,7 @@ def listar_instalacoes():
     empresa_id = session.get('empresa')
     try:
         page = request.args.get('page', 1, type=int)
-        per_page = 10
+        per_page = 20
 
         offset = (page - 1) * per_page
 

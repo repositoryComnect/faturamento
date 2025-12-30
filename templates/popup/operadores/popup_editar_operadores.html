@@ -1,0 +1,131 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+
+<body>
+    
+<div class="modal fade" id="updateOperadoresModal" tabindex="-1" aria-labelledby="updateOperadoresModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable modal-custom">
+        <div class="modal-content shadow-lg">
+
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title fw-bold" id="updateOperadoresModalLabel">Editar Operadores</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+
+            <div class="modal-body bg-light">
+                <form id="atualizarOperadoresForm" action="" method="POST">
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                            data-bs-toggle="collapse" data-bs-target="#buscarOperadoresCollapse"
+                            aria-expanded="true" aria-controls="buscarOperadoresCollapse" style="cursor:pointer;">
+                            <span>Procurar Instalação</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div class="collapse show" id="buscarOperadoresCollapse">
+                            <div class="card-body">
+
+                                <label for="fetch_operador_editar" class="form-label fw-semibold">Código do Operador</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="fetch_operador_editar" name="fetch_operador_editar"
+                                           placeholder="Digite o número ou nome da instalação...">
+
+                                    <button class="btn btn-secondary" type="button" id="btnBuscarInstalacao">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+
+                                    <span id="loadingInstalacao" class="input-group-text d-none">
+                                        <div class="spinner-border spinner-border-sm"></div>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3 section-card">
+                        <div class="card-header d-flex justify-content-between fw-bold"
+                             data-bs-toggle="collapse"
+                             data-bs-target="#cardInfoBasicaInstalacao"
+                             style="cursor:pointer;">
+                            Informações Básicas
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div id="cardInfoBasicaInstalacao" class="collapse show">
+                            <div class="card-body">
+                                <div class="row g-3">
+
+                                    <div class="col-md-1">
+                                        <label class="form-label">ID</label>
+                                        <input type="text" class="form-control" id="id_operador"
+                                               name="id_operador" readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Nome</label>
+                                        <input id="nome_operador"
+                                                name="nome_operador"
+                                                type="text"
+                                                class="form-control">
+                                    
+                                        </input>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Sobrenome</label>
+                                        <input type="text" class="form-control" id="sobrenome_operador"
+                                               name="sobrenome_operador" >
+                                    </div>
+
+                                    <div class="col-md-5">
+                                        <label class="form-label">E-mail</label>
+                                        <input type="text" class="form-control" id="email_operador"
+                                               name="email_operador">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Username</label>
+                                        <input type="text" class="form-control" id="username_operador"
+                                               name="username_operador">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Senha</label>
+                                        <input type="text" class="form-control" id="password_operador"
+                                               name="password_operador">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label class="form-label">Confirmar Senha</label>
+                                        <input type="text" class="form-control" id="confirm_password_operador"
+                                               name="confirm_password_operador">
+                                    </div>
+                                
+                                    <div class="col-md-2">
+                                        <label class="form-label">Perfil</label>
+                                        <select class="form-select" name="perfil_operador" id="perfil_operador">
+                                            <option value="1">Administrador</option>
+                                            <option value="2">Operador</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-warning">
+                            Salvar 
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<!--<script src="{{ url_for('static', filename='js/contratos/popup_js/contratos.js') }}"></script>-->

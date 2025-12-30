@@ -1,0 +1,58 @@
+{% extends "base_template.html" %}
+
+{% block title %}Operadores{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-5 mb-2">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Operadores</h2>
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createOperadorModal">
+            <i class="bi bi-plus-circle"></i> Criar Operador
+        </button>
+    </div>
+
+    <div id="erroGlobal" class="alert alert-danger d-none"></div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-light section-header">
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Sobrenome</th>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Status</th>
+                    <th>Admin</th>
+                    <th>Criação</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody id="operadoresTableBody">
+                <tr>
+                    <td colspan="9" class="text-center text-muted py-4">
+                        Carregando operadores...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+
+{% include 'popup/operadores/popup_criar_operadores.html' %}
+{% include 'popup/operadores/popup_editar_operadores.html' %}
+<script src="{{ url_for('static', filename='js/operadores/operadores.js') }}"></script>
+{% endblock %}

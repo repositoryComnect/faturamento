@@ -31,6 +31,10 @@ function proximoCodigoPlano() {
                 return;
             }
 
+            function createLink(url, label) {
+                return `<a href="${url}" class="text-primary" style="text-decoration:none; font-weight:600;">${label}</a>`;
+            }
+
             document.getElementById('codigo_plano').value = data.codigo ?? "";
             document.getElementById('nome_plano').value = data.nome ?? "";
             document.getElementById('valor_plano').value = data.valor ?? "";
@@ -62,7 +66,7 @@ function proximoCodigoPlano() {
                     tr.classList.add("text-center");
 
                     tr.innerHTML = `
-                        <td>${produto.codigo ?? '-'}</td>
+                        <td>${createLink(`/produtos`, produto.codigo)}</td>
                         <td>${produto.nome ?? '-'}</td>
                         <td>${produto.descricao ?? '-'}</td>
                         <td>${produto.quantidade ?? '-'}</td>
@@ -98,14 +102,10 @@ function proximoCodigoPlano() {
                     const tr = document.createElement("tr");
 
                     tr.innerHTML = `
-                        <td class="text-center">${contrato.numero ?? '-'}</td>
+                        <td>${createLink(`/contratos/buscar-por-numero-listagem/${contrato.numero}`, contrato.numero)}</td>
                         <td>${contrato.razao_social ?? contrato.nome_fantasia ?? '-'}</td>
                         <td class="text-center">${contrato.cnpj_cpf ?? '-'}</td>
-                        <td class="text-center">
-                            <span class="badge ${contrato.status === 'Ativo' ? 'bg-success' : 'bg-secondary'}">
-                                ${contrato.status ?? 'N/A'}
-                            </span>
-                        </td>
+                        <td class="text-center">${contrato.status ?? 'N/A'}</td>
                     `;
 
                     tabelaContratos.appendChild(tr);
@@ -159,6 +159,7 @@ function buscarPlanoPorCodigo(codigo) {
                 });
                 return;
             }
+            
 
             document.getElementById('codigo_plano').value = data.codigo ?? "";
             document.getElementById('nome_plano').value = data.nome ?? "";
@@ -198,15 +199,19 @@ function preencherProdutosPlano(produtos) {
         `;
         return;
     }
+    
+    function createLink(url, label) {
+        return `<a href="${url}" class="text-primary" style="text-decoration:none; font-weight:600;">${label}</a>`;
+    }
 
     produtos.forEach(produto => {
         const tr = document.createElement('tr');
 
         tr.innerHTML = `
-            <td class="text-center">${produto.codigo ?? '-'}</td>
+            <td>${createLink(`/produtos`, produto.codigo)}</td>
             <td>${produto.nome ?? '-'}</td>
             <td>${produto.descricao ?? '-'}</td>
-            <td class="text-center">${produto.quantidade ?? 0}</td>
+            <td class="text">${produto.quantidade ?? 0}</td>
             <td class="text-end">${formatarMoeda(produto.preco_base)}</td>
             <td>${produto.status ?? '-'}</td>
         `;

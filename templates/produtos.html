@@ -4,6 +4,10 @@
 
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles_contratos.css') }}">
+
+
 {% endblock %}
 
 {% block content %}
@@ -26,9 +30,9 @@
     </div><br>
 
 
-        <div class="table-responsive">
+        <div class="table-responsive ">
             <table class="table table-bordered table-striped align-middle">
-                <thead class="table-light">
+                <thead class="table-light section-header ">
                     <tr>
                         <th class="py-3 px-4">Código</th>
                         <th class="py-3 px-4">Nome Produto</th>
@@ -45,7 +49,7 @@
                         <td class="py-3 px-4">{{ produto.nome }}</td>
                         <td class="py-3 px-4">{{ produto.descricao }}</td>
                         <td class="py-3 px-4">{{ produto.preco_base }}</td>
-                        <td class="py-3 px-4">{{ produto.ativo }}</td>
+                        <td class="py-3 px-4">{{ produto.status }}</td>
                         <td class="py-3 px-4">{{ produto.created_at.strftime('%d/%m/%Y') }}</td>   
                     </tr>
                     {% endfor %}

@@ -27,7 +27,7 @@ def proximo_numero_contrato():
 @contratos_bp.route('/produtos_ativos', methods=['GET'])
 def produtos_ativos():
     empresa_id = session.get('empresa')
-    produtos = Produto.query.filter_by(ativo='Ativo', empresa_id=empresa_id).order_by(Produto.nome).all()
+    produtos = Produto.query.filter_by(status='Ativo', empresa_id=empresa_id).order_by(Produto.nome).all()
     resultado = [
     {
         'id': p.id,
@@ -288,7 +288,7 @@ def listar_contratos():
     try:
         empresa_id = session.get('empresa')
         page = request.args.get('page', 1, type=int)
-        per_page = 10  
+        per_page = 20  
         
         offset = (page - 1) * per_page
         resultado = db.session.execute(

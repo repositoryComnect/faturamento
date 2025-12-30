@@ -11,6 +11,7 @@ from modules.revendas.routes import revendas_bp
 from modules.vendedores.routes import vendedores_bp
 from modules.instalacoes.routes import instalacoes_bp
 from modules.faturamento.routes import faturamento_bp
+from modules.operadores.routes import operadores_bp
 from flask_migrate import Migrate
 from modules.planos.routes import planos_bp
 from application.models.models import db, User
@@ -32,6 +33,7 @@ app.register_blueprint(revendas_bp)
 app.register_blueprint(vendedores_bp)
 app.register_blueprint(faturamento_bp)
 app.register_blueprint(instalacoes_bp)
+app.register_blueprint(operadores_bp)
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:%40Slink1205@localhost/faturamento'

@@ -1,72 +1,92 @@
-<head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup_clientes.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
-</head>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
 
 <body>
-
-<div class="modal fade" id="createInstalacaoModal" tabindex="-1" aria-labelledby="createInstalacaoModalLabel" aria-hidden="true">
+    
+<div class="modal fade" id="updateInstalacaoModal" tabindex="-1" aria-labelledby="updateInstalacaoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable modal-custom">
-        <div class="modal-content">
+        <div class="modal-content shadow-lg">
 
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="createInstalacaoModalLabel">Nova Instalação</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title fw-bold" id="updateInstalacaoModalLabel">Editar Instalação</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
             </div>
 
-            <div class="modal-body">
-                <form id="instalacaoForm"
-                    action="{{ url_for('instalacoes_bp.insert_instalacoes') }}"
-                    method="POST">
-                    <div class="card mb-3 section-card">
-                        <div class="card-header d-flex justify-content-between fw-bold"
-                             data-bs-toggle="collapse"
-                             data-bs-target="#cardInfoBasicaInstalacao"
-                             style="cursor:pointer;">
-                            Informações Básicas
+            <div class="modal-body bg-light">
+                <form id="atualizarInstalacaoForm" action="" method="POST">
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                            data-bs-toggle="collapse" data-bs-target="#buscarInstalacaoCollapse"
+                            aria-expanded="true" aria-controls="buscarInstalacaoCollapse" style="cursor:pointer;">
+                            <span>Procurar Instalação</span>
                             <i class="bi bi-chevron-down"></i>
                         </div>
 
-                        <div id="cardInfoBasicaInstalacao" class="collapse show">
+                        <div class="collapse show" id="buscarInstalacaoCollapse">
+                            <div class="card-body">
+
+                                <label for="fetch_instalacao_editar" class="form-label fw-semibold">Código ou Nome da Instalação</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="fetch_instalacao_editar" name="fetch_instalacao_editar"
+                                           placeholder="Digite o número ou nome da instalação...">
+
+                                    <button class="btn btn-secondary" type="button" id="btnBuscarInstalacao">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+
+                                    <span id="loadingInstalacao" class="input-group-text d-none">
+                                        <div class="spinner-border spinner-border-sm"></div>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
+                            data-bs-toggle="collapse" data-bs-target="#infoBasicaInstalacao"
+                            aria-expanded="true" aria-controls="infoBasicaInstalacao" style="cursor:pointer;">
+                            <span>Informações Básicas</span>
+                            <i class="bi bi-chevron-down"></i>
+                        </div>
+
+                        <div id="infoBasicaInstalacao" class="collapse show">
                             <div class="card-body">
                                 <div class="row g-3">
 
                                     <div class="col-md-2">
                                         <label class="form-label">Código Instalação:</label>
-                                        <input type="text" class="form-control" id="cod_instalacao"
-                                               name="cod_instalacao" readonly>
+                                        <input type="text" class="form-control" id="edit_cod_instalacao"
+                                               name="edit_cod_instalacao" readonly>
                                     </div>
 
-                                    <div class="col-md-3">
-                                        <label class="form-label">Cliente:</label>
-                                        <select id="cliente_selecionado_instalacao"
-                                                name="cliente_selecionado_instalacao"
-                                                class="form-select">
-                                            <option value="">Vincule um cliente</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         <label class="form-label">Razão Social:</label>
-                                        <input type="text" class="form-control" id="company"
-                                               name="company" readonly>
+                                        <input type="text" class="form-control" id="edit_razao_social_instalacao"
+                                               name="edit_razao_social">
                                     </div>
 
                                     <div class="col-md-2">
                                         <label class="form-label">ID Portal:</label>
-                                        <input type="text" class="form-control" id="id_portal"
+                                        <input type="text" class="form-control" id="edit_id_portal_instalacao"
                                                name="id_portal">
                                     </div>
 
                                     <div class="col-md-2">
                                         <label class="form-label">Cadastramento:</label>
-                                        <input type="text" class="form-control" id="cadastramento_instalacao"
-                                               name="cadastramento_instalacao" readonly>
+                                        <input type="text" class="form-control" id="edit_cadastramento_instalacao"
+                                               name="edit_cadastramento_instalacao" readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label class="form-label">Atualização:</label>
+                                        <input type="text" class="form-control" id="edit_atualizacao_instalacao"
+                                               name="edit_atualizacao_instalacao" readonly>
                                     </div>
 
                                     <div class="col-md-2">
                                         <label class="form-label">Status:</label>
-                                        <select class="form-select" name="status" id="status">
+                                        <select class="form-select" name="status" id="edit_status_instalacao">
                                             <option value="Ativo">Ativo</option>
                                             <option value="Suspenso">Suspenso</option>
                                             <option value="Cancelado">Cancelado</option>
@@ -86,33 +106,33 @@
                             <i class="bi bi-chevron-down"></i>
                         </div>
 
-                        <div id="cardEnderecoInstalacao" class="collapse show">
+                        <div id="cardEnderecoInstalacao" class="collapse ">
                             <div class="card-body">
                                 <div class="row g-3">
 
                                     <div class="col-md-2">
                                         <label class="form-label">CEP:</label>
-                                        <input type="text" class="form-control" id="cep" name="cep">
+                                        <input type="text" class="form-control" id="edit_cep_instalacao" name="edit_cep_instalacao">
                                     </div>
 
                                     <div class="col-md-4">
                                         <label class="form-label">Endereço:</label>
-                                        <input type="text" class="form-control" id="endereco" name="endereco">
+                                        <input type="text" class="form-control" id="edit_endereco_instalacao" name="edit_endereco_instalacao">
                                     </div>
 
                                     <div class="col-md-2">
                                         <label class="form-label">Bairro:</label>
-                                        <input type="text" class="form-control" id="bairro" name="bairro">
+                                        <input type="text" class="form-control" id="edit_bairro_instalacao" name="edit_bairro_instalacao">
                                     </div>
 
                                     <div class="col-md-3">
                                         <label class="form-label">Cidade:</label>
-                                        <input type="text" class="form-control" id="cidade" name="cidade">
+                                        <input type="text" class="form-control" id="edit_cidade_instalacao" name="edit_cidade_instalacao">
                                     </div>
 
                                     <div class="col-md-1">
                                         <label class="form-label">UF:</label>
-                                        <select class="form-select" id="uf" name="uf">
+                                        <select class="form-select" id="edit_uf_instalacao" name="edit_uf_instalacao">
                                             <option value=""></option>
                                                 <option>RJ</option>
                                                 <option>SP</option>
@@ -140,7 +160,6 @@
                         </div>
                     </div>
 
-                    <!-- CARD 3 - Observações -->
                     <div class="card mb-3 section-card">
                         <div class="card-header d-flex justify-content-between fw-bold"
                              data-bs-toggle="collapse"
@@ -152,27 +171,25 @@
 
                         <div id="cardObsInstalacao" class="collapse">
                             <div class="card-body">
-                                <textarea class="form-control" id="observacao"
-                                          name="observacao" rows="4"></textarea>
+                                <textarea class="form-control" id="edit_observacao_instalacao"
+                                          name="edit_observacao_instalacao" rows="4"></textarea>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Footer -->
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             Cancelar
                         </button>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-warning">
                             Salvar 
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/instalacoes/popup_instalacoes.js') }}"></script>
 </body>
+<!--<script src="{{ url_for('static', filename='js/contratos/popup_js/contratos.js') }}"></script>-->

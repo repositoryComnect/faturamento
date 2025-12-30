@@ -39,7 +39,7 @@ def insert_vendedores():
 def get_vendedores():
     try:
         page = request.args.get('page', 1, type=int)
-        per_page = 10  
+        per_page = 20  
         
         offset = (page - 1) * per_page
         resultado = db.session.execute(

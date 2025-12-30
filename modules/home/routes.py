@@ -82,9 +82,8 @@ def render_ferramentas():
 def render_produtos():
     empresa_id = session.get('empresa')
     page = request.args.get('page', 1, type=int)
-    per_page = 15  # Itens por página
+    per_page = 15  
     
-    # Consulta paginada com filtro por empresa
     produtos_paginados = Produto.query \
         .filter_by(empresa_id=empresa_id) \
         .paginate(page=page, per_page=per_page, error_out=False)
@@ -164,6 +163,12 @@ def trocar_empresa():
     print(f"Empresa alterada para: {session['empresa']}")
 
     return redirect(url_for('login.home'))
+
+@home_bp.route('/operadores', methods=['GET'])
+@login_required
+def render_operadores():
+    empresa_id = session.get('empresa')
+    return render_template('registro_operadores.html')
 
 @home_bp.route('/faturamento', methods=['GET'])
 @login_required

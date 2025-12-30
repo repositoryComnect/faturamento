@@ -8,29 +8,29 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid mt-3 mb-4">
+<div class="container-fluid mt-1 mb-2">
     <div class="d-flex justify-content-between align-items-center">
         <h2>Planos</h2>
-        <div class="d-flex gap-1">
-            <button class="btn btn-primary me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#criarPlanoModal">
-                <i class="bi bi-plus-circle me-2"></i>Criar Plano
-            </button>
-            <button class="btn btn-warning me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#atualizarPlanoModal">
-                <i class="bi bi-gear-wide-connected me-2"></i>Editar Plano
-            </button>
-            <button class="btn btn-danger me-2 btn-sm rounded" data-bs-toggle="modal" data-bs-target="#deletePlanoModal">
-                <i class="bi bi-trash me-2"></i>Excluir Plano
-            </button>
-            <button class="btn btn-secondary me-2 btn-sm rounded" onclick="window.location.href=this.getAttribute('action')" 
-                    action="{{ url_for('planos_bp.get_planos') }}">
-                <i class="bi bi-search me-2"></i>Listar Todos
-            </button>
-            <form class="d-flex" role="search" method="GET" action="{{ url_for('planos_bp.get_list_planos') }}">
-                <input class="form-control me-2" 
-                       type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
-                <button class="btn btn-outline-success" type="submit">Localizar</button>
-            </form>
-        </div>
+            <div class="d-flex gap-1 flex-wrap align-items-center">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#criarPlanoModal">
+                    <i class="bi bi-plus-circle me-2"></i>Criar Plano
+                </button>
+                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#atualizarPlanoModal">
+                    <i class="bi bi-gear-wide-connected me-2"></i>Editar Plano
+                </button>
+                <button class="btn btn-danger " data-bs-toggle="modal" data-bs-target="#deletePlanoModal">
+                    <i class="bi bi-trash me-2"></i>Excluir Plano
+                </button>
+                <button class="btn btn-secondary" onclick="window.location.href=this.getAttribute('action')" 
+                        action="{{ url_for('planos_bp.get_planos') }}">
+                    <i class="bi bi-search me-2"></i>Listar Todos
+                </button>
+                <form class="d-flex" role="search" method="GET" action="{{ url_for('planos_bp.get_list_planos') }}">
+                    <input class="form-control me-2" 
+                        type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Localizar</button>
+                </form>
+            </div>
     </div>
     
 
@@ -121,9 +121,7 @@
                                 <label class="form-label">Status:</label>
                                 <input type="text" id="status_plano" name="status_plano" class="form-control" value="{{ plano.status if plano else '' }}" readonly>
                             </div>
-
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -138,7 +136,6 @@
                 <div class="collapse" id="sec-licenca">
                     <div class="card-body">
                         <div class="row">
-
                             <div class="col-md-4">
                                 <label for="desc_boleto">Descrição Boleto:</label>
                                 <input type="text" id="desc_boleto_licenca_plano" name="desc_boleto_licenca_plano" 
@@ -162,7 +159,6 @@
                                 <textarea name="desc_nf_licenca_plano" id="desc_nf_licenca_plano" 
                                         class="form-control" rows="3" readonly></textarea>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -182,8 +178,7 @@
                                             <th>Código</th>
                                             <th>Nome do Contrato</th>
                                             <th>CNPJ / CPF</th>
-                                            <th>Status</th>
-                                            
+                                            <th>Status</th>  
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -223,7 +218,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>

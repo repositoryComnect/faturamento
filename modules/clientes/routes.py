@@ -525,10 +525,9 @@ def buscar_cliente():
 @cliente_bp.route('/listar/clientes')
 def listar_clientes():
     empresa_id = session.get('empresa')
-    # Garante que, mesmo em caso de exceção, estas variáveis existam para o Jinja.
     clientes = []
     page = request.args.get('page', 1, type=int)
-    per_page = 10 
+    per_page = 20 
     total = 0
     error = None 
 
@@ -538,28 +537,23 @@ def listar_clientes():
             
         offset = (page - 1) * per_page
         
-        # Busca clientes limitados para a página atual
         resultado = db.session.execute(
             text("SELECT * FROM clientes WHERE empresa_id = :empresa_id ORDER BY razao_social LIMIT :limit OFFSET :offset"),
             {'empresa_id': empresa_id, 'limit': per_page, 'offset': offset}
         )
         clientes = [dict(row._mapping) for row in resultado]
         
-        # Busca do total de registros (Total de páginas)
         total_resultado = db.session.execute(
             text("SELECT COUNT(*) FROM clientes WHERE empresa_id = :empresa_id"),
             {'empresa_id': empresa_id}
         ).scalar()
         
-        # O total pode ser None, garantimos que seja um inteiro (0)
         total = total_resultado if total_resultado is not None else 0
         
     except Exception as e:
-        # Define a mensagem de erro. As outras variáveis mantêm seus valores padrão (listas/números vazios).
         print(f"Erro ao listar clientes: {str(e)}")
         error = "Não foi possível carregar os clientes. Por favor, tente novamente mais tarde."
 
-    # Todas as variáveis esperadas pelo template são passadas, garantindo que 'total' sempre exista.
     return render_template('/listar/listar_clientes.html', 
                            clientes=clientes, 
                            page=page, 

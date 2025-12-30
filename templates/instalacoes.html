@@ -3,9 +3,9 @@
 {% block title %}Instalações{% endblock %}
 
 {% block styles %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style_listar.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style_revendas.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/popup.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles_contratos.css') }}">
+
 
 {% endblock %}
 
@@ -14,7 +14,7 @@
 <div class="container-fluid mt-3 mb-3">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Instalações</h2>
-        <div class="d-flex gap-1 flex-wrap align-items-center">
+        <div class="d-flex gap-2 flex-wrap align-items-center">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createInstalacaoModal">
                 <i class="bi bi-plus-circle me-2"></i>Criar Instalação
             </button>
@@ -127,11 +127,11 @@
                         <div class="col-md-2">
                             <label for="atualizacao">Atualização:</label>
                             <input type="text"
-                                   id="atualizacao"
-                                   name="atualizacao"
-                                   value="{{ instalacoes.atualizacao }}"
-                                   class="form-control"
-                                   readonly>
+                                id="atualizacao"
+                                name="atualizacao"
+                                value="{{ instalacoes.atualizacao.strftime('%d/%m/%Y') }}"
+                                class="form-control"
+                                readonly>
                         </div>
 
                         <div class="col-md-1">
@@ -143,11 +143,11 @@
                                    class="form-control"
                                    readonly>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
+        
         {% endif %}
 
         <div class="card mb-2">
@@ -241,7 +241,7 @@
                             {% else %}
                             <tr>
                                 <td colspan="6" class="text-center">
-                                Nenhum cliente relacionado ao contrato encontrado.
+                                Nenhum cliente relacionado a instalação foi encontrado.
                                 </td>
                             </tr>
                             {% endif %}
@@ -265,7 +265,7 @@
 
                             <div class="d-flex gap-2">
                                 <button type="button" class="btn btn-primary"
-                                        data-bs-toggle="modal" data-bs-target="#cliente_createModal">
+                                        data-bs-toggle="modal" data-bs-target="#createClientModal">
                                 <i class="bi bi-plus-circle me-2"></i> Criar Cliente
                                 </button>
                             </div>
@@ -315,8 +315,13 @@
 
 {% include 'extensions/links_popup.html' %}
 
+<!-- Controladores POPUP -->
 {% include 'popup/instalacoes/popup_criar_instalacao.html' %}
+{% include 'popup/instalacoes/popup_editar_instalacao.html' %}
 {% include 'popup/instalacoes/popup_delete_instalacoes.html' %}
-
 {% include 'popup/instalacoes/popup_listar_instalacoes.html' %}
+
+<!-- Vinculos Cliente -->
+{% include 'popup/clientes/popup_cliente.html' %}
+
 {% endblock %}
