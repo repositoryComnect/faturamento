@@ -9,32 +9,41 @@
 
 {% block content %}
 <div class="container-fluid mt-1 mb-2">
-    <div class="d-flex justify-content-between align-items-center">
-        <h2>Planos</h2>
-            <div class="d-flex gap-1 flex-wrap align-items-center">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#criarPlanoModal">
-                    <i class="bi bi-plus-circle me-2"></i>Criar Plano
-                </button>
-                <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#atualizarPlanoModal">
-                    <i class="bi bi-gear-wide-connected me-2"></i>Editar Plano
-                </button>
-                <button class="btn btn-danger " data-bs-toggle="modal" data-bs-target="#deletePlanoModal">
-                    <i class="bi bi-trash me-2"></i>Excluir Plano
-                </button>
-                <button class="btn btn-secondary" onclick="window.location.href=this.getAttribute('action')" 
-                        action="{{ url_for('planos_bp.get_planos') }}">
-                    <i class="bi bi-search me-2"></i>Listar Todos
-                </button>
-                <form class="d-flex" role="search" method="GET" action="{{ url_for('planos_bp.get_list_planos') }}">
-                    <input class="form-control me-2" 
-                        type="search" name="search" id="search" placeholder="Razão Social/Contrato/Nome Fantasia" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Localizar</button>
-                </form>
-            </div>
-    </div>
-    
+        <div class="planos-form">
+            <div class="row align-items-center mb-2">
+            <div class="col-md-12 d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">Planos</h2>
 
-    <div class="planos-form">
+                <div class="d-flex gap-1 flex-wrap align-items-center">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#criarPlanoModal">
+                        <i class="bi bi-plus-circle me-2"></i>Criar Plano
+                    </button>
+
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#atualizarPlanoModal">
+                        <i class="bi bi-gear-wide-connected me-2"></i>Editar Plano
+                    </button>
+
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deletePlanoModal">
+                        <i class="bi bi-trash me-2"></i>Excluir Plano
+                    </button>
+
+                    <button class="btn btn-secondary"
+                            onclick="window.location.href=this.getAttribute('action')"
+                            action="{{ url_for('planos_bp.get_planos') }}">
+                        <i class="bi bi-search me-2"></i>Listar Todos
+                    </button>
+
+                    <form class="d-flex align-items-center" role="search" method="GET"
+                        action="{{ url_for('planos_bp.get_list_planos') }}">
+                        <input class="form-control me-2"
+                            type="search"
+                            name="search"
+                            placeholder="Razão Social/Contrato/Nome Fantasia">
+                        <button class="btn btn-outline-success" type="submit">Localizar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
             <div class="card mb-1">
                 <div class="card-header section-header d-flex justify-content-between align-items-center" 
                         data-bs-toggle="collapse" data-bs-target="#basicInfoCollapse" 

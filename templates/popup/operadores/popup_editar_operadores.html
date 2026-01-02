@@ -12,7 +12,7 @@
             </div>
 
             <div class="modal-body bg-light">
-                <form id="atualizarOperadoresForm" action="" method="POST">
+                <form id="atualizarOperadoresForm" action="{{ url_for('operadores_bp.editar_operadores') }}" method="POST">
                     <div class="card mb-3 border-0 shadow-sm">
                         <div class="card-header d-flex justify-content-between align-items-center bg-white fw-bold"
                             data-bs-toggle="collapse" data-bs-target="#buscarOperadoresCollapse"
@@ -128,4 +128,5 @@
 </div>
 
 </body>
-<!--<script src="{{ url_for('static', filename='js/contratos/popup_js/contratos.js') }}"></script>-->
+
+<script src="{{ url_for('static', filename='js/operadores/popup_js/popup_editar_operadores.js') }}"></script>

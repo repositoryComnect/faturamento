@@ -46,10 +46,13 @@ function carregarOperadores() {
                         <td>${op.created_at || '-'}</td>
 
                         <td>
-                            <button class="btn btn-sm btn-warning me-1"
-                                    onclick="editarOperador(${op.id})">
+                            <button class="btn btn-sm btn-warning"
+                                data-bs-toggle="modal"
+                                data-bs-target="#updateOperadoresModal"
+                                data-op-id="${op.id}">
                                 <i class="bi bi-pencil"></i>
                             </button>
+
 
                             <button class="btn btn-sm btn-danger"
                                     onclick="excluirOperador(${op.id})">
@@ -78,7 +81,7 @@ function editarOperador(id) {
 function excluirOperador(id) {
     if (!confirm('Deseja excluir este operador?')) return;
 
-    fetch(`/operadores/delete/${id}`, { method: 'DELETE' })
+    fetch(`/operadores/operadores/delete/${id}`, { method: 'POST' })
         .then(r => r.json())
         .then(data => {
             if (data.success) {
