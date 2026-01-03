@@ -132,6 +132,7 @@ function preencherCamposInstalacao(inst) {
 
 
 let timeoutSequenciaInstalacao;
+
 function buscarDadosInstalacao(codigoInstalacao) {
     if (!codigoInstalacao) return;
 
@@ -143,6 +144,7 @@ function buscarDadosInstalacao(codigoInstalacao) {
             url: '/instalacao/buscar-por-numero/' + codigoInstalacao,
             method: 'GET',
             success: function (data) {
+
                 console.log("Dados da instalação recebidos:", data);
 
                 if (!data || Object.keys(data).length === 0 || data.error) {
@@ -156,10 +158,22 @@ function buscarDadosInstalacao(codigoInstalacao) {
                         timerProgressBar: true,
                         showConfirmButton: true
                     });
+
+                    $('#clientesTableBody').html(`
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                Nenhum cliente relacionado a instalação foi encontrado.
+                            </td>
+                        </tr>
+                    `);
+
                     $('#loadingCliente').addClass('d-none');
                     return;
                 }
 
+                /* ===============================
+                   CAMPOS DA INSTALAÇÃO
+                =============================== */
                 const fieldMap = {
                     'codigo_instalacao': '#codigo_instalacao',
                     'razao_social': '#razao_social',
@@ -175,19 +189,60 @@ function buscarDadosInstalacao(codigoInstalacao) {
                 };
 
                 for (const key in fieldMap) {
-                    const selector = fieldMap[key];
-                    const value = data[key];
-
-                    if (value !== null && value !== undefined) {
-                        $(selector).val(value);
+                    if (data[key] !== null && data[key] !== undefined) {
+                        $(fieldMap[key]).val(data[key]);
                     }
+                }
+
+                /* ===============================
+                   TABELA DE CLIENTES
+                =============================== */
+                const tbody = $('#clientesTableBody');
+                tbody.empty();
+
+                if (data.cliente && data.cliente.length > 0) {
+
+                    data.cliente.forEach(cliente => {
+
+                        const statusClass =
+                            cliente.status && cliente.status.toUpperCase() === 'ATIVO'
+                                ? 'status-ativo'
+                                : 'status-inativo';
+
+                        tbody.append(`
+                            <tr>
+                                <td>
+                                    <a href="/clientes/${cliente.sequencia}">
+                                        ${cliente.sequencia}
+                                    </a>
+                                </td>
+                                <td>${cliente.nome_fantasia ?? ''}</td>
+                                <td>${cliente.razao_social ?? ''}</td>
+                                <td>${cliente.cnpj_cpf ?? ''}</td>
+                                <td>${cliente.cidade ?? ''}</td>
+                                <td class="text-center">
+                                    <span class="status-badge ${statusClass}">
+                                        ${cliente.status ?? 'N/A'}
+                                    </span>
+                                </td>
+                            </tr>
+                        `);
+                    });
+
+                } else {
+                    tbody.append(`
+                        <tr>
+                            <td colspan="6" class="text-center">
+                                Nenhum cliente relacionado a instalação foi encontrado.
+                            </td>
+                        </tr>
+                    `);
                 }
 
                 $('#loadingCliente').addClass('d-none');
             },
-            error: function (xhr) {
-                console.error("Erro na requisição:", xhr);
 
+            error: function () {
                 Swal.fire({
                     icon: 'error',
                     title: 'Erro ao buscar a instalação',
@@ -207,3 +262,4 @@ function buscarDadosInstalacao(codigoInstalacao) {
 $('#codigo_instalacao').on('change', function () {
     buscarDadosInstalacao(this.value);
 });
+

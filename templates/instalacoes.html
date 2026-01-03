@@ -191,62 +191,36 @@
         </div>
 
         <div class="card mb-2">
-            <div class="card-header section-header"
-                 data-bs-toggle="collapse"
-                 data-bs-target="#clientesCollapse">
-                <h5 class="mb-0">Clientes Associados</h5>
-            </div>
+                <div class="card-header section-header"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#clientesCollapse">
+                    <h5 class="mb-0">Clientes Associados</h5>
+                </div>
 
-            <div class="collapse" id="clientesCollapse">
+                <div class="collapse" id="clientesCollapse">
                     <div class="card-body">
-                    <div class="row g-2">
-                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
-                        <table class="clientes-table table table-striped table-bordered">
-                            <thead>
-                            <tr class="text-center">
-                                <th>Código</th>
-                                <th>Nome Fantasia</th>
-                                <th>Razão Social</th>
-                                <th>CPF/CNPJ</th>
-                                <th>Cidade</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% if clientes %}
-                                {% for cliente in clientes %}
-                                <tr>
-                                <td>
-                                    <a href="{{ url_for('cliente_bp.render_cliente', sequencia=cliente.sequencia) }}">
-                                        {{ cliente.sequencia }}
-                                    </a>
-                                </td>
 
-                                <td>{{ cliente.nome_fantasia }}</td>
-                                <td>{{ cliente.razao_social }}</td>
-                                <td>{{ cliente.cnpj_cpf }}</td>
-                                <td>{{ cliente.cidade }}</td>
-                                <td class="text-center">
-                                    <span class="status-badge 
-                                    {% if cliente.estado_atual and cliente.estado_atual|upper == 'ATIVO' %}
-                                        status-ativo
-                                    {% else %}
-                                        status-inativo
-                                    {% endif %}">
-                                    {{ cliente.estado_atual or 'N/A' }}
-                                    </span>
-                                </td>
-                                </tr>
-                                {% endfor %}
-                            {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center">
-                                Nenhum cliente relacionado a instalação foi encontrado.
-                                </td>
-                            </tr>
-                            {% endif %}
-                            </tbody>
-                        </table>
+                        <div class="table-responsive" style="width: 100%; max-width: 5000px; margin: 0 auto;">
+                            <table class="clientes-table table table-striped table-bordered">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>Código</th>
+                                        <th>Nome Fantasia</th>
+                                        <th>Razão Social</th>
+                                        <th>CPF/CNPJ</th>
+                                        <th>Cidade</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="clientesTableBody">
+                                    <tr>
+                                        <td colspan="6" class="text-center">
+                                            Nenhum cliente relacionado a instalação foi encontrado.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                      
 
                         <div id="clientes-pagination" class="d-flex justify-content-center mt-3">
                             <button id="prevPage" class="btn btn-outline-primary btn-sm me-2" disabled>Anterior</button>
@@ -275,7 +249,6 @@
                                         data-bs-toggle="modal" data-bs-target="#desvincularContractModal">
                                 <i class="bi bi-trash me-2"></i> Desvincular Cliente
                                 </button>
-                            </div>
                             </div>
                         </div>
                     </div>
